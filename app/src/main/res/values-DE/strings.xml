@@ -1,0 +1,578 @@
+<resources>
+
+    <string name="welcome_to_loudly">Willkommen bei Loudly</string>
+    <string name="welcome_to_loudly_description">Lass uns dein Musikerlebnis personalisieren.</string>
+    <string name="yt_music_fingertips">YouTube Music immer griffbereit</string>
+    <string name="ytm_account_sync">YT Music-Kontosynchronisierung</string>
+    <string name="ad_free_playback">Keine WERBUNG bei der Wiedergabe</string>
+    <string name="offline_music_experience">Offline-Musikerlebnis</string>
+    <string name="android_auto">Unterstützt Android Auto</string>
+    <string name="discord_support">Unterstützt Discord-Status</string>
+    <string name="fos_info">Vollständig Open Source</string>
+    <string name="select_player_ui">Wähle deine Player-Benutzeroberfläche</string>
+    <string name="select_player_ui_description">Wähle die Player-Ansicht in der App. Du kannst diese Einstellung später unter "Einstellungen > Erscheinungsbild" ändern.</string>
+    <string name="setup_complete">Einrichtung abgeschlossen!</string>
+    <string name="setup_complete_description">Du bist bereit, Loudly zu entdecken.</string>
+    <string name="finish">Fertigstellen</string>
+    <string name="back">Zurück</string>
+    <string name="next">Weiter</string>
+
+    <string name="home">Start</string>
+    <string name="explore">Entdecken</string>
+    <string name="songs">Songs</string>
+    <string name="artists">Künstler</string>
+    <string name="albums">Alben</string>
+    <string name="playlists">Playlists</string>
+
+    <string name="liked">Musik, die dir gefällt</string>
+    <string name="like">Gefällt mir</string>
+    <string name="offline">Offline-Musik</string>
+    <string name="my_top">Meine Top-Musik</string>
+    <string name="cached">Gecachte Musik</string>
+    <string name="local">Lokale Musik</string>
+
+    <string name="content_filter">Inhaltsfilter</string>
+
+    <string name="all_time">Insgesamt</string>
+    <string name="past_24_hours">Letzte 24 Stunden</string>
+    <string name="past_week">Letzte Woche</string>
+    <string name="past_month">Letzter Monat</string>
+    <string name="past_year">Letztes Jahr</string>
+
+    <plurals name="n_selected">
+        <item quantity="one">%d ausgewählt</item>
+        <item quantity="other">%d ausgewählt</item>
+    </plurals>
+
+    <string name="good_morning">Guten Morgen</string>
+    <string name="good_afternoon">Guten Tag</string>
+    <string name="good_evening">Guten Abend</string>
+    <string name="good_night">Gute Nacht</string>
+    <string name="recent_activity">Letzte Aktivitäten</string>
+    <string name="history">Verlauf</string>
+    <string name="history_empty">Dein Verlauf wird hier angezeigt</string>
+    <string name="stats_empty">Deine Statistiken werden hier angezeigt</string>
+    <string name="stats">Statistiken</string>
+    <string name="mood_and_genres">Stimmungen und Genres</string>
+    <string name="account">Konto</string>
+    <string name="quick_picks">Schnellauswahl</string>
+    <string name="quick_picks_empty">Höre Lieder, um deine Schnellauswahl zu erstellen</string>
+    <string name="forgotten_favorites">Vergessene Favoriten</string>
+    <string name="keep_listening">Weiterhören</string>
+    <string name="your_youtube_playlists">Deine YouTube-Playlists</string>
+    <string name="similar_to">Ähnlich wie</string>
+    <string name="new_release_albums">Neuveröffentlichungen</string>
+    <string name="not_internet">Keine Internetverbindung</string>
+    <string name="internet_required">Es scheint, als hättest du keine Internetverbindung. Bitte überprüfe dein Netzwerk.</string>
+
+    <string name="today">Heute</string>
+    <string name="yesterday">Gestern</string>
+    <string name="this_week">Diese Woche</string>
+    <string name="last_week">Letzte Woche</string>
+    <string name="local_history">Lokal</string>
+    <string name="remote_history">Online</string>
+    <string name="history_queue_title_local">Lokaler Verlauf</string>
+    <string name="history_queue_title_online">Online-Verlauf</string>
+
+    <string name="most_played_songs">Meistgespielte Songs</string>
+    <string name="most_played_artists">Meistgespielte Künstler</string>
+    <string name="most_played_albums">Meistgespielte Alben</string>
+
+    <string name="search">Suche</string>
+    <string name="search_yt_music">In Loudly suchen</string>
+    <string name="search_library">Bibliothek durchsuchen…</string>
+    <string name="SearchHistory">Suchverlauf</string>
+    <string name="Sujestions">Vorschläge</string>
+    <string name="SearchResutls">Suchergebnisse</string>
+    <string name="filter_library">Bibliothek</string>
+    <string name="filter_liked">Gefällt mir</string>
+    <string name="filter_downloaded">Heruntergeladen</string>
+    <string name="filter_all">Alle</string>
+    <string name="filter_songs">Songs</string>
+    <string name="filter_videos">Videos</string>
+    <string name="filter_albums">Alben</string>
+    <string name="filter_artists">Künstler</string>
+    <string name="filter_playlists">Playlists</string>
+    <string name="filter_community_playlists">Community-Playlists</string>
+    <string name="filter_featured_playlists">Vorgestellte Playlists</string>
+    <string name="filter_bookmarked">Mit Lesezeichen</string>
+    <string name="no_results_found">Keine Ergebnisse gefunden</string>
+
+    <string name="library_empty">Deine Bibliothek wird hier angezeigt</string>
+    <string name="library_song_empty">Songs aus deiner Bibliothek werden hier angezeigt</string>
+    <string name="library_artist_empty">Künstler aus deiner Bibliothek werden hier angezeigt</string>
+    <string name="library_album_empty">Alben aus deiner Bibliothek werden hier angezeigt</string>
+    <string name="library_playlist_empty">Deine Playlists werden hier angezeigt</string>
+
+    <string name="from_your_library">Aus deiner Bibliothek</string>
+
+    <string name="other_versions">Andere Versionen</string>
+
+    <string name="liked_songs">Songs, die dir gefallen</string>
+    <string name="downloaded_songs">Heruntergeladene Songs</string>
+    <string name="playlist_is_empty">Die Playlist ist leer</string>
+    <string name="remove_download_playlist_confirm">Möchtest du wirklich alle Songs der Playlist \"%s\" aus dem Speicher für heruntergeladene Songs entfernen?</string>
+    <string name="delete_playlist_confirm">Möchtest du die Playlist \"%s\" wirklich löschen?</string>
+
+    <string name="off">Aus</string>
+
+    <string name="retry">Erneut versuchen</string>
+    <string name="radio">Radio</string>
+    <string name="shuffle">Zufallswiedergabe</string>
+    <string name="reset">Zurücksetzen</string>
+
+    <string name="details">Details</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="start_radio">Radio starten</string>
+    <string name="play">Abspielen</string>
+    <string name="play_next">Als Nächstes abspielen</string>
+    <string name="add_to_queue">Zur Warteschlange hinzufügen</string>
+    <string name="add_to_library">Zur Bibliothek hinzufügen</string>
+    <string name="add_all_to_library">Alle zur Bibliothek hinzufügen</string>
+    <string name="remove_from_library">Aus der Bibliothek entfernen</string>
+    <string name="remove_all_from_library">Alle aus der Bibliothek entfernen</string>
+    <string name="download">Herunterladen</string>
+    <string name="downloading">Wird heruntergeladen</string>
+    <string name="remove_download">Download entfernen</string>
+    <string name="import_playlist">Playlist importieren</string>
+    <string name="add_to_playlist">Zu Playlist hinzufügen</string>
+    <string name="view_artist">Künstler ansehen</string>
+    <string name="view_album">Album ansehen</string>
+    <string name="refetch">Erneut abrufen</string>
+    <string name="share">Teilen</string>
+    <string name="delete">Löschen</string>
+    <string name="remove_from_history">Aus dem Verlauf entfernen</string>
+    <string name="remove_from_playlist">Aus der Playlist entfernen</string>
+    <string name="remove_from_queue">Aus der Warteschlange entfernen</string>
+    <string name="remove_from_cache">Aus dem Cache entfernen</string>
+    <string name="playlist_m3u_export">Als M3U-Datei exportieren</string>
+    <string name="search_online">Online suchen</string>
+    <string name="sync">Synchronisieren</string>
+    <string name="advanced">Erweitert</string>
+    <string name="tempo_and_pitch">Tempo und Tonhöhe</string>
+
+    <string name="sort_by_create_date">Hinzufügedatum</string>
+    <string name="sort_by_last_updated">Aktualisierungsdatum</string>
+    <string name="sort_by_name">Name</string>
+    <string name="sort_by_artist">Künstler</string>
+    <string name="sort_by_year">Jahr</string>
+    <string name="sort_by_song_count">Anzahl der Songs</string>
+    <string name="sort_by_length">Länge</string>
+    <string name="sort_by_play_time">Wiedergabezeit</string>
+    <string name="sort_by_custom">Benutzerdefinierte Reihenfolge</string>
+
+    <string name="media_id">Medien-ID</string>
+    <string name="mime_type">MIME-Typ</string>
+    <string name="codecs">Codecs</string>
+    <string name="bitrate">Bitrate</string>
+    <string name="sample_rate">Abtastrate</string>
+    <string name="loudness">Lautheit</string>
+    <string name="volume">Lautstärke</string>
+    <string name="file_size">Dateigröße</string>
+    <string name="unknown">Unbekannt</string>
+    <string name="copied">In die Zwischenablage kopiert</string>
+
+    <string name="edit_lyrics">Songtext bearbeiten</string>
+    <string name="search_lyrics">Songtext suchen</string>
+    <string name="delete_lyric_confirm">Möchtest du den gespeicherten Songtext für „%s“ wirklich löschen?</string>
+
+    <string name="edit_song">Song bearbeiten</string>
+    <string name="song_title">Songtitel</string>
+    <string name="song_artists">Künstler des Songs</string>
+    <string name="error_song_title_empty">Der Songtitel darf nicht leer sein.</string>
+    <string name="error_song_artist_empty">Der Künstler des Songs darf nicht leer sein.</string>
+    <string name="save">Speichern</string>
+
+    <string name="sync_playlist">Playlist synchronisieren</string>
+    <string name="choose_playlist">Playlist auswählen</string>
+    <string name="edit_playlist">Playlist bearbeiten</string>
+    <string name="create_playlist">Playlist erstellen</string>
+    <string name="playlist_name">Name der Playlist</string>
+    <string name="error_playlist_name_empty">Der Name der Playlist darf nicht leer sein.</string>
+
+    <string name="edit_artist">Künstler bearbeiten</string>
+    <string name="artist_name">Künstlername</string>
+    <string name="error_artist_name_empty">Der Künstlername darf nicht leer sein.</string>
+
+    <string name="duplicates">Duplikate</string>
+    <string name="skip_duplicates">Duplikate überspringen</string>
+    <string name="add_anyway">Trotzdem hinzufügen</string>
+    <string name="duplicates_description_single">Der Song ist bereits in deiner Playlist</string>
+    <string name="duplicates_description_multiple">%d Songs sind bereits in deiner Playlist</string>
+    <string name="allows_for_sync_witch_youtube">Hinweis: Dies ermöglicht die Synchronisierung mit YouTube Music</string>
+
+    <plurals name="n_song">
+        <item quantity="one">%d Song</item>
+        <item quantity="other">%d Songs</item>
+    </plurals>
+    <plurals name="n_artist">
+        <item quantity="one">%d Künstler</item>
+        <item quantity="other">%d Künstler</item>
+    </plurals>
+    <plurals name="n_album">
+        <item quantity="one">%d Album</item>
+        <item quantity="other">%d Alben</item>
+    </plurals>
+    <plurals name="n_playlist">
+        <item quantity="one">%d Playlist</item>
+        <item quantity="other">%d Playlists</item>
+    </plurals>
+    <plurals name="n_week">
+        <item quantity="one">%d Woche</item>
+        <item quantity="other">%d Wochen</item>
+    </plurals>
+    <plurals name="n_month">
+        <item quantity="one">%d Monat</item>
+        <item quantity="other">%d Monate</item>
+    </plurals>
+    <plurals name="n_year">
+        <item quantity="one">%d Jahr</item>
+        <item quantity="other">%d Jahre</item>
+    </plurals>
+
+    <string name="playlist_imported">Playlist importiert</string>
+    <string name="removed_song_from_playlist">„%s“ aus der Playlist entfernt</string>
+    <string name="playlist_synced">Playlist synchronisiert</string>
+    <string name="undo">Rückgängig</string>
+
+    <string name="now_playing">Aktuelle Wiedergabe</string>
+    <string name="lyrics_not_found">Songtext nicht gefunden</string>
+    <string name="sleep_timer">Sleep-Timer</string>
+    <string name="end_of_song">Ende des Songs</string>
+    <plurals name="minute">
+        <item quantity="one">1 Minute</item>
+        <item quantity="other">%d Minuten</item>
+    </plurals>
+    <string name="error_no_stream">Kein Stream verfügbar</string>
+    <string name="error_no_internet">Keine Netzwerkverbindung</string>
+    <string name="error_timeout">Zeitüberschreitung</string>
+    <string name="error_unknown">Unbekannter Fehler</string>
+    <string name="menu">Menü</string>
+    <string name="share_list">Liste teilen</string>
+
+    <string name="seek_backward">5 Sekunden zurück</string>
+    <string name="seek_forward">5 Sekunden vor</string>
+
+    <string name="action_like">Gefällt mir</string>
+    <string name="action_like_all">Allen gefällt mir geben</string>
+    <string name="action_remove_like">„Gefällt mir“ entfernen</string>
+    <string name="action_remove_like_all">Alle „Gefällt mir“ entfernen</string>
+    <string name="action_shuffle_on">Zufallswiedergabe an</string>
+    <string name="action_shuffle_off">Zufallswiedergabe aus</string>
+    <string name="repeat_mode_off">Wiederholung aus</string>
+    <string name="repeat_mode_one">Aktuellen Song wiederholen</string>
+    <string name="repeat_mode_all">Warteschlange wiederholen</string>
+
+    <string name="queue_all_songs">Alle Songs</string>
+    <string name="queue_searched_songs">Gesuchte Songs</string>
+
+    <string name="music_player">Musikplayer</string>
+
+    <string name="notifications">Benachrichtigungen</string>
+    <string name="keep_alive_title">Verhindern, dass die App vom System beendet wird</string>
+    <string name="keep_alive_description">Verwende eine Vordergrundbenachrichtigung, um zu verhindern, dass Loudly zufällig vom System geschlossen wird.</string>
+    <string name="notifications_settings">Benachrichtigungseinstellungen</string>
+    <string name="notification_permission_is_required">Benachrichtigungsberechtigung ist erforderlich</string>
+
+    <string name="settings">Einstellungen</string>
+    <string name="appearance">Erscheinungsbild</string>
+    <string name="theme">Thema</string>
+    <string name="proxy">Proxy</string>
+    <string name="enable_dynamic_theme">Dynamisches Thema aktivieren</string>
+    <string name="dark_theme">Dunkles Thema</string>
+    <string name="dark_theme_on">An</string>
+    <string name="dark_theme_off">Aus</string>
+    <string name="dark_theme_follow_system">Systemeinstellung folgen</string>
+    <string name="pure_black">Reines Schwarz</string>
+    <string name="app_design_variant">App-Design</string>
+    <string name="app_design_ui_1_0">App-UI 1.0</string>
+    <string name="app_design_ui_1_5">App-UI 1.5</string>
+    <string name="listen_youtube_music">Auf YouTube Music anhören</string>
+    <string name="visit_the_loudly">Loudly besuchen</string>
+    <string name="artist">Künstler</string>
+    <string name="listen_to_loudly">Loudly anhören</string>
+    <string name="enable_swipe_thumbnail">Wischen auf Thumbnail zum Wechseln des Songs aktivieren</string>
+    <string name="customize_navigation_tabs">Navigations-Tabs anpassen</string>
+    <string name="player">Player</string>
+    <string name="player_text_alignment">Textausrichtung des Players</string>
+    <string name="lyrics_text_position">Position des Songtextes</string>
+    <string name="sided">Seitlich</string>
+    <string name="left">Links</string>
+    <string name="center">Mitte</string>
+    <string name="mini_player_style">Stil des Mini-Players</string>
+    <string name="player_style">Player-Stil</string>
+    <string name="player_style_old_ui">Alter Player-UI</string>
+    <string name="player_style_ui_1_0">Player-UI 1.0</string>
+    <string name="player_style_ui_2_0">Player-UI 2.0</string>
+    <string name="follow_theme">Thema folgen</string>
+    <string name="gradient">Farbverlauf</string>
+    <string name="blur">Unschärfe</string>
+    <string name="blurmv">Unschärfe (Bewegung)</string>
+    <string name="player_background_style">Hintergrundstil des Players</string>
+    <string name="right">Rechts</string>
+    <string name="slider_style">Stil des Schiebereglers</string>
+    <string name="default_">Standard</string>
+    <string name="squiggly">Wellig</string>
+    <string name="compose">Compose</string>
+    <string name="thumbnail_corner_radius">Eckenradius des Thumbnails konfigurieren</string>
+    <string name="show_content_filter">Inhaltsfilter anzeigen</string>
+    <string name="misc">Sonstiges</string>
+    <string name="main">Haupt</string>
+    <string name="auto_playlists_customization">Anpassung der Auto-Playlists</string>
+    <string name="show_liked_auto_playlist">Auto-Playlist „Gefällt mir“ anzeigen</string>
+    <string name="show_download_auto_playlist">Auto-Playlist „Downloads“ anzeigen</string>
+    <string name="show_top_auto_playlist">Auto-Playlist „Top“ anzeigen</string>
+    <string name="show_cached_auto_playlist">Auto-Playlist „Gecacht“ anzeigen</string>
+    <string name="show_local_auto_playlist">Auto-Playlist „Lokal“ anzeigen</string>
+    <string name="swipe_song_to_dismiss">Song nach rechts wischen für nächsten, nach links für Hinzufügen zur Warteschlange</string>
+    <string name="default_open_tab">Standard-Tab beim Öffnen</string>
+    <string name="default_lib_chips">Standard-Bibliotheksfilter</string>
+    <string name="grid_cell_size">Größe der Gitterzelle</string>
+    <string name="slim_navbar">Beschriftungen der unteren Navigationsleiste anzeigen</string>
+    <string name="small">Klein</string>
+    <string name="big">Groß</string>
+    <string name="Changelog">Änderungsprotokoll</string>
+    <string name="no_changes">Keine kürzlichen Änderungen gefunden</string>
+    <string name="changelogs">Letzte Änderungen:</string>
+    <string name="closepopup">Schließen</string>
+    <string name="NewVersion">Neue Version verfügbar</string>
+    <string name="Hi">Hallo nochmal</string>
+    <string name="Donate">Spenden</string>
+    <string name="Telegramchanel">Offizieller Kanal</string>
+    <string name="web_site">Webseite</string>
+    <string name="web_site_info">Offizielle Webseite ❯</string>
+    <string name="code">Quellcode</string>
+    <string name="code_text">Zugriff auf den Quellcode der App</string>
+    <string name="bugs">Fehler</string>
+    <string name="bugs_text">Fehlerberichte und mehr</string>
+    <string name="help">Hilfe</string>
+    <string name="contribution_text">Wenn du beitragen möchtest, klicke hier ❯</string>
+    <string name="Developer">Entwickler | @RRechz</string>
+
+    <string name="content">Inhalt</string>
+    <string name="login">Anmelden</string>
+    <string name="token_hidden">Tippen, um Token anzuzeigen</string>
+    <string name="token_shown">Erneut tippen, um zu kopieren oder zu bearbeiten</string>
+    <string name="token_adv_login_description">Dies ist eine ERWEITERTE Anmeldemethode. Als Alternative zum Webportal kannst du deinen Anmelde-Token hier direkt eingeben oder aktualisieren. Dies kann beispielsweise die Anmeldung auf mehreren Geräten beschleunigen. Bitte beachte, dass ungültige Token-Formate, die die App nicht parsen kann, nicht akzeptiert werden.</string>
+    <string name="import_from_spotify">Aus Spotify importieren</string>
+    <string name="title_spotify">Spotify</string>
+    <string name="title_discord">Discord</string>
+    <string name="like_autodownload">Songs, die dir gefallen, automatisch herunterladen</string>
+    <string name="ytm_sync">Automatisch mit deinem YouTube Music-Konto synchronisieren</string>
+    <string name="wifi_only">Nur WLAN</string>
+    <string name="not_logged_in">Nicht angemeldet</string>
+    <string name="content_language">Standard-Inhaltssprache</string>
+    <string name="content_country">Standard-Inhaltsland</string>
+    <string name="system_default">Systemstandard</string>
+    <string name="enable_proxy">Proxy aktivieren</string>
+    <string name="proxy_type">Proxy-Typ</string>
+    <string name="proxy_url">Proxy-URL</string>
+    <string name="restart_to_take_effect">Neustart erforderlich, damit die Änderungen wirksam werden</string>
+    <string name="app_language">App-Sprache</string>
+    <string name="configure_app_language">App-Sprachen konfigurieren</string>
+    <string name="intent_app_language_not_found">App-Spracheinstellungen nicht gefunden, bitte manuell konfigurieren</string>
+    <string name="open_supported_links">Unterstützte Links standardmäßig öffnen</string>
+    <string name="configure_supported_links">Unterstützte Links konfigurieren</string>
+    <string name="intent_supported_links_not_found">Einstellungen für unterstützte Links nicht gefunden, bitte manuell konfigurieren</string>
+
+    <string name="player_and_audio">Player und Audio</string>
+    <string name="audio_quality">Audioqualität</string>
+    <string name="audio_quality_max">Maximal</string>
+    <string name="audio_quality_auto">Automatisch</string>
+    <string name="audio_quality_high">Hoch</string>
+    <string name="audio_quality_low">Niedrig</string>
+    <string name="minimum_playback_duration">Minimale Wiedergabedauer</string>
+    <string name="minimum_playback_duration_info">Die Mindestdauer eines Songs, die abgespielt werden muss, bevor er als „abgespielt“ gilt</string>
+    <string name="queue">Warteschlange</string>
+    <string name="persistent_queue">Dauerhafte Warteschlange</string>
+    <string name="persistent_queue_desc">Letzte Warteschlange beim Start der App wiederherstellen</string>
+    <string name="auto_load_more">Automatisch mehr Songs laden</string>
+    <string name="auto_load_more_desc">Automatisch mehr Songs hinzufügen, wenn das Ende der Warteschlange erreicht ist, falls möglich</string>
+    <string name="skip_silence">Stille überspringen</string>
+    <string name="audio_normalization">Audio-Normalisierung</string>
+    <string name="play_song_when_bluetooth_device_connected">Wiedergabe fortsetzen, wenn Bluetooth-Gerät verbunden ist</string>
+    <string name="stop_playing_when_song_sound_minimum_volume">Wiedergabe stoppen, wenn Song die Mindestlautstärke erreicht</string>
+    <string name="adding_played_songs_to_ytm_history">Abgespielte Songs zum YouTube-Music-Verlauf hinzufügen</string>
+    <string name="auto_skip_next_on_error">Bei Fehler automatisch zum nächsten Song springen</string>
+    <string name="auto_skip_next_on_error_desc">Sichere dein ununterbrochenes Wiedergabeerlebnis</string>
+    <string name="stop_music_on_task_clear">Musik beim Leeren der Aufgaben stoppen</string>
+    <string name="equalizer">Equalizer</string>
+    <string name="lyrics">Songtext</string>
+    <string name="lyrics_settings_title">Songtexte</string>
+    <string name="local_player_settings_title">Einstellungen des lokalen Players</string>
+    <string name="storage">Speicher</string>
+    <string name="cache">Cache</string>
+    <string name="image_cache">Bild-Cache</string>
+    <string name="song_cache">Song-Cache</string>
+    <string name="max_cache_size">Maximale Cache-Größe</string>
+    <string name="unlimited">Unbegrenzt</string>
+    <string name="audio_offload">Offload aktivieren</string>
+    <string name="audio_offload_description">Verwende den Offload-Audio-Pfad für die Audiowiedergabe. Das Deaktivieren kann den Stromverbrauch erhöhen, kann aber nützlich sein, wenn du Probleme mit der Audiowiedergabe oder der Nachbearbeitung hast.</string>
+    <string name="clear_all_downloads">Alle Downloads löschen</string>
+    <string name="max_image_cache_size">Maximale Bild-Cache-Größe</string>
+    <string name="clear_image_cache">Bild-Cache leeren</string>
+    <string name="max_song_cache_size">Maximale Song-Cache-Größe</string>
+    <string name="clear_song_cache">Song-Cache leeren</string>
+    <string name="size_used">verwendet</string>
+    <string name="clear_all_cache_dialog">Bist du sicher, dass du den gesamten Cache leeren möchtest?</string>
+    <string name="clear_all_downloads_dialog">Bist du sicher, dass du alle Downloads löschen möchtest?</string>
+    <string name="clear_song_cache_dialog">Bist du sicher, dass du alle gecachten Songs löschen möchtest?</string>
+    <string name="clear_images_cache_dialog">Bist du sicher, dass du alle gecachten Bilder löschen möchtest?</string>
+    <string name="clear_translation_models_cache_dialog">Bist du sicher, dass du alle gecachten Übersetzungsmodelle löschen möchtest?</string>
+
+    <string name="privacy">Datenschutz</string>
+    <string name="listen_history">Wiedergabeverlauf</string>
+    <string name="pause_listen_history">Wiedergabeverlauf anhalten</string>
+    <string name="clear_listen_history">Wiedergabeverlauf löschen</string>
+    <string name="clear_listen_history_confirm">Bist du sicher, dass du den gesamten Wiedergabeverlauf löschen möchtest?</string>
+    <string name="pause_search_history">Suchverlauf anhalten</string>
+    <string name="clear_search_history">Suchverlauf löschen</string>
+    <string name="clear_search_history_confirm">Bist du sicher, dass du den gesamten Suchverlauf löschen möchtest?</string>
+    <string name="search_history">Suchverlauf</string>
+    <string name="use_login_for_browse">Anmeldung zum Durchsuchen von Inhalten verwenden</string>
+    <string name="use_login_for_browse_desc">Dies kann beeinflussen, welche Inhalte du siehst, und zeigt beispielsweise nur Premium-Alben an, wenn du mit einem Premium-Konto angemeldet bist.</string>
+    <string name="disable_screenshot">Screenshot deaktivieren</string>
+    <string name="disable_screenshot_desc">Wenn diese Option aktiviert ist, sind Screenshots und die App-Ansicht in den zuletzt verwendeten Apps deaktiviert.</string>
+    <string name="enable_lrclib">LrcLib-Songtextanbieter aktivieren</string>
+    <string name="enable_kugou">KuGou-Songtextanbieter aktivieren</string>
+    <string name="default_lyrics_provider">Standard-Songtextanbieter</string>
+    <string name="lyrics_multiline_title">Mehrzeilige Songtexte lesen</string>
+    <string name="lyrics_multiline_description">Behandle alle Zeilen zwischen Synchronisationspunkten als einen einzigen Songtext</string>
+    <string name="lyrics_trim_title">Leerzeichen um Songtexte entfernen</string>
+    <string name="lyrics_font_size">Schriftgröße</string>
+    <string name="hide_explicit">Explizite Inhalte ausblenden</string>
+    <string name="enable_notifications">Benachrichtigungen aktivieren</string>
+
+    <string name="backup_restore">Sicherung und Wiederherstellung</string>
+    <string name="backup">Sicherung</string>
+    <string name="restore">Wiederherstellung</string>
+    <string name="import_m3u">Playlist importieren (m3u)</string>
+    <string name="m3u_import_failed">Import der Playlist fehlgeschlagen</string>
+    <string name="imported_playlist">Importierte Playlist</string>
+    <string name="backup_create_success">Sicherung erfolgreich erstellt</string>
+    <string name="backup_create_failed">Sicherung konnte nicht erstellt werden</string>
+    <string name="restore_failed">Wiederherstellung der Sicherung fehlgeschlagen</string>
+
+    <string name="discord_integration">Discord-Integration</string>
+    <string name="discord_information">Loudly verwendet die KizzyRPC-Bibliothek, um den Status deines Discord-Kontos festzulegen. Dies beinhaltet die Verwendung der Discord-Gateway-Verbindung, was als Verstoß gegen die Discord-Nutzungsbedingungen angesehen werden könnte. Es sind jedoch keine Fälle bekannt, in denen Benutzerkonten aus diesem Grund gesperrt wurden. Verwendung auf eigene Gefahr.\n\nLoudly extrahiert nur deinen Token, alles andere wird lokal gespeichert.</string>
+    <string name="dismiss">Verwerfen</string>
+    <string name="options">Optionen</string>
+    <string name="preview">Vorschau</string>
+    <string name="login_failed">Anmeldung fehlgeschlagen</string>
+    <string name="logout">Abmelden</string>
+    <string name="enable_discord_rpc">Rich Presence aktivieren</string>
+
+    <string name="about">Über</string>
+    <string name="app_version">App-Version</string>
+    <string name="checking_for_update">Suche nach Updates...</string>
+    <string name="update_card_version_ready_to_download">Version %1$s zum Download verfügbar.</string>
+    <string name="update_card_downloading">Wird heruntergeladen... %1$d%%</string>
+    <string name="install">Aktualisieren</string>
+    <string name="try_again">Erneut versuchen</string>
+    <string name="download_now">Jetzt herunterladen</string>
+    <string name="app_type">App-Typ</string>
+
+    <string name="new_version_available">Neue Version verfügbar</string>
+    <string name="translation_models">Übersetzungsmodelle</string>
+    <string name="clear_translation_models">Übersetzungsmodelle löschen</string>
+    <string name="history_duration">Dauer des Verlaufs</string>
+    <plurals name="seconds">
+        <item quantity="one">1 Sekunde</item>
+        <item quantity="other">%d Sekunden</item>
+    </plurals>
+    <string name="widget_title">Musik 3x2</string>
+    <string name="widget_quick_title">Musik 2x1</string>
+    <string name="play_pause">Wiedergabe/Pause</string>
+    <string name="about_subtitle">Version · Entwickler · Lizenz</string>
+    <string name="category_interface">Benutzeroberfläche</string>
+    <string name="category_content">Inhalt &amp; Konto</string>
+    <string name="category_player">Player</string>
+    <string name="category_system">System</string>
+    <string name="library">Bibliothek</string>
+    <string name="integrations">Integrationen</string>
+    <string name="system_integration">Systemintegration</string>
+    <string name="total_used_space">Insgesamt genutzter Speicherplatz</string>
+    <string name="currently_used">Derzeit verwendet</string>
+    <string name="clear_cache">Cache leeren</string>
+    <string name="backup_restore_description">Sicherung · Wiederherstellung · Import</string>
+    <string name="privacy_description">Verlauf · Suche · Screenshot</string>
+    <string name="storage_description">Downloads · Cache · Bilder</string>
+    <string name="player_and_audio_description">Sound · Warteschlange · Songtexte</string>
+    <string name="content_description">Sprache · Standort · Proxy</string>
+    <string name="account_description">Anmelden · Spotify · Discord</string>
+    <string name="appearance_description">Thema · Schieberegler · Player</string>
+
+    <string name="header_background">Profilkartenbild</string>
+    <string name="header_background_description">Passe das Bild auf der Profilkarte an</string>
+    <string name="select_header_image">Profilbild auswählen</string>
+    <string name="predefined_images">Vorgefertigte Bilder</string>
+    <string name="select_from_gallery">Aus der Galerie auswählen</string>
+    <string name="edit_photo">Foto bearbeiten</string>
+    <string name="cancel">Abbrechen</string>
+
+    <string name="sync_local_songs_toast">Lokale Songs erfolgreich synchronisiert</string>
+    <string name="local_scanner_title">Lokaler Scanner</string>
+
+    <string name="auto_scanner_title">Automatisch scannen</string>
+    <string name="auto_scanner_description">Songs beim Öffnen der App automatisch scannen</string>
+
+    <string name="scanner_settings_title">Zusätzliche Scannereinstellungen</string>
+    <string name="scanner_strict_file_name_title">Strikte Dateinamen</string>
+    <string name="scanner_strict_file_name_description">Wenn aktiviert, werden Erweiterungen NICHT ignoriert. Z. B. ist "Song.ogg" ein anderer Song als "Song.flac"</string>
+    <string name="scanner_sensitivity_title">Scanner-Empfindlichkeit konfigurieren</string>
+    <string name="scanner_sensitivity_L1">Titel abgleichen</string>
+    <string name="scanner_sensitivity_L2">Titel und Künstler abgleichen</string>
+    <string name="scanner_sensitivity_L3">Titel, Künstler, Alben abgleichen</string>
+
+    <string name="folders_settings_title">Ordner</string>
+    <string name="flat_subfolders_title">Unterordner vereinfachen</string>
+    <string name="flat_subfolders_description">Deaktivieren, um die Dateistruktur wie auf der Festplatte beizubehalten</string>
+
+    <string name="tips_and_features">Tipps &amp; Funktionen</string>
+    <string name="tips_and_fetures_description"> Tipps · Funktionen</string>
+    <string name="create_your_story">Erstelle deine Story</string>
+    <string name="share_your_story_description">Teile den Song, den du gerade hörst, in sozialen Medien mit einem stilvollen Design, das mit den dominanten Farben des Albumcovers erstellt wurde.</string>
+    <string name="customizable_settings">Anpassbare Einstellungen</string>
+    <string name="customizable_settings_description">Mache die App zu deiner eigenen, indem du den Hintergrund der Titelkarte im Einstellungsbildschirm durch ein Bild aus deiner Galerie ersetzt.</string>
+    <string name="new_song_list">Neue Songliste</string>
+    <string name="new_song_list_description">Sieh dir deine aktuelle Playlist an und wechsle einfach zwischen den Songs, indem du vom Player-Bildschirm nach oben wischst (neues Design exklusiv für Player UI 2.0)</string>
+    <string name="remastered_settings">Überarbeitetes Einstellungsdesign</string>
+    <string name="remastered_settings_description">Finde leicht, was du suchst, mit einem neuen kartenbasierten Einstellungsdesign, das moderner und bequemer ist.</string>
+    <string name="classic_music_widget">Klassisches Musik-Widget</string>
+    <string name="classic_music_widget_description">Greife schnell auf alle Bedienelemente und Songinformationen von deinem Startbildschirm aus zu.</string>
+    <string name="minimalist_music_widget">Minimalistisches Musik-Widget</string>
+    <string name="minimalist_music_widget_description">„Quik“-Musik-Widget, inspiriert vom Design der Schnelleinstellungstaste von Android 16</string>
+    <string name="share_on_story">In Story teilen</string>
+    <string name="copy_song_link">Song-Link kopieren</string>
+    <string name="link_copied">Link in die Zwischenablage kopiert!</string>
+    <string name="streamed_on_loudly">Gestreamt auf Loudly</string>
+
+    <string name="select_all">Alle auswählen</string>
+    <string name="fetching_all_playlists">Alle Playlists werden abgerufen…</string>
+    <string name="import_selected_items">Ausgewählte Elemente importieren</string>
+    <string name="something_went_wrong">Etwas ist schiefgelaufen. Wir sind genauso verwirrt wie du.</string>
+    <string name="well_thats_embarrassing">Nun, das ist peinlich. Wir haben auch keine Ahnung, was passiert ist.</string>
+    <string name="instructions_to_get_required_credentials">Anweisungen zum Erhalt der erforderlichen Anmeldeinformationen</string>
+    <string name="make_sure_to_click">3. Stelle sicher, dass du auf „Hinzufügen“ klickst, nachdem du den lokalen Pfad oben eingegeben hast.</string>
+    <string name="accept_the_terms_of_service">5. Akzeptiere die Nutzungsbedingungen und klicke auf „Speichern“.</string>
+    <string name="you_ll_be_redirected_to_a_new_page">Du wirst auf eine neue Seite weitergeleitet. Klicke auf Einstellungen, kopiere dann die Client-ID und das Client-Geheimnis und füge sie in die Textfelder unten in dieser App ein.</string>
+    <string name="enter_the_necessary_details">2. Gib die erforderlichen Details ein und verwende http://127.0.0.1:45454 als Umleitungs-URIs.</string>
+    <string name="toggle_wep_api">4. Schalte die Web-API um. Das Kontrollkästchen sollte jetzt ein Häkchen haben.</string>
+    <string name="now_click_the_authorize_and_continue">Klicke jetzt auf die Schaltfläche „Autorisieren und Fortfahren“ unten und melde dich mit dem Konto an, aus dem du importieren möchtest, und autorisiere und fahre fort, was dich zu einer Seite weiterleitet, die mit http://127.0.0.1:45454/?code= beginnen sollte
+
+Füge diese gesamte URL in das Textfeld unten ein, das „Autorisierungscode“ sagt, und klicke auf die Schaltfläche „Authentifizieren“</string>
+    <string name="visit_spotify_for_developers">1. Besuche das Spotify-Dashboard für Entwickler und klicke auf „App erstellen“.</string>
+    <string name="login_with_spotify">Mit Spotify API-Anmeldeinformationen anmelden</string>
+    <string name="authorize_and_continue">Autorisieren und Fortfahren</string>
+    <string name="authorization_code">Autorisierungscode</string>
+    <string name="authenticate">Authentifizieren</string>
+    <string name="client_secret">Client-Geheimnis</string>
+    <string name="client_id">Client-ID</string>
+    <string name="import_in_progress">Import läuft…</string>
+    <string name="dont_close_app_message">Schließe die App nicht und gehe nicht zurück. Dieser Vorgang wird nicht im Hintergrund ausgeführt, also warte bitte, bis er abgeschlossen ist!
+KEINE PANIK, WENN ES HÄNGENBLEIBT; das Abrufen kann manchmal eine Weile dauern.</string>
+    <string name="choose_liked_songs">Wähle das Ziel für „Songs, die dir gefallen“</string>
+    <string name="where_should_the_liked_songs">Wohin sollen die Songs, die dir gefallen, importiert werden?</string>
+    <string name="new_playlist_named">Eine neue Playlist mit dem Namen „Songs, die dir gefallen“</string>
+    <string name="default_liked_songs">In die standardmäßigen „Songs, die dir gefallen“</string>
+</resources>

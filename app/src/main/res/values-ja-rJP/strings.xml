@@ -1,0 +1,568 @@
+<resources>
+
+    <string name="welcome_to_loudly">Loudlyへようこそ</string>
+    <string name="welcome_to_loudly_description">音楽体験のカスタマイズを始めましょう。</string>
+    <string name="yt_music_fingertips">YouTube Musicを指先で</string>
+    <string name="ytm_account_sync">YT Musicアカウントの同期</string>
+    <string name="ad_free_playback">広告なしの再生</string>
+    <string name="offline_music_experience">オフラインでの音楽体験</string>
+    <string name="android_auto">Android Autoに対応</string>
+    <string name="discord_support">Discordステータスに対応</string>
+    <string name="fos_info">完全オープンソース</string>
+    <string name="select_player_ui">プレーヤーUIを選択</string>
+    <string name="select_player_ui_description">アプリ内プレーヤーの表示を選択します。この設定は後で「設定 > 外観」で変更できます。</string>
+    <string name="setup_complete">設定完了！</string>
+    <string name="setup_complete_description">Loudlyを探求する準備が整いました。</string>
+    <string name="finish">完了</string>
+    <string name="back">戻る</string>
+    <string name="next">次へ</string>
+
+    <string name="home">ホーム</string>
+    <string name="explore">探索</string>
+    <string name="songs">曲</string>
+    <string name="artists">アーティスト</string>
+    <string name="albums">アルバム</string>
+    <string name="playlists">再生リスト</string>
+
+    <string name="liked">高く評価した音楽</string>
+    <string name="like">高評価</string>
+    <string name="offline">オフライン音楽</string>
+    <string name="my_top">マイ・トップミュージック</string>
+    <string name="cached">キャッシュ済みの音楽</string>
+    <string name="local">ローカルの音楽</string>
+
+    <string name="content_filter">コンテンツフィルター</string>
+
+    <string name="all_time">全期間</string>
+    <string name="past_24_hours">過去24時間</string>
+    <string name="past_week">過去1週間</string>
+    <string name="past_month">過去1か月</string>
+    <string name="past_year">過去1年</string>
+
+    <plurals name="n_selected">
+        <item quantity="other">%d件を選択中</item>
+    </plurals>
+
+    <string name="good_morning">おはようございます</string>
+    <string name="good_afternoon">こんにちは</string>
+    <string name="good_evening">こんばんは</string>
+    <string name="good_night">おやすみなさい</string>
+    <string name="recent_activity">最近のアクティビティ</string>
+    <string name="history">履歴</string>
+    <string name="history_empty">履歴はここに表示されます</string>
+    <string name="stats_empty">統計はここに表示されます</string>
+    <string name="stats">統計</string>
+    <string name="mood_and_genres">ムードとジャンル</string>
+    <string name="account">アカウント</string>
+    <string name="quick_picks">クイックピック</string>
+    <string name="quick_picks_empty">曲を聴いてクイックピックを生成しましょう</string>
+    <string name="forgotten_favorites">忘れていたお気に入り</string>
+    <string name="keep_listening">続きを聴く</string>
+    <string name="your_youtube_playlists">あなたのYouTube再生リスト</string>
+    <string name="similar_to">「%s」と似ているコンテンツ</string>
+    <string name="new_release_albums">ニューリリースアルバム</string>
+    <string name="not_internet">インターネット接続がありません</string>
+    <string name="internet_required">インターネットに接続されていないようです。ネットワークを確認してください。</string>
+
+    <string name="today">今日</string>
+    <string name="yesterday">昨日</string>
+    <string name="this_week">今週</string>
+    <string name="last_week">先週</string>
+    <string name="local_history">ローカル</string>
+    <string name="remote_history">リモート</string>
+    <string name="history_queue_title_local">ローカル履歴</string>
+    <string name="history_queue_title_online">リモート履歴</string>
+
+    <string name="most_played_songs">最も再生された曲</string>
+    <string name="most_played_artists">最も再生されたアーティスト</string>
+    <string name="most_played_albums">最も再生されたアルバム</string>
+
+    <string name="search">検索</string>
+    <string name="search_yt_music">Loudlyで検索</string>
+    <string name="search_library">ライブラリを検索…</string>
+    <string name="SearchHistory">検索履歴</string>
+    <string name="Sujestions">候補</string>
+    <string name="SearchResutls">検索結果</string>
+    <string name="filter_library">ライブラリ</string>
+    <string name="filter_liked">高く評価</string>
+    <string name="filter_downloaded">ダウンロード済み</string>
+    <string name="filter_all">すべて</string>
+    <string name="filter_songs">曲</string>
+    <string name="filter_videos">動画</string>
+    <string name="filter_albums">アルバム</string>
+    <string name="filter_artists">アーティスト</string>
+    <string name="filter_playlists">再生リスト</string>
+    <string name="filter_community_playlists">コミュニティの再生リスト</string>
+    <string name="filter_featured_playlists">おすすめの再生リスト</string>
+    <string name="filter_bookmarked">ブックマーク済み</string>
+    <string name="no_results_found">結果が見つかりませんでした</string>
+
+    <string name="library_empty">ライブラリはここに表示されます</string>
+    <string name="library_song_empty">ライブラリの曲はここに表示されます</string>
+    <string name="library_artist_empty">ライブラリのアーティストはここに表示されます</string>
+    <string name="library_album_empty">ライブラリのアルバムはここに表示されます</string>
+    <string name="library_playlist_empty">あなたの再生リストはここに表示されます</string>
+
+    <string name="from_your_library">ライブラリから</string>
+
+    <string name="other_versions">他のバージョン</string>
+
+    <string name="liked_songs">高く評価した曲</string>
+    <string name="downloaded_songs">ダウンロード済みの曲</string>
+    <string name="playlist_is_empty">再生リストは空です</string>
+    <string name="remove_download_playlist_confirm">再生リスト「%s」のすべての曲をダウンロード済みストレージから削除しますか？</string>
+    <string name="delete_playlist_confirm">再生リスト「%s」を本当に削除しますか？</string>
+
+    <string name="off">オフ</string>
+
+    <string name="retry">再試行</string>
+    <string name="radio">ラジオ</string>
+    <string name="shuffle">シャッフル</string>
+    <string name="reset">リセット</string>
+
+    <string name="details">詳細</string>
+    <string name="edit">編集</string>
+    <string name="start_radio">ラジオを開始</string>
+    <string name="play">再生</string>
+    <string name="play_next">次に再生</string>
+    <string name="add_to_queue">キューに追加</string>
+    <string name="add_to_library">ライブラリに追加</string>
+    <string name="add_all_to_library">すべてライブラリに追加</string>
+    <string name="remove_from_library">ライブラリから削除</string>
+    <string name="remove_all_from_library">すべてライブラリから削除</string>
+    <string name="download">ダウンロード</string>
+    <string name="downloading">ダウンロード中</string>
+    <string name="remove_download">ダウンロードを削除</string>
+    <string name="import_playlist">再生リストをインポート</string>
+    <string name="add_to_playlist">再生リストに追加</string>
+    <string name="view_artist">アーティストを表示</string>
+    <string name="view_album">アルバムを表示</string>
+    <string name="refetch">再取得</string>
+    <string name="share">共有</string>
+    <string name="delete">削除</string>
+    <string name="remove_from_history">履歴から削除</string>
+    <string name="remove_from_playlist">再生リストから削除</string>
+    <string name="remove_from_queue">キューから削除</string>
+    <string name="remove_from_cache">キャッシュから削除</string>
+    <string name="playlist_m3u_export">M3Uファイルとしてエクスポート</string>
+    <string name="search_online">オンラインで検索</string>
+    <string name="sync">同期</string>
+    <string name="advanced">詳細設定</string>
+    <string name="tempo_and_pitch">テンポとピッチ</string>
+
+    <string name="sort_by_create_date">追加日</string>
+    <string name="sort_by_last_updated">更新日</string>
+    <string name="sort_by_name">名前順</string>
+    <string name="sort_by_artist">アーティスト順</string>
+    <string name="sort_by_year">年順</string>
+    <string name="sort_by_song_count">曲数順</string>
+    <string name="sort_by_length">長さ順</string>
+    <string name="sort_by_play_time">再生時間順</string>
+    <string name="sort_by_custom">カスタム順</string>
+
+    <string name="media_id">メディアID</string>
+    <string name="mime_type">MIMEタイプ</string>
+    <string name="codecs">コーデック</string>
+    <string name="bitrate">ビットレート</string>
+    <string name="sample_rate">サンプルレート</string>
+    <string name="loudness">ラウドネス</string>
+    <string name="volume">音量</string>
+    <string name="file_size">ファイルサイズ</string>
+    <string name="unknown">不明</string>
+    <string name="copied">クリップボードにコピーしました</string>
+
+    <string name="edit_lyrics">歌詞を編集</string>
+    <string name="search_lyrics">歌詞を検索</string>
+    <string name="delete_lyric_confirm">「%s」の保存されている歌詞を本当に削除しますか？</string>
+
+    <string name="edit_song">曲を編集</string>
+    <string name="song_title">曲のタイトル</string>
+    <string name="song_artists">曲のアーティスト</string>
+    <string name="error_song_title_empty">曲のタイトルは空にできません。</string>
+    <string name="error_song_artist_empty">曲のアーティストは空にできません。</string>
+    <string name="save">保存</string>
+
+    <string name="sync_playlist">再生リストを同期</string>
+    <string name="choose_playlist">再生リストを選択</string>
+    <string name="edit_playlist">再生リストを編集</string>
+    <string name="create_playlist">再生リストを作成</string>
+    <string name="playlist_name">再生リスト名</string>
+    <string name="error_playlist_name_empty">再生リスト名は空にできません。</string>
+
+    <string name="edit_artist">アーティストを編集</string>
+    <string name="artist_name">アーティスト名</string>
+    <string name="error_artist_name_empty">アーティスト名は空にできません。</string>
+
+    <string name="duplicates">重複</string>
+    <string name="skip_duplicates">重複をスキップ</string>
+    <string name="add_anyway">そのまま追加</string>
+    <string name="duplicates_description_single">この曲はすでに再生リストにあります</string>
+    <string name="duplicates_description_multiple">%d曲はすでに再生リストにあります</string>
+    <string name="allows_for_sync_witch_youtube">注意：これによりYouTube Musicとの同期が可能になります</string>
+
+    <plurals name="n_song">
+        <item quantity="other">%d 曲</item>
+    </plurals>
+    <plurals name="n_artist">
+        <item quantity="other">%d 人のアーティスト</item>
+    </plurals>
+    <plurals name="n_album">
+        <item quantity="other">%d 枚のアルバム</item>
+    </plurals>
+    <plurals name="n_playlist">
+        <item quantity="other">%d 個の再生リスト</item>
+    </plurals>
+    <plurals name="n_week">
+        <item quantity="other">%d 週間</item>
+    </plurals>
+    <plurals name="n_month">
+        <item quantity="other">%d か月</item>
+    </plurals>
+    <plurals name="n_year">
+        <item quantity="other">%d 年</item>
+    </plurals>
+
+    <string name="playlist_imported">再生リストがインポートされました</string>
+    <string name="removed_song_from_playlist">再生リストから「%s」を削除しました</string>
+    <string name="playlist_synced">再生リストが同期されました</string>
+    <string name="undo">元に戻す</string>
+
+    <string name="now_playing">再生中</string>
+    <string name="lyrics_not_found">歌詞が見つかりません</string>
+    <string name="sleep_timer">スリープタイマー</string>
+    <string name="end_of_song">曲の終わり</string>
+    <plurals name="minute">
+        <item quantity="other">%d 分</item>
+    </plurals>
+    <string name="error_no_stream">利用可能なストリームがありません</string>
+    <string name="error_no_internet">ネットワーク接続がありません</string>
+    <string name="error_timeout">タイムアウト</string>
+    <string name="error_unknown">不明なエラー</string>
+    <string name="menu">メニュー</string>
+    <string name="share_list">リストを共有</string>
+
+    <string name="seek_backward">5秒戻る</string>
+    <string name="seek_forward">5秒進む</string>
+
+    <string name="action_like">高く評価</string>
+    <string name="action_like_all">すべて高く評価</string>
+    <string name="action_remove_like">高評価を削除</string>
+    <string name="action_remove_like_all">すべての高評価を削除</string>
+    <string name="action_shuffle_on">シャッフル オン</string>
+    <string name="action_shuffle_off">シャッフル オフ</string>
+    <string name="repeat_mode_off">リピート オフ</string>
+    <string name="repeat_mode_one">現在の曲をリピート</string>
+    <string name="repeat_mode_all">キューをリピート</string>
+
+    <string name="queue_all_songs">すべての曲</string>
+    <string name="queue_searched_songs">検索した曲</string>
+
+    <string name="music_player">音楽プレーヤー</string>
+
+    <string name="notifications">通知</string>
+    <string name="keep_alive_title">システムによるアプリの強制終了を防止</string>
+    <string name="keep_alive_description">フォアグラウンド通知を使用して、Loudlyがシステムによってランダムに終了されるのを防ぎます。</string>
+    <string name="notifications_settings">通知設定</string>
+    <string name="notification_permission_is_required">通知の権限が必要です</string>
+
+    <string name="settings">設定</string>
+    <string name="appearance">外観</string>
+    <string name="theme">テーマ</string>
+    <string name="proxy">プロキシ</string>
+    <string name="enable_dynamic_theme">ダイナミックテーマを有効にする</string>
+    <string name="dark_theme">ダークテーマ</string>
+    <string name="dark_theme_on">オン</string>
+    <string name="dark_theme_off">オフ</string>
+    <string name="dark_theme_follow_system">システムに従う</string>
+    <string name="pure_black">純黒</string>
+    <string name="app_design_variant">アプリのデザイン</string>
+    <string name="app_design_ui_1_0">アプリUI 1.0</string>
+    <string name="app_design_ui_1_5">アプリUI 1.5</string>
+    <string name="listen_youtube_music">YouTube Musicで聴く</string>
+    <string name="visit_the_loudly">Loudlyにアクセス</string>
+    <string name="artist">アーティスト</string>
+    <string name="listen_to_loudly">Loudlyを聴く</string>
+    <string name="enable_swipe_thumbnail">サムネイルのスワイプで曲を変更</string>
+    <string name="customize_navigation_tabs">ナビゲーションタブをカスタマイズ</string>
+    <string name="player">プレーヤー</string>
+    <string name="player_text_alignment">プレーヤーのテキスト配置</string>
+    <string name="lyrics_text_position">歌詞テキストの位置</string>
+    <string name="sided">横</string>
+    <string name="left">左</string>
+    <string name="center">中央</string>
+    <string name="mini_player_style">ミニプレーヤーのスタイル</string>
+    <string name="player_style">プレーヤーのスタイル</string>
+    <string name="player_style_old_ui">旧プレーヤーUI</string>
+    <string name="player_style_ui_1_0">プレーヤーUI 1.0</string>
+    <string name="player_style_ui_2_0">プレーヤーUI 2.0</string>
+    <string name="follow_theme">テーマに従う</string>
+    <string name="gradient">グラデーション</string>
+    <string name="blur">ぼかし</string>
+    <string name="blurmv">ぼかし（モーション）</string>
+    <string name="player_background_style">プレーヤーの背景スタイル</string>
+    <string name="right">右</string>
+    <string name="slider_style">スライダーのスタイル</string>
+    <string name="default_">デフォルト</string>
+    <string name="squiggly">波線</string>
+    <string name="compose">Compose</string>
+    <string name="thumbnail_corner_radius">サムネイルの角の半径を設定</string>
+    <string name="show_content_filter">コンテンツフィルターを表示</string>
+    <string name="misc">その他</string>
+    <string name="main">メイン</string>
+    <string name="auto_playlists_customization">自動再生リストのカスタマイズ</string>
+    <string name="show_liked_auto_playlist">自動再生リスト「高く評価」を表示</string>
+    <string name="show_download_auto_playlist">自動再生リスト「ダウンロード済み」を表示</string>
+    <string name="show_top_auto_playlist">自動再生リスト「トップ」を表示</string>
+    <string name="show_cached_auto_playlist">自動再生リスト「キャッシュ済み」を表示</string>
+    <string name="show_local_auto_playlist">自動再生リスト「ローカル」を表示</string>
+    <string name="swipe_song_to_dismiss">曲を右にスワイプで次に再生、左でキューに追加</string>
+    <string name="default_open_tab">デフォルトで開くタブ</string>
+    <string name="default_lib_chips">デフォルトのライブラリフィルター</string>
+    <string name="grid_cell_size">グリッドセルのサイズ</string>
+    <string name="slim_navbar">下部ナビゲーションバーのラベルを表示</string>
+    <string name="small">小</string>
+    <string name="big">大</string>
+    <string name="Changelog">変更履歴</string>
+    <string name="no_changes">最近の変更は見つかりませんでした</string>
+    <string name="changelogs">最近の変更：</string>
+    <string name="closepopup">閉じる</string>
+    <string name="NewVersion">新しいバージョンが利用可能です</string>
+    <string name="Hi">こんにちは</string>
+    <string name="Donate">寄付</string>
+    <string name="Telegramchanel">公式チャンネル</string>
+    <string name="web_site">ウェブサイト</string>
+    <string name="web_site_info">公式サイト ❯</string>
+    <string name="code">ソースコード</string>
+    <string name="code_text">アプリのソースコードにアクセス</string>
+    <string name="bugs">問題</string>
+    <string name="bugs_text">バグ報告など</string>
+    <string name="help">ヘルプ</string>
+    <string name="contribution_text">貢献したい方はこちらをクリック ❯</string>
+    <string name="Developer">開発者 | @RRechz</string>
+
+    <string name="content">コンテンツ</string>
+    <string name="login">ログイン</string>
+    <string name="token_hidden">タップしてトークンを表示</string>
+    <string name="token_shown">もう一度タップしてコピーまたは編集</string>
+    <string name="token_adv_login_description">これは高度なログイン方法です。ウェブポータルの代わりに、ここで直接ログイントークンを入力または更新できます。これにより、複数のデバイスでのログインが高速化される場合があります。アプリが解析できない無効なトークン形式は受け付けられないことに注意してください。</string>
+    <string name="import_from_spotify">Spotifyからインポート</string>
+    <string name="title_spotify">Spotify</string>
+    <string name="title_discord">Discord</string>
+    <string name="like_autodownload">高く評価した曲を自動でダウンロード</string>
+    <string name="ytm_sync">YouTube Musicアカウントと自動で同期</string>
+    <string name="wifi_only">Wi-Fiのみ</string>
+    <string name="not_logged_in">ログインしていません</string>
+    <string name="content_language">デフォルトのコンテンツ言語</string>
+    <string name="content_country">デフォルトのコンテンツ国</string>
+    <string name="system_default">システムデフォルト</string>
+    <string name="enable_proxy">プロキシを有効にする</string>
+    <string name="proxy_type">プロキシの種類</string>
+    <string name="proxy_url">プロキシURL</string>
+    <string name="restart_to_take_effect">再起動して適用</string>
+    <string name="app_language">アプリの言語</string>
+    <string name="configure_app_language">アプリの言語を設定</string>
+    <string name="intent_app_language_not_found">アプリの言語設定が見つかりませんでした。手動で設定してください。</string>
+    <string name="open_supported_links">サポートされているリンクをデフォルトで開く</string>
+    <string name="configure_supported_links">サポートされているリンクを設定</string>
+    <string name="intent_supported_links_not_found">サポートされているリンクの設定が見つかりませんでした。手動で設定してください。</string>
+
+    <string name="player_and_audio">プレーヤーとオーディオ</string>
+    <string name="audio_quality">音質</string>
+    <string name="audio_quality_max">最高</string>
+    <string name="audio_quality_auto">自動</string>
+    <string name="audio_quality_high">高</string>
+    <string name="audio_quality_low">低</string>
+    <string name="minimum_playback_duration">最小再生時間</string>
+    <string name="minimum_playback_duration_info">曲が「再生済み」と見なされるために必要な最小再生時間</string>
+    <string name="queue">キュー</string>
+    <string name="persistent_queue">永続的なキュー</string>
+    <string name="persistent_queue_desc">アプリ起動時に最後のキューを復元</string>
+    <string name="auto_load_more">自動でさらに読み込む</string>
+    <string name="auto_load_more_desc">キューの終わりに達したときに、可能であれば自動で曲を追加</string>
+    <string name="skip_silence">無音部分をスキップ</string>
+    <string name="audio_normalization">オーディオの正規化</string>
+    <string name="play_song_when_bluetooth_device_connected">Bluetoothデバイス接続時に再生を続ける</string>
+    <string name="stop_playing_when_song_sound_minimum_volume">最小音量時に再生を停止</string>
+    <string name="adding_played_songs_to_ytm_history">再生した曲をYouTube Musicの履歴に追加</string>
+    <string name="auto_skip_next_on_error">エラー時に次の曲へ自動スキップ</string>
+    <string name="auto_skip_next_on_error_desc">途切れない再生体験を保証します</string>
+    <string name="stop_music_on_task_clear">タスククリア時に音楽を停止</string>
+    <string name="equalizer">イコライザー</string>
+    <string name="lyrics">歌詞</string>
+    <string name="lyrics_settings_title">歌詞</string>
+    <string name="local_player_settings_title">ローカルプレーヤー設定</string>
+    <string name="storage">ストレージ</string>
+    <string name="cache">キャッシュ</string>
+    <string name="image_cache">画像キャッシュ</string>
+    <string name="song_cache">曲キャッシュ</string>
+    <string name="max_cache_size">最大キャッシュサイズ</string>
+    <string name="unlimited">無制限</string>
+    <string name="audio_offload">オフロードを有効にする</string>
+    <string name="audio_offload_description">オーディオ再生にオフロードパスを使用します。無効にすると電力消費が増える可能性がありますが、再生や後処理に問題がある場合に役立ちます。</string>
+    <string name="clear_all_downloads">すべてのダウンロードをクリア</string>
+    <string name="max_image_cache_size">最大画像キャッシュサイズ</string>
+    <string name="clear_image_cache">画像キャッシュをクリア</string>
+    <string name="max_song_cache_size">最大曲キャッシュサイズ</string>
+    <string name="clear_song_cache">曲キャッシュをクリア</string>
+    <string name="size_used">使用済み</string>
+    <string name="clear_all_cache_dialog">すべてのキャッシュをクリアしますか？</string>
+    <string name="clear_all_downloads_dialog">すべてのダウンロードをクリアしますか？</string>
+    <string name="clear_song_cache_dialog">すべてのキャッシュ済み曲をクリアしますか？</string>
+    <string name="clear_images_cache_dialog">すべてのキャッシュ済み画像をクリアしますか？</string>
+    <string name="clear_translation_models_cache_dialog">すべてのキャッシュ済み翻訳モデルをクリアしますか？</string>
+
+    <string name="privacy">プライバシー</string>
+    <string name="listen_history">再生履歴</string>
+    <string name="pause_listen_history">再生履歴を一時停止</string>
+    <string name="clear_listen_history">再生履歴をクリア</string>
+    <string name="clear_listen_history_confirm">すべての再生履歴をクリアしますか？</string>
+    <string name="pause_search_history">検索履歴を一時停止</string>
+    <string name="clear_search_history">検索履歴をクリア</string>
+    <string name="clear_search_history_confirm">すべての検索履歴をクリアしますか？</string>
+    <string name="search_history">検索履歴</string>
+    <string name="use_login_for_browse">コンテンツ閲覧にログインを使用</string>
+    <string name="use_login_for_browse_desc">これは表示されるコンテンツに影響し、例えばプレミアムアカウントでログインしている場合はプレミアム限定アルバムを表示します。</string>
+    <string name="disable_screenshot">スクリーンショットを無効にする</string>
+    <string name="disable_screenshot_desc">このオプションを有効にすると、スクリーンショットと最近使ったアプリでのアプリの表示が無効になります。</string>
+    <string name="enable_lrclib">LrcLib歌詞プロバイダーを有効にする</string>
+    <string name="enable_kugou">KuGou歌詞プロバイダーを有効にする</string>
+    <string name="default_lyrics_provider">デフォルトの歌詞プロバイダー</string>
+    <string name="lyrics_multiline_title">複数行の歌詞を読む</string>
+    <string name="lyrics_multiline_description">同期ポイント間のすべての行を1つの歌詞テキストとして扱います</string>
+    <string name="lyrics_trim_title">歌詞の周りのスペースを削除</string>
+    <string name="lyrics_font_size">フォントサイズ</string>
+    <string name="hide_explicit">露骨なコンテンツを非表示</string>
+    <string name="enable_notifications">通知を有効にする</string>
+
+    <string name="backup_restore">バックアップと復元</string>
+    <string name="backup">バックアップ</string>
+    <string name="restore">復元</string>
+    <string name="import_m3u">再生リストをインポート (m3u)</string>
+    <string name="m3u_import_failed">再生リストのインポートに失敗しました</string>
+    <string name="imported_playlist">インポートされた再生リスト</string>
+    <string name="backup_create_success">バックアップが正常に作成されました</string>
+    <string name="backup_create_failed">バックアップの作成に失敗しました</string>
+    <string name="restore_failed">バックアップの復元に失敗しました</string>
+
+    <string name="discord_integration">Discord連携</string>
+    <string name="discord_information">LoudlyはKizzyRPCライブラリを使用してDiscordアカウントのステータスを設定します。これにはDiscord Gateway接続の使用が含まれ、Discordの利用規約違反と見なされる可能性があります。ただし、この理由でユーザーアカウントが停止された既知のケースはありません。自己責任でご使用ください。\n\nLoudlyはあなたのトークンのみを抽出し、それ以外はすべてローカルに保存されます。</string>
+    <string name="dismiss">閉じる</string>
+    <string name="options">オプション</string>
+    <string name="preview">プレビュー</string>
+    <string name="login_failed">ログインに失敗しました</string>
+    <string name="logout">ログアウト</string>
+    <string name="enable_discord_rpc">リッチプレゼンスを有効にする</string>
+
+    <string name="about">アプリについて</string>
+    <string name="app_version">アプリのバージョン</string>
+    <string name="checking_for_update">アップデートを確認中...</string>
+    <string name="update_card_version_ready_to_download">バージョン %1$s がダウンロード可能です。</string>
+    <string name="update_card_downloading">ダウンロード中... %1$d%%</string>
+    <string name="install">アップグレード</string>
+    <string name="try_again">再試行</string>
+    <string name="download_now">今すぐダウンロード</string>
+    <string name="app_type">アプリの種類</string>
+
+    <string name="new_version_available">新しいバージョンが利用可能です</string>
+    <string name="translation_models">翻訳モデル</string>
+    <string name="clear_translation_models">翻訳モデルをクリア</string>
+    <string name="history_duration">履歴の期間</string>
+    <plurals name="seconds">
+        <item quantity="other">%d 秒</item>
+    </plurals>
+    <string name="widget_title">音楽 3x2</string>
+    <string name="widget_quick_title">音楽 2x1</string>
+    <string name="play_pause">再生/一時停止</string>
+    <string name="about_subtitle">バージョン · 開発者 · ライセンス</string>
+    <string name="category_interface">UI</string>
+    <string name="category_content">コンテンツとアカウント</string>
+    <string name="category_player">プレーヤー</string>
+    <string name="category_system">システム</string>
+    <string name="library">ライブラリ</string>
+    <string name="integrations">連携</string>
+    <string name="system_integration">システム連携</string>
+    <string name="total_used_space">総使用容量</string>
+    <string name="currently_used">現在使用中</string>
+    <string name="clear_cache">キャッシュをクリア</string>
+    <string name="backup_restore_description">バックアップ · 復元 · インポート</string>
+    <string name="privacy_description">履歴 · 検索 · スクリーンショット</string>
+    <string name="storage_description">ダウンロード · キャッシュ · 画像</string>
+    <string name="player_and_audio_description">サウンド · キュー · 歌詞</string>
+    <string name="content_description">言語 · 地域 · プロキシ</string>
+    <string name="account_description">ログイン · Spotify · Discord</string>
+    <string name="appearance_description">テーマ · スライダー · プレーヤー</string>
+
+    <string name="header_background">プロフィールカードの画像</string>
+    <string name="header_background_description">プロフィールカードの画像をカスタマイズ</string>
+    <string name="select_header_image">プロフィール画像を選択</string>
+    <string name="predefined_images">既製の画像</string>
+    <string name="select_from_gallery">ギャラリーから選択</string>
+    <string name="edit_photo">写真を編集</string>
+    <string name="cancel">キャンセル</string>
+
+    <string name="sync_local_songs_toast">ローカルの曲の同期に成功しました</string>
+    <string name="local_scanner_title">ローカルスキャナー</string>
+
+    <string name="auto_scanner_title">自動でスキャン</string>
+    <string name="auto_scanner_description">アプリ起動時に自動で曲をスキャンします</string>
+
+    <string name="scanner_settings_title">追加のスキャナー設定</string>
+    <string name="scanner_strict_file_name_title">厳密なファイル名</string>
+    <string name="scanner_strict_file_name_description">有効にすると、拡張子は無視されません。例：「Song.ogg」は「Song.flac」とは別の曲になります</string>
+    <string name="scanner_sensitivity_title">スキャナーの感度を設定</string>
+    <string name="scanner_sensitivity_L1">タイトルで一致</string>
+    <string name="scanner_sensitivity_L2">タイトルとアーティストで一致</string>
+    <string name="scanner_sensitivity_L3">タイトル、アーティスト、アルバムで一致</string>
+
+    <string name="folders_settings_title">フォルダ</string>
+    <string name="flat_subfolders_title">サブフォルダをフラット化</string>
+    <string name="flat_subfolders_description">ディスク上のファイル構造を維持するには無効にします</string>
+
+    <string name="tips_and_features">ヒントと機能</string>
+    <string name="tips_and_fetures_description"> ヒント · 機能</string>
+    <string name="create_your_story">ストーリーを作成</string>
+    <string name="share_your_story_description">聴いている曲を、アルバムカバーの基調色で作成されたスタイリッシュなデザインでSNSに共有しましょう。</string>
+    <string name="customizable_settings">カスタマイズ可能な設定</string>
+    <string name="customizable_settings_description">設定画面のタイトルカードの背景をギャラリーの画像に置き換えて、アプリを自分だけのものにしましょう。</string>
+    <string name="new_song_list">新しい曲リスト</string>
+    <string name="new_song_list_description">プレーヤー画面から上にスワイプして現在の再生リストを表示し、簡単に曲を切り替えましょう（プレーヤーUI 2.0限定の新デザイン）</string>
+    <string name="remastered_settings">リマスターされた設定デザイン</string>
+    <string name="remastered_settings_description">よりモダンで便利な新しいカードベースの設定デザインで、探しているものを簡単に見つけましょう。</string>
+    <string name="classic_music_widget">クラシック音楽ウィジェット</string>
+    <string name="classic_music_widget_description">ホーム画面からすべてのコントロールと曲情報に素早くアクセスできます。</string>
+    <string name="minimalist_music_widget">ミニマリスト音楽ウィジェット</string>
+    <string name="minimalist_music_widget_description">Android 16のクイック設定ボタンのデザインにインスパイアされた「Quik」音楽ウィジェット</string>
+    <string name="share_on_story">ストーリーで共有</string>
+    <string name="copy_song_link">曲のリンクをコピー</string>
+    <string name="link_copied">リンクをクリップボードにコピーしました！</string>
+    <string name="streamed_on_loudly">Loudlyでストリーミング</string>
+
+    <string name="select_all">すべて選択</string>
+    <string name="fetching_all_playlists">すべての再生リストを取得中…</string>
+    <string name="import_selected_items">選択した項目をインポート</string>
+    <string name="something_went_wrong">問題が発生しました。私たちもあなたと同じように困惑しています。</string>
+    <string name="well_thats_embarrassing">これは恥ずかしい。私たちにも何が起こったのかわかりません。</string>
+    <string name="instructions_to_get_required_credentials">必要な認証情報を取得するための手順</string>
+    <string name="make_sure_to_click">3. 上記のローカルパスを入力したら、「追加」をクリックしてください。</string>
+    <string name="accept_the_terms_of_service">5. 利用規約に同意し、「保存」をクリックします。</string>
+    <string name="you_ll_be_redirected_to_a_new_page">新しいページにリダイレクトされます。設定をクリックし、クライアントIDとクライアントシークレットをコピーして、このアプリの以下のテキストフィールドに貼り付けてください。</string>
+    <string name="enter_the_necessary_details">2. 必要な詳細情報を入力し、リダイレクトURIとして http://127.0.0.1:45454 を使用します。</string>
+    <string name="toggle_wep_api">4. Web APIを切り替えます。チェックボックスにチェックマークが付いているはずです。</string>
+    <string name="now_click_the_authorize_and_continue">下の「承認して続行」ボタンをクリックし、インポートしたいアカウントでログインし、承認して続行します。すると、http://127.0.0.1:45454/?code= で始まるサイトにリダイレクトされます。
+
+その完全なURLを下の「認証コード」というテキストフィールドに貼り付け、「認証」ボタンをクリックしてください</string>
+    <string name="visit_spotify_for_developers">1. Spotify for Developers のダッシュボードにアクセスし、「アプリを作成」をクリックします。</string>
+    <string name="login_with_spotify">Spotify API認証情報でログイン</string>
+    <string name="authorize_and_continue">承認して続行</string>
+    <string name="authorization_code">認証コード</string>
+    <string name="authenticate">認証</string>
+    <string name="client_secret">クライアントシークレット</string>
+    <string name="client_id">クライアントID</string>
+    <string name="import_in_progress">インポート中…</string>
+    <string name="dont_close_app_message">アプリを閉じたり、戻ったりしないでください。この操作はバックグラウンドでは実行されませんので、完了するまでお待ちください。
+スタックしているように見えても慌てないでください。取得に時間がかかることがあります。</string>
+    <string name="choose_liked_songs">「高く評価した曲」の保存先を選択</string>
+    <string name="where_should_the_liked_songs">高く評価した曲はどこにインポートしますか？</string>
+    <string name="new_playlist_named">「高く評価した曲」という名前の新しい再生リスト</string>
+    <string name="default_liked_songs">デフォルトの「高く評価した曲」へ</string>
+</resources>
