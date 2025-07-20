@@ -22,6 +22,9 @@
 * *Android Auto support
 * Discord Rich Presence support
 
+## Will Be Added Soon!
+* Loudly AI: Music Asistant
+
 ## Screenshots
 <p float="left">
   <img src="https://github.com/RRechz/Loudly/blob/master/image/loudly_screenshots_1.jpg" width="200" />
