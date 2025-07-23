@@ -20,6 +20,7 @@ buildscript {
     dependencies {
         classpath(libs.gradle)
         classpath(kotlin("gradle-plugin", libs.versions.kotlin.get()))
+        classpath("com.google.dagger:hilt-android-gradle-plugin:${libs.versions.hilt.get()}") // Versiyonu libs.versions'dan alın
         if (isFullBuild) {
             classpath(libs.google.services)
             classpath(libs.firebase.crashlytics.plugin)

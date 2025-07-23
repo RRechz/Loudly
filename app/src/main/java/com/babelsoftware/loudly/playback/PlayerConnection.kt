@@ -89,6 +89,8 @@ class PlayerConnection(
 
     val error = MutableStateFlow<PlaybackException?>(null)
 
+    val errorManagerState = service.errorManagerState
+
     init {
         player.addListener(this)
 

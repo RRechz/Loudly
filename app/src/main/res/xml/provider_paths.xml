@@ -9,6 +9,7 @@
     <cache-path
         name="shared_files"
         path="." />
+    <cache-path name="shared_logs" path="." />
     <external-cache-path
         name="external_cache"
         path="." />

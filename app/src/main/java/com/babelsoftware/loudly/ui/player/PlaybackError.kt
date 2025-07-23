@@ -3,6 +3,7 @@ package com.babelsoftware.loudly.ui.player
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -15,14 +16,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.media3.common.PlaybackException
+import com.babelsoftware.loudly.R
 import com.babelsoftware.loudly.constants.DarkModeKey
 import com.babelsoftware.loudly.constants.PlayerBackgroundStyle
 import com.babelsoftware.loudly.constants.PlayerBackgroundStyleKey
 import com.babelsoftware.loudly.ui.screens.settings.DarkMode
 import com.babelsoftware.loudly.utils.rememberEnumPreference
-import com.babelsoftware.loudly.R
 
 @Composable
 fun PlaybackError(
@@ -40,19 +43,51 @@ fun PlaybackError(
     }
     val textColor = when (playerBackground) {
         PlayerBackgroundStyle.DEFAULT -> MaterialTheme.colorScheme.secondary
-        else ->
-            if (useDarkTheme)
-                MaterialTheme.colorScheme.onSurface
-            else
-                MaterialTheme.colorScheme.onPrimary
+        else -> if (useDarkTheme) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onPrimary
     }
+
+    // Hata koduna göre anlamlı mesajlar ve açıklamalar oluşturalım.
+    val (errorMessage, errorDescription) = remember(error.errorCode) {
+        when (error.errorCode) {
+            PlaybackException.ERROR_CODE_IO_UNSPECIFIED,
+            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
+            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT ->
+                Pair(
+                    R.string.error_network_title,
+                    R.string.error_network_description
+                )
+            PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED,
+            PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED ->
+                Pair(
+                    R.string.error_unsupported_format_title,
+                    R.string.error_unsupported_format_description
+                )
+            PlaybackException.ERROR_CODE_DRM_PROVISIONING_FAILED ->
+                Pair(
+                    R.string.error_drm_title,
+                    R.string.error_drm_description
+                )
+            PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW ->
+                Pair(
+                    R.string.error_behind_live_window_title,
+                    R.string.error_behind_live_window_description
+                )
+            else -> {
+                // Diğer tüm durumlar için genel bir hata mesajı.
+                // İsteğe bağlı olarak `error.errorCodeName` loglanabilir.
+                Pair(
+                    R.string.error_playback_failed_title,
+                    R.string.error_playback_failed_description
+                )
+            }
+        }
+    }
+
     Row(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.pointerInput(Unit) {
-            detectTapGestures(
-                onTap = { retry() }
-            )
+            detectTapGestures(onTap = { retry() })
         }
     ) {
         Icon(
@@ -61,10 +96,19 @@ fun PlaybackError(
             tint = MaterialTheme.colorScheme.error
         )
 
-        Text(
-            text = error.cause?.cause?.message ?: stringResource(R.string.error_unknown),
-            color = textColor,
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Column {
+            Text(
+                text = stringResource(errorMessage),
+                color = textColor,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = stringResource(id = errorDescription),
+                color = textColor.copy(alpha = 0.8f),
+                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 12.sp
+            )
+        }
     }
 }

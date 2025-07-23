@@ -81,6 +81,7 @@ import com.babelsoftware.loudly.ui.component.*
 import com.babelsoftware.loudly.ui.menu.AddToPlaylistDialog
 import com.babelsoftware.loudly.ui.menu.PlayerMenu
 import com.babelsoftware.loudly.ui.theme.extractGradientColors
+import com.babelsoftware.loudly.utils.LogReportHelper
 import com.babelsoftware.loudly.utils.makeTimeString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -218,7 +219,10 @@ fun NowPlayingScreen(
     var sliderPosition by remember { mutableStateOf<Long?>(null) }
     var showLyrics by remember { mutableStateOf(false) }
 
-    val onSurfaceColor = Color.White
+    val errorState by playerConnection.errorManagerState.collectAsState()
+    val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
+    val context = LocalContext.current
+    val onSurfaceColor = Color.White // Örnek renk
 
     Column(
         modifier = Modifier
@@ -246,11 +250,48 @@ fun NowPlayingScreen(
                 Icon(painterResource(R.drawable.arrow_back), contentDescription = "Geri", tint = onSurfaceColor)
             }
 
-            if (error != null) {
-                PlaybackErrorChip(
-                    retry = { playerConnection.player.prepare() }
-                )
-            } else {
+            AnimatedVisibility(visible = errorState != PlayerErrorManager.State.IDLE) {
+                when (errorState) {
+                    PlayerErrorManager.State.RECOVERING -> {
+                        InfoChip(
+                            icon = R.drawable.ic_autorenew, // Bu ikonu projenize ekleyin (dönen ok)
+                            text = stringResource(R.string.recovering_playback),
+                            color = onSurfaceColor.copy(alpha = 0.8f),
+                            onClick = {}
+                        )
+                    }
+                    PlayerErrorManager.State.FAILED -> {
+                        val error by playerConnection.error.collectAsState()
+                        if (error != null) {
+                            // Kalıcı hata durumunda detaylı hata mesajını göster
+                            PlaybackError(
+                                error = error!!,
+                                retry = { playerConnection.player.prepare() }
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            // Rapor Paylaş Butonu
+                            Button(
+                                onClick = {
+                                    LogReportHelper.createAndShareErrorReport(
+                                        context,
+                                        error!!,
+                                        mediaMetadata?.id
+                                    )
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                            ) {
+                                Icon(painterResource(R.drawable.share), contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Hata Raporu Paylaş")
+                            }
+                        }
+                    }
+                    else -> { /* IDLE durumu, bir şey gösterme */ }
+                }
+            }
+
+            // Hata yoksa normal çipi göster
+            AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) {
                 NetworkStatusChip()
             }
         }
@@ -325,48 +366,6 @@ fun NowPlayingScreen(
             canSkipNext = playerConnection.canSkipNext.collectAsState().value,
             navController = navController
         )
-    }
-}
-
-@Composable
-private fun PlaybackErrorChip(
-    retry: () -> Unit
-) {
-    Card(
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f),
-            contentColor = MaterialTheme.colorScheme.onErrorContainer
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.4f))
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.height(IntrinsicSize.Min)
-        ) {
-            Text(
-                text = stringResource(R.string.error_unknown),
-                fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-            )
-            Divider(
-                color = MaterialTheme.colorScheme.error.copy(alpha = 0.4f),
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(1.dp)
-            )
-            TextButton(
-                onClick = retry,
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.retry),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp
-                )
-            }
-        }
     }
 }
 

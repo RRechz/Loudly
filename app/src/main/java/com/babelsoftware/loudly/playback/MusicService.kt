@@ -113,6 +113,7 @@ import com.babelsoftware.loudly.utils.enumPreference
 import com.babelsoftware.loudly.utils.get
 import com.babelsoftware.loudly.utils.isInternetAvailable
 import com.babelsoftware.loudly.reportException
+import com.babelsoftware.loudly.ui.player.PlayerErrorManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -190,6 +191,9 @@ class MusicService : MediaLibraryService(),
 
     private val normalizeFactor = MutableStateFlow(1f)
     val playerVolume = MutableStateFlow(dataStore.get(PlayerVolumeKey, 1f).coerceIn(0f, 1f))
+
+    private lateinit var errorManager: PlayerErrorManager
+    val errorManagerState = MutableStateFlow(PlayerErrorManager.State.IDLE)
 
     lateinit var sleepTimer: SleepTimer
 
@@ -295,6 +299,9 @@ class MusicService : MediaLibraryService(),
                 addListener(sleepTimer)
                 addAnalyticsListener(PlaybackStatsListener(false, this@MusicService))
             }
+        errorManager = PlayerErrorManager(player) { newState ->
+            errorManagerState.value = newState
+        }
         mediaLibrarySessionCallback.apply {
             toggleLike = ::toggleLike
             toggleStartRadio = ::toggleStartRadio
@@ -702,7 +709,16 @@ class MusicService : MediaLibraryService(),
         }
     }
 
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+        super.onIsPlayingChanged(isPlaying)
+        // Oynatma başarılı bir şekilde başladığında hata yöneticisini sıfırlayın
+        if (isPlaying && player.playbackState == Player.STATE_READY) {
+            errorManager.notifyPlaybackStarted()
+        }
+    }
+
     override fun onPlayerError(error: PlaybackException) {
+        /*
         if (dataStore.get(AutoSkipNextOnErrorKey, false) &&
             isInternetAvailable(this) &&
             player.hasNextMediaItem()
@@ -711,6 +727,8 @@ class MusicService : MediaLibraryService(),
             player.prepare()
             player.playWhenReady = true
         }
+         */
+        errorManager.handlePlayerError(error)
     }
 
     private fun createCacheDataSource(): CacheDataSource.Factory =
@@ -890,6 +908,7 @@ class MusicService : MediaLibraryService(),
             discordRpc?.closeRPC()
         }
         discordRpc = null
+        errorManager.release()
         mediaSession.release()
         player.removeListener(this)
         player.removeListener(sleepTimer)
