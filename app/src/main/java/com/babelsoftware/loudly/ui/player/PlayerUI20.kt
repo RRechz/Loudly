@@ -29,14 +29,57 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -44,8 +87,14 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -72,7 +121,6 @@ import com.babelsoftware.innertube.YouTube
 import com.babelsoftware.loudly.LocalDatabase
 import com.babelsoftware.loudly.LocalPlayerConnection
 import com.babelsoftware.loudly.R
-import com.babelsoftware.loudly.db.entities.LyricsEntity
 import com.babelsoftware.loudly.extensions.metadata
 import com.babelsoftware.loudly.extensions.togglePlayPause
 import com.babelsoftware.loudly.extensions.toggleRepeatMode
@@ -80,13 +128,16 @@ import com.babelsoftware.loudly.extensions.toggleShuffleMode
 import com.babelsoftware.loudly.lyrics.LyricsEntry
 import com.babelsoftware.loudly.lyrics.LyricsUtils
 import com.babelsoftware.loudly.models.MediaMetadata
-import com.babelsoftware.loudly.ui.component.*
+import com.babelsoftware.loudly.ui.component.BottomSheetState
+import com.babelsoftware.loudly.ui.component.LocalMenuState
+import com.babelsoftware.loudly.ui.component.ResizableIconButton
 import com.babelsoftware.loudly.ui.menu.AddToPlaylistDialog
 import com.babelsoftware.loudly.ui.menu.PlayerMenu
 import com.babelsoftware.loudly.ui.theme.extractGradientColors
 import com.babelsoftware.loudly.utils.LogReportHelper
 import com.babelsoftware.loudly.utils.makeTimeString
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.absoluteValue
@@ -217,7 +268,6 @@ fun NowPlayingScreen(
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
     val isPlaying by playerConnection.isPlaying.collectAsState()
-    val error by playerConnection.error.collectAsState()
 
     var sliderPosition by remember { mutableStateOf<Long?>(null) }
     var showLyrics by remember { mutableStateOf(false) }
@@ -233,6 +283,17 @@ fun NowPlayingScreen(
         DetailsDialog(
             onDismiss = { showDetailsDialog = false }
         )
+    }
+
+    var showPersistentErrorUI by remember { mutableStateOf(false) }
+
+    LaunchedEffect(errorState) {
+        if (errorState == PlayerErrorManager.State.RECOVERING) {
+            delay(5000)
+            if (playerConnection.errorManagerState.value == PlayerErrorManager.State.RECOVERING) {
+                showPersistentErrorUI = true
+            }
+        } else { showPersistentErrorUI = false }
     }
 
     Column(
@@ -261,22 +322,14 @@ fun NowPlayingScreen(
                 Icon(painterResource(R.drawable.arrow_back), contentDescription = "Geri", tint = onSurfaceColor)
             }
 
-            AnimatedVisibility(visible = errorState != PlayerErrorManager.State.IDLE) {
-                when (errorState) {
-                    PlayerErrorManager.State.RECOVERING -> {
-                        InfoChip(
-                            icon = R.drawable.ic_autorenew,
-                            text = stringResource(R.string.recovering_playback),
-                            color = onSurfaceColor.copy(alpha = 0.8f),
-                            onClick = {}
-                        )
-                    }
-                    PlayerErrorManager.State.FAILED -> {
+            AnimatedVisibility(visible = errorState == PlayerErrorManager.State.RECOVERING) {
+                if (showPersistentErrorUI) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         val error by playerConnection.error.collectAsState()
                         if (error != null) {
                             PlaybackError(
                                 error = error!!,
-                                retry = { playerConnection.player.prepare() }
+                                retry = { /* Retrying is now fully automated */ }
                             )
                             Spacer(Modifier.height(8.dp))
                             Button(
@@ -295,14 +348,16 @@ fun NowPlayingScreen(
                             }
                         }
                     }
-                    else -> { /* IDLE status, not displaying anything */ }
+                } else {
+                    InfoChip(
+                        icon = R.drawable.ic_autorenew,
+                        text = stringResource(R.string.recovering_playback),
+                        color = onSurfaceColor.copy(alpha = 0.8f),
+                        onClick = {}
+                    )
                 }
             }
-
-            // Show normal chip if there are no errors
-            AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) {
-                NetworkStatusChip()
-            }
+            AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) { NetworkStatusChip() }
         }
 
         Box(
@@ -350,7 +405,8 @@ fun NowPlayingScreen(
         ContextualInfoRow(
             navController = navController,
             bottomSheetState = bottomSheetState,
-            onShowPlaylist = onShowPlaylist
+            onShowPlaylist = onShowPlaylist,
+            onShowDetailsDialog = { showDetailsDialog = true }
         )
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -393,7 +449,7 @@ private fun NetworkStatusChip() {
             else -> null
         }
 
-        if (icon != null && text != null) {
+        if (icon != null) {
             InfoChip(icon = icon, text = text, onClick = {})
         }
     }
@@ -404,13 +460,13 @@ private fun NetworkStatusChip() {
 fun ContextualInfoRow(
     navController: NavController,
     bottomSheetState: BottomSheetState,
-    onShowPlaylist: () -> Unit
+    onShowPlaylist: () -> Unit,
+    onShowDetailsDialog: () -> Unit
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
     val menuState = LocalMenuState.current
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
     val currentFormat by playerConnection.currentFormat.collectAsState(initial = null)
-    var showDetailsDialog by remember { mutableStateOf(false) }
 
     val showArtistChip = mediaMetadata?.artists?.any { it.id != null } == true
     val bitrate = currentFormat?.bitrate
@@ -459,7 +515,7 @@ fun ContextualInfoRow(
                         }
                     }
                     if (bitrate != null && showArtistChip) {
-                        Divider(
+                        HorizontalDivider(
                             modifier = Modifier
                                 .fillMaxHeight()
                                 .width(1.dp),
@@ -517,7 +573,7 @@ fun ContextualInfoRow(
                         mediaMetadata = mediaMetadata,
                         navController = navController,
                         bottomSheetState = bottomSheetState,
-                        onShowDetailsDialog = { showDetailsDialog = true },
+                        onShowDetailsDialog = onShowDetailsDialog,
                         onDismiss = menuState::dismiss
                     )
                 }
@@ -592,8 +648,9 @@ fun ControlPanel(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(16.dp)
         ) {
+            val currentPosition by rememberUpdatedState(newValue = position)
             Text(
-                text = "${makeTimeString(position)} / ${makeTimeString(duration)}",
+                text = "${makeTimeString(currentPosition)} / ${makeTimeString(duration)}",
                 color = onSurfaceVariantColor,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -1073,7 +1130,7 @@ fun SimplePlaylistItem(
         }
         Spacer(Modifier.width(16.dp))
         Text(
-            text = makeTimeString((metadata.duration?.toDouble()?.times(1000))?.toLong() ?: 0L),
+            text = metadata.duration?.let { makeTimeString(it * 1000L) } ?: "0:00",
             color = textColor.copy(alpha = 0.7f),
             style = MaterialTheme.typography.bodyMedium
         )
@@ -1196,7 +1253,7 @@ class CurvedHeaderShape : Shape {
             moveTo(0f, 0f)
             lineTo(size.width, 0f)
             lineTo(size.width, size.height - 60f)
-            quadraticBezierTo(
+            quadraticTo(
                 x1 = size.width / 2, y1 = size.height + 60f,
                 x2 = 0f, y2 = size.height - 60f
             )

@@ -1,72 +1,65 @@
-package com.babelsoftware.loudly.ui.player // veya uygun bir paket
+package com.babelsoftware.loudly.ui.player
 
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import com.babelsoftware.loudly.extensions.forceResume
 import kotlinx.coroutines.*
 
 /**
- * Oynatıcı hatalarını yönetmek, yeniden deneme ve kalite düşürme gibi
- * otomatik kurtarma stratejilerini uygulamak için bir yardımcı sınıf.
+ * A smart, self-validating, and persistent helper class that handles errors.
  */
 class PlayerErrorManager(
     private val player: Player,
     private val onStateChange: (State) -> Unit
 ) {
-    // Kurtarma durumlarını UI'a bildirmek için enum sınıfı
-    enum class State {
-        IDLE,       // Boşta, hata yok
-        RECOVERING, // Otomatik kurtarma deneniyor
-        FAILED      // Kurtarma başarısız oldu, kalıcı hata
-    }
-
+    enum class State { IDLE, RECOVERING, FAILED }
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private var consecutiveErrors = 0
-    private var backoffMillis = 1000L
+    private var recoveryJob: Job? = null
 
-    companion object {
-        private const val MAX_CONSECUTIVE_ERRORS = 3 // Maksimum ardışık hata sayısı
-        private const val MAX_BACKOFF_MILLIS = 8000L // Maksimum yeniden deneme bekleme süresi
-    }
-
-    /**
-     * Oynatıcıdan bir hata geldiğinde bu fonksiyon çağrılır.
-     */
     fun handlePlayerError(error: PlaybackException) {
-        consecutiveErrors++
-        if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
-            onStateChange(State.FAILED)
-            return
-        }
+        if (recoveryJob?.isActive == true) return
 
-        onStateChange(State.RECOVERING)
-
-        scope.launch {
-            delay(backoffMillis)
-
-            // Hâlâ bir medya öğesi varsa ve oynatıcı durdurulmadıysa yeniden deneme yap
-            if (player.currentMediaItem != null && player.playbackState != Player.STATE_IDLE) {
-                player.prepare()
-                player.play()
+        when (error.errorCode) {
+            PlaybackException.ERROR_CODE_DRM_PROVISIONING_FAILED,
+            PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED,
+            PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED -> {
+                onStateChange(State.FAILED)
             }
 
-            // Bir sonraki deneme için bekleme süresini artır
-            backoffMillis = (backoffMillis * 2).coerceAtMost(MAX_BACKOFF_MILLIS)
+            else -> {
+                onStateChange(State.RECOVERING)
+                recoveryJob = scope.launch {
+                    var needsLongerDelay = false
+                    while (isActive && !player.isPlaying && player.currentMediaItem != null) {
+                        if (needsLongerDelay) {
+                            delay(5000)
+                        }
+
+                        player.prepare()
+
+                        var attempt = 0
+                        while (isActive && attempt < 5 && !player.isPlaying) {
+                            player.forceResume()
+                            delay(1000)
+                            attempt++
+                        }
+                        needsLongerDelay = !player.isPlaying
+                    }
+                    onStateChange(State.IDLE)
+                }
+            }
         }
     }
 
     /**
-     * Oynatma başarıyla başladığında hata sayacını sıfırlar.
+     * Called when playback has started successfully.
      */
     fun notifyPlaybackStarted() {
-        if (consecutiveErrors == 0) return // Zaten hata yoksa işlem yapma
-        consecutiveErrors = 0
-        backoffMillis = 1000L
+        if (recoveryJob?.isActive == true) {
+            recoveryJob?.cancel()
+        }
         onStateChange(State.IDLE)
     }
-
-    /**
-     * Kaynakları temizler.
-     */
     fun release() {
         scope.cancel()
     }
