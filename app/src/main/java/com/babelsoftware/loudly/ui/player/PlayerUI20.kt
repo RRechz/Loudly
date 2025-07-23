@@ -72,10 +72,13 @@ import com.babelsoftware.innertube.YouTube
 import com.babelsoftware.loudly.LocalDatabase
 import com.babelsoftware.loudly.LocalPlayerConnection
 import com.babelsoftware.loudly.R
+import com.babelsoftware.loudly.db.entities.LyricsEntity
 import com.babelsoftware.loudly.extensions.metadata
 import com.babelsoftware.loudly.extensions.togglePlayPause
 import com.babelsoftware.loudly.extensions.toggleRepeatMode
 import com.babelsoftware.loudly.extensions.toggleShuffleMode
+import com.babelsoftware.loudly.lyrics.LyricsEntry
+import com.babelsoftware.loudly.lyrics.LyricsUtils
 import com.babelsoftware.loudly.models.MediaMetadata
 import com.babelsoftware.loudly.ui.component.*
 import com.babelsoftware.loudly.ui.menu.AddToPlaylistDialog
@@ -222,7 +225,15 @@ fun NowPlayingScreen(
     val errorState by playerConnection.errorManagerState.collectAsState()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
     val context = LocalContext.current
-    val onSurfaceColor = Color.White // Örnek renk
+    val onSurfaceColor = Color.White
+
+    var showDetailsDialog by remember { mutableStateOf(false) }
+
+    if (showDetailsDialog) {
+        DetailsDialog(
+            onDismiss = { showDetailsDialog = false }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -254,7 +265,7 @@ fun NowPlayingScreen(
                 when (errorState) {
                     PlayerErrorManager.State.RECOVERING -> {
                         InfoChip(
-                            icon = R.drawable.ic_autorenew, // Bu ikonu projenize ekleyin (dönen ok)
+                            icon = R.drawable.ic_autorenew,
                             text = stringResource(R.string.recovering_playback),
                             color = onSurfaceColor.copy(alpha = 0.8f),
                             onClick = {}
@@ -263,13 +274,11 @@ fun NowPlayingScreen(
                     PlayerErrorManager.State.FAILED -> {
                         val error by playerConnection.error.collectAsState()
                         if (error != null) {
-                            // Kalıcı hata durumunda detaylı hata mesajını göster
                             PlaybackError(
                                 error = error!!,
                                 retry = { playerConnection.player.prepare() }
                             )
                             Spacer(Modifier.height(8.dp))
-                            // Rapor Paylaş Butonu
                             Button(
                                 onClick = {
                                     LogReportHelper.createAndShareErrorReport(
@@ -282,15 +291,15 @@ fun NowPlayingScreen(
                             ) {
                                 Icon(painterResource(R.drawable.share), contentDescription = null)
                                 Spacer(Modifier.width(8.dp))
-                                Text("Hata Raporu Paylaş")
+                                Text("Share Error Report")
                             }
                         }
                     }
-                    else -> { /* IDLE durumu, bir şey gösterme */ }
+                    else -> { /* IDLE status, not displaying anything */ }
                 }
             }
 
-            // Hata yoksa normal çipi göster
+            // Show normal chip if there are no errors
             AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) {
                 NetworkStatusChip()
             }
@@ -308,11 +317,9 @@ fun NowPlayingScreen(
                 label = "Player/Lyrics"
             ) { lyricsVisible ->
                 if (lyricsVisible) {
-                    Lyrics(
-                        sliderPositionProvider = { position },
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clickable { showLyrics = false }
+                    LyricsScreen(
+                        position = position,
+                        onDismiss = { showLyrics = false }
                     )
                 } else {
                     CircularArcPlayer(
@@ -1273,6 +1280,103 @@ fun InfoChip(
                     fontSize = 12.sp,
                     color = color
                 )
+            }
+        }
+    }
+}
+
+/**
+ * A special Composable that manages and displays song lyrics.
+ * Handles loading, not found, and display states.
+ */
+@Composable
+private fun LyricsScreen(
+    position: Long,
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit
+) {
+    val playerConnection = LocalPlayerConnection.current ?: return
+    val lyricsEntity by playerConnection.currentLyrics.collectAsState()
+    val isTranslating by playerConnection.translating.collectAsState()
+    val onSurfaceColor = Color.White
+
+    val parsedLyrics: List<LyricsEntry> = remember(lyricsEntity) {
+        LyricsUtils.parseLyrics(lyricsEntity?.lyrics ?: "", trim = true, multilineEnable = false)
+    }
+
+    val currentLineIndex by remember(parsedLyrics, position) {
+        derivedStateOf {
+            if (parsedLyrics.isNotEmpty()) {
+                LyricsUtils.findCurrentLineIndex(parsedLyrics, position)
+            } else {
+                -1
+            }
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .clickable(onClick = onDismiss)
+            .padding(horizontal = 24.dp, vertical = 48.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        when {
+            lyricsEntity == null || isTranslating -> {
+                CircularProgressIndicator(color = onSurfaceColor)
+            }
+            parsedLyrics.isEmpty() -> {
+                Text(
+                    text = "No lyrics were found for this song.",
+                    color = onSurfaceColor.copy(alpha = 0.7f),
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center
+                )
+            }
+            else -> {
+                val listState = rememberLazyListState()
+
+                LaunchedEffect(currentLineIndex) {
+                    if (currentLineIndex != -1 && currentLineIndex < listState.layoutInfo.totalItemsCount) {
+                        listState.animateScrollToItem(index = currentLineIndex, scrollOffset = -250)
+                    }
+                }
+
+                LazyColumn(
+                    state = listState,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    item { Spacer(modifier = Modifier.height(200.dp)) }
+
+                    itemsIndexed(parsedLyrics) { index, line ->
+                        if (line.isTranslation) return@itemsIndexed
+
+                        val isActive = index == currentLineIndex
+
+                        val color by animateColorAsState(
+                            targetValue = if (isActive) onSurfaceColor else onSurfaceColor.copy(alpha = 0.6f),
+                            label = "LyricColor"
+                        )
+                        val fontSize by animateFloatAsState(
+                            targetValue = if (isActive) 26f else 22f,
+                            label = "LyricFontSize"
+                        )
+                        val fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal
+
+                        Text(
+                            text = line.text,
+                            color = color,
+                            fontSize = fontSize.sp,
+                            fontWeight = fontWeight,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 36.sp
+                        )
+                    }
+
+                    item { Spacer(modifier = Modifier.height(200.dp)) }
+                }
             }
         }
     }
