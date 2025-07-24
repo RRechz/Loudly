@@ -19,13 +19,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/**
- * Referans projedeki çalışma mantığına göre uyarlanmış, stabil ve sorunsuz çalışan nihai kod.
- * Tasarım korunmuş, sadece kontrol ve güncelleme mantığı düzeltilmiştir.
- */
 class MusicWidget : AppWidgetProvider() {
 
-    // onUpdate, onEnabled, ve onDisabled fonksiyonları widget'ın yaşam döngüsünü yönetir.
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
@@ -37,19 +32,14 @@ class MusicWidget : AppWidgetProvider() {
     }
 
     override fun onEnabled(context: Context) {
-        // İlk widget eklendiğinde ilerleme çubuğu güncelleyiciyi başlatmayı dene.
         manageProgressUpdater(context)
     }
 
     override fun onDisabled(context: Context) {
-        // Son widget kaldırıldığında güncelleyiciyi kesin olarak durdur.
         stopProgressUpdater()
     }
 
-    /**
-     * Widget butonlarına basıldığında veya durum değişikliği bildirildiğinde bu fonksiyon tetiklenir.
-     * Referans projedeki gibi, her eylemden sonra widget'ın tamamı güncellenir.
-     */
+    // ---> This function is triggered when widget buttons are pressed or a status change is reported.
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         val player = PlayerConnection.instance
@@ -58,15 +48,12 @@ class MusicWidget : AppWidgetProvider() {
             ACTION_PLAY_PAUSE -> player?.togglePlayPause()
             ACTION_PREV -> player?.seekToPrevious()
             ACTION_NEXT -> player?.seekToNext()
-            // Müzik uygulamasından durum değişikliği geldiğinde de güncelle.
-            ACTION_STATE_CHANGED -> { /* Sadece güncelleme tetiklenir */ }
+            ACTION_STATE_CHANGED -> { /* Only updates are triggered */ }
         }
-
-        // Bir eylem gerçekleştikten sonra, tüm widget'ları yeni duruma göre güncelle.
         updateAllWidgets(context)
-        // Oynatma durumu değişmiş olabileceğinden, güncelleyiciyi yeniden yönet.
         manageProgressUpdater(context)
     }
+    // <---
 
     companion object {
         private const val ACTION_PLAY_PAUSE = "com.babelsoftware.loudly.ACTION_PLAY_PAUSE"
@@ -77,9 +64,7 @@ class MusicWidget : AppWidgetProvider() {
         private val handler = Handler(Looper.getMainLooper())
         private var progressUpdater: Runnable? = null
 
-        /**
-         * Ekrandaki tüm müzik widget'larını günceller.
-         */
+        // ---> Updates all music widgets on the screen.
         fun updateAllWidgets(context: Context) {
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val componentName = ComponentName(context, MusicWidget::class.java)
@@ -87,10 +72,9 @@ class MusicWidget : AppWidgetProvider() {
                 updateWidget(context, appWidgetManager, appWidgetId)
             }
         }
+        // <---
 
-        /**
-         * Belirli bir widget'ı güncelleyen ana fonksiyon.
-         */
+        // ---> The main function that updates a specific widget.
         private fun updateWidget(
             context: Context,
             appWidgetManager: AppWidgetManager,
@@ -99,9 +83,8 @@ class MusicWidget : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.widget_music)
             val player = PlayerConnection.instance?.player
 
-            // Müzik çalmıyorsa veya bağlantı koptuysa, varsayılan görünümü ayarla.
             if (player == null || player.currentMediaItem == null) {
-                views.setTextViewText(R.id.widget_track_title, "Müzik Çalmıyor")
+                views.setTextViewText(R.id.widget_track_title, "Music Not Playing")
                 views.setTextViewText(R.id.widget_artist, "")
                 views.setImageViewResource(R.id.widget_play_pause, R.drawable.play)
                 views.setImageViewResource(R.id.widget_album_art, R.drawable.widget_album_art_background)
@@ -109,7 +92,7 @@ class MusicWidget : AppWidgetProvider() {
                 return
             }
 
-            // --- 1. Metin, Buton ve İlerleme gibi anında güncellenecek bilgileri ayarla ---
+            // 1. Set up information such as text, buttons, and progress that will be updated instantly.
             views.setTextViewText(R.id.widget_track_title, player.mediaMetadata.title)
             views.setTextViewText(R.id.widget_artist, player.mediaMetadata.artist)
 
@@ -119,10 +102,10 @@ class MusicWidget : AppWidgetProvider() {
             val progress = if (player.duration > 0) (player.currentPosition * 100 / player.duration).toInt() else 0
             views.setProgressBar(R.id.widget_progress, 100, progress, false)
 
-            // --- 2. Kenarları yuvarlatma özelliğini etkinleştir ---
+            // 2. Enable the rounded corners feature
             views.setBoolean(R.id.widget_album_art, "setClipToOutline", true)
 
-            // --- 3. Albüm kapağını yükle ---
+            // 3. Upload the album cover
             val imageUrl = player.mediaMetadata.artworkUri
             if (imageUrl != null) {
                 CoroutineScope(Dispatchers.IO).launch {
@@ -142,7 +125,7 @@ class MusicWidget : AppWidgetProvider() {
                 views.setImageViewResource(R.id.widget_album_art, R.drawable.widget_album_art_background)
             }
 
-            // --- 4. Tıklama olaylarını (PendingIntent) ayarla ---
+            // 4. Set up click events (PendingIntent)
             views.setOnClickPendingIntent(R.id.widget_play_pause, getBroadcastPendingIntent(context, ACTION_PLAY_PAUSE))
             views.setOnClickPendingIntent(R.id.widget_prev, getBroadcastPendingIntent(context, ACTION_PREV))
             views.setOnClickPendingIntent(R.id.widget_next, getBroadcastPendingIntent(context, ACTION_NEXT))
@@ -151,9 +134,9 @@ class MusicWidget : AppWidgetProvider() {
             val openAppPendingIntent = PendingIntent.getActivity(context, 0, openAppIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             views.setOnClickPendingIntent(R.id.widget_container, openAppPendingIntent)
 
-            // --- 5. Widget'ı GÜNCELLE ---
-            appWidgetManager.updateAppWidget(appWidgetId, views)
+            appWidgetManager.updateAppWidget(appWidgetId, views) // 5. UPDATE the widget
         }
+        // <---
 
         private fun getBroadcastPendingIntent(context: Context, action: String): PendingIntent {
             val intent = Intent(context, MusicWidget::class.java).apply { this.action = action }
@@ -162,21 +145,17 @@ class MusicWidget : AppWidgetProvider() {
             )
         }
 
-        /**
-         * Sadece müzik çalarken ilerleme çubuğunu güncelleyen mekanizmayı yönetir.
-         * Bu, referans koddaki mantığın daha güvenli halidir.
-         */
+        // ---> Manages the mechanism that updates the progress bar only when music is playing.
         private fun manageProgressUpdater(context: Context) {
-            stopProgressUpdater() // Önce mevcut olanı durdur.
+            stopProgressUpdater()
             if (PlayerConnection.instance?.player?.isPlaying == true) {
                 progressUpdater = Runnable {
                     updateAllWidgets(context)
-                    // Sadece hala çalıyorsa bir sonraki güncellemeyi planla.
                     if (PlayerConnection.instance?.player?.isPlaying == true) {
                         handler.postDelayed(progressUpdater!!, 1000)
                     }
                 }.also {
-                    handler.post(it) // Güncelleyiciyi başlat.
+                    handler.post(it)
                 }
             }
         }
@@ -185,5 +164,6 @@ class MusicWidget : AppWidgetProvider() {
             progressUpdater?.let { handler.removeCallbacks(it) }
             progressUpdater = null
         }
+        // <---
     }
 }

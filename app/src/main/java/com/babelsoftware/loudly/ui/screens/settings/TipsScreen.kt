@@ -29,12 +29,10 @@ fun TipsScreen(
             )
         }
     ) { paddingValues ->
-        // LazyColumn ile tüm rehber adımlarını dikey bir listede gösteriyoruz.
         LazyColumn(modifier = Modifier.padding(paddingValues)) {
             item { StoryShareFeatureStep() }
             item { SettingsHeaderFeatureStep() }
             item { PlayerPlaylistFeatureStep() }
-            item { QuickWidgetFeatureStep() }
             item { ClassicWidgetFeatureStep() }
             item { NewSettingsUiFeatureStep() }
         }

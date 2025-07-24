@@ -118,18 +118,6 @@ fun ClassicWidgetFeatureStep(modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-fun QuickWidgetFeatureStep(modifier: Modifier = Modifier) {
-    FeatureGuideStep(
-        title = stringResource(R.string.minimalist_music_widget),
-        description = stringResource(R.string.minimalist_music_widget_description),
-        modifier = modifier
-    ) {
-        QuickWidgetPreview()
-    }
-}
-
-
 // Special preview designs
 @Composable
 private fun StorySharePreview() {

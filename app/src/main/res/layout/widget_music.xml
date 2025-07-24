@@ -39,14 +39,14 @@
                 style="@style/Widget.Loudly.TextView.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Şarkı Adı" />
+                android:text="Song name" />
 
             <TextView
                 android:id="@+id/widget_artist"
                 style="@style/Widget.Loudly.TextView.Artist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sanatçı Adı" />
+                android:text="Artist" />
         </LinearLayout>
 
         <LinearLayout
