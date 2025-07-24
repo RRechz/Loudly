@@ -5,4 +5,12 @@
     <color name="light_blue_900">#FF01579B</color>
     <color name="Lights">#FFFFFF</color>
     <color name="white_30">#4DFFFFFF</color>
+
+    <!-- Widget Text Colors -->
+    <color name="widget_text_primary">#FFFFFF</color>
+    <color name="widget_text_secondary">#E0E0E0</color>
+
+    <!-- Widget Progress Bar Colors -->
+    <color name="widget_progress_bar_progress">#FFFFFF</color>
+    <color name="widget_progress_bar_background">#80FFFFFF</color>
 </resources>

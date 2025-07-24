@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Kenar yuvarlaklığı -->
+    <corners android:radius="28dp" />
+
+    <!--
+    Tüm Android sürümlerinde çalışan yarı saydam renk.
+    Bu renk, duvar kağıdının üzerinde "buzlu cam" efekti hissi verir.
+    Açık ve koyu temada iyi çalışır.
+    -->
+    <solid android:color="#B3333333" />
+</shape>

@@ -17,6 +17,7 @@
     <string name="finish">Finish</string>
     <string name="back">Back</string>
     <string name="next">Next</string>
+    <string name="previous">Previous</string>
 
     <!-- Bottom navigation -->
     <string name="home">Home</string>
@@ -534,17 +535,15 @@
     <string name="cancel">Cancel</string>
 
     <!-- Playback Error -->
-    <string name="error_network_title">Ağ Hatası</string>
-    <string name="error_network_description">İnternet bağlantınızı kontrol edin ve tekrar deneyin.</string>
-    <string name="error_unsupported_format_title">Desteklenmeyen İçerik</string>
-    <string name="error_unsupported_format_description">Bu şarkının formatı cihazınızda desteklenmiyor.</string>
-    <string name="error_drm_title">Lisans Hatası</string>
-    <string name="error_drm_description">Bu korumalı içerik oynatılamıyor. Lütfen daha sonra tekrar deneyin.</string>
-    <string name="error_behind_live_window_title">Canlı Yayın Hatası</string>
-    <string name="error_behind_live_window_description">Canlı yayın akışında bir sorun oluştu. Lütfen yeniden başlatın.</string>
-    <string name="error_playback_failed_title">Oynatma Başarısız</string>
-    <string name="error_playback_failed_description">Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin.</string>
-    <string name="recovering_playback">Yeniden deneniyor…</string>
+    <string name="error_network_title">Network Error</string>
+    <string name="error_network_description">Check your internet connection and try again.</string>
+    <string name="error_unsupported_format_title">Unsupported Content</string>
+    <string name="error_unsupported_format_description">This song format is not supported on your device.</string>
+    <string name="error_behind_live_window_title">Live Broadcast Error</string>
+    <string name="error_behind_live_window_description">There is a problem with the live stream. Please restart.</string>
+    <string name="error_playback_failed_title">Playback Failed</string>
+    <string name="error_playback_failed_description">An unknown error has occurred. Please try again.</string>
+    <string name="recovering_playback">Trying again…</string>
 
     <!--scanner page settings-->
     <string name="sync_local_songs_toast">Sync local songs successfully</string>

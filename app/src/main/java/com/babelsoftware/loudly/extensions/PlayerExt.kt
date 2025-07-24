@@ -112,3 +112,15 @@ fun Player.setOffloadEnabled(enabled: Boolean) {
                 .build()
         ).build()
 }
+
+/**
+ * Oynatıcıyı 'playWhenReady' durumunu değiştirerek çalmaya zorlar.
+ * Bu, oynatıcının STATE_READY durumunda takılıp kalmasını engeller.
+ */
+fun Player.forceResume() {
+    // Sadece oynatıcı hazır durumdaysa ve çalmıyorsa bu işlemi yap
+    if (this.playbackState == Player.STATE_READY && !this.isPlaying) {
+        this.playWhenReady = false
+        this.playWhenReady = true
+    }
+}
