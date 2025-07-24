@@ -215,20 +215,16 @@ interface DatabaseDao {
     fun forgottenFavorites(now: Long = System.currentTimeMillis()): Flow<List<Song>>
 
     @Transaction
-    @Query(
-        """
-        SELECT *
-        FROM song
-        WHERE id IN (SELECT songId
-                     FROM event
-                     WHERE timestamp > :fromTimeStamp
-                     GROUP BY songId
-                     ORDER BY SUM(playTime) DESC
-                     LIMIT :limit
-                     OFFSET :offset)
-    """
-    )
-    fun mostPlayedSongs(fromTimeStamp: Long, limit: Int = 6, offset: Int = 0): Flow<List<Song>>
+    @Query("""
+    SELECT s.*, COUNT(e.songId) as playCount
+    FROM song as s
+    JOIN event as e ON s.id = e.songId
+    WHERE e.timestamp > :fromTimeStamp
+    GROUP BY s.id
+    ORDER BY playCount DESC
+    LIMIT :limit
+""")
+    fun mostPlayedSongsWithPlayCount(fromTimeStamp: Long, limit: Int): Flow<List<com.babelsoftware.loudly.models.SongWithPlayCount>>
 
     @Transaction
     @Query(
