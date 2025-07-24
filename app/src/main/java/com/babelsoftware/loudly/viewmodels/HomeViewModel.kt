@@ -89,8 +89,11 @@ class HomeViewModel @Inject constructor(
             .first().shuffled().take(20)
 
         val fromTimeStamp = System.currentTimeMillis() - 86400000 * 7 * 2
-        val keepListeningSongs = database.mostPlayedSongs(fromTimeStamp, limit = 15, offset = 5)
-            .first().shuffled().take(10)
+        val keepListeningSongs = database.mostPlayedSongsWithPlayCount(fromTimeStamp, limit = 15)
+            .first()
+            .map { it.song } // SongWithPlayCount -> Song dönüşümü
+            .shuffled()
+            .take(10)
         val keepListeningAlbums = database.mostPlayedAlbums(fromTimeStamp, limit = 8, offset = 2)
             .first().filter { it.album.thumbnailUrl != null }.shuffled().take(5)
         val keepListeningArtists = database.mostPlayedArtists(fromTimeStamp)
@@ -113,14 +116,14 @@ class HomeViewModel @Inject constructor(
             database.mostPlayedArtists(fromTimeStamp, limit = 10).first()
                 .filter { it.artist.isYouTubeArtist }
                 .shuffled().take(3)
-                .mapNotNull {
-                    val items = mutableListOf<YTItem>()
-                    YouTube.artist(it.id).onSuccess { page ->
+                .mapNotNull { artistWithData ->
+                val items = mutableListOf<YTItem>()
+                    YouTube.artist(artistWithData.artist.id).onSuccess { page ->
                         items += page.sections.getOrNull(page.sections.size - 2)?.items.orEmpty()
                         items += page.sections.lastOrNull()?.items.orEmpty()
                     }
                     SimilarRecommendation(
-                        title = it,
+                        title = artistWithData,
                         items = items
                             .filterExplicit(hideExplicit)
                             .shuffled()
@@ -128,14 +131,16 @@ class HomeViewModel @Inject constructor(
                     )
                 }
         val songRecommendations =
-            database.mostPlayedSongs(fromTimeStamp, limit = 10).first()
-                .filter { it.album != null }
+            database.mostPlayedSongsWithPlayCount(fromTimeStamp, limit = 10).first()
+                // DÜZELTME: 'it.album' yerine 'it.song.album' kullanılıyor.
+                .filter { it.song.album != null }
                 .shuffled().take(2)
-                .mapNotNull { song ->
-                    val endpoint = YouTube.next(WatchEndpoint(videoId = song.id)).getOrNull()?.relatedEndpoint ?: return@mapNotNull null
+                .mapNotNull { songWithCount -> // DÜZELTME: Değişken adı daha anlaşılır hale getirildi.
+                    // DÜZELTME: `song` nesnesine `songWithCount.song` üzerinden erişiliyor.
+                    val endpoint = YouTube.next(WatchEndpoint(videoId = songWithCount.song.id)).getOrNull()?.relatedEndpoint ?: return@mapNotNull null
                     val page = YouTube.related(endpoint).getOrNull() ?: return@mapNotNull null
                     SimilarRecommendation(
-                        title = song,
+                        title = songWithCount.song,
                         items = (page.songs.shuffled().take(8) +
                                 page.albums.shuffled().take(4) +
                                 page.artists.shuffled().take(4) +

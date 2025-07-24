@@ -46,7 +46,6 @@ fun PlaybackError(
         else -> if (useDarkTheme) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onPrimary
     }
 
-    // Hata koduna göre anlamlı mesajlar ve açıklamalar oluşturalım.
     val (errorMessage, errorDescription) = remember(error.errorCode) {
         when (error.errorCode) {
             PlaybackException.ERROR_CODE_IO_UNSPECIFIED,
@@ -62,19 +61,12 @@ fun PlaybackError(
                     R.string.error_unsupported_format_title,
                     R.string.error_unsupported_format_description
                 )
-            PlaybackException.ERROR_CODE_DRM_PROVISIONING_FAILED ->
-                Pair(
-                    R.string.error_drm_title,
-                    R.string.error_drm_description
-                )
             PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW ->
                 Pair(
                     R.string.error_behind_live_window_title,
                     R.string.error_behind_live_window_description
                 )
             else -> {
-                // Diğer tüm durumlar için genel bir hata mesajı.
-                // İsteğe bağlı olarak `error.errorCodeName` loglanabilir.
                 Pair(
                     R.string.error_playback_failed_title,
                     R.string.error_playback_failed_description

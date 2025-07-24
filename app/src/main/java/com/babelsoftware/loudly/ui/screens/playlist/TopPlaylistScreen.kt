@@ -126,7 +126,7 @@ fun TopPlaylistScreen(
 
     val likeLength =
         remember(songs) {
-            songs?.fastSumBy { it.song.duration } ?: 0
+            songs?.fastSumBy { it.song.song.duration } ?: 0
         }
 
     var isSearching by rememberSaveable { mutableStateOf(false) }
@@ -170,7 +170,7 @@ fun TopPlaylistScreen(
     LaunchedEffect(songs) {
         mutableSongs.apply {
             clear()
-            songs?.let { addAll(it) }
+            songs?.let { songList -> addAll(songList.map { it.song }) }
         }
         if (songs?.isEmpty() == true) return@LaunchedEffect
         downloadUtil.downloads.collect { downloads ->
@@ -231,10 +231,16 @@ fun TopPlaylistScreen(
     val filteredSongs = if (searchQueryStr.isEmpty()) {
         songs
     } else {
-        songs?.filter { song ->
-            song.song.title.contains(searchQueryStr, ignoreCase = true) ||
-                    song.artists.joinToString("")
-                        .contains(searchQueryStr, ignoreCase = true)
+        // DÜZELTME: Lambda parametresinin adı 'songWithCount' olarak değiştirildi ve doğru kullanıldı.
+        songs?.filter { songWithCount ->
+            // Şarkı başlığı eşleşmesi kontrolü
+            val titleMatch = songWithCount.song.song.title.contains(searchQueryStr, ignoreCase = true)
+
+            // Sanatçı isimleri eşleşmesi kontrolü
+            // DÜZELTME: `artists` listesindeki her bir sanatçının 'name' özelliğine erişerek arama yapılıyor.
+            val artistsMatch = songWithCount.song.artists.joinToString { it.name }.contains(searchQueryStr, ignoreCase = true)
+
+            titleMatch || artistsMatch
         }
     }
     val state = rememberLazyListState()
@@ -386,7 +392,7 @@ fun TopPlaylistScreen(
                                         Button(
                                             onClick = {
                                                 playerConnection.addToQueue(
-                                                    items = songs!!.map { it.toMediaItem() },
+                                                    items = songs!!.map { it.song.toMediaItem() },
                                                 )
                                             },
                                             modifier = Modifier
@@ -407,7 +413,7 @@ fun TopPlaylistScreen(
                                             playerConnection.playQueue(
                                                 ListQueue(
                                                     title = context.getString(R.string.my_top),
-                                                    items = songs!!.map { it.toMediaItem() }
+                                                    items = songs!!.map { it.song.toMediaItem() }
                                                 )
                                             )
                                         },
@@ -428,7 +434,7 @@ fun TopPlaylistScreen(
                                                 ListQueue(
                                                     title = context.getString(R.string.my_top),
                                                     items = songs!!.shuffled()
-                                                        .map { it.toMediaItem() }
+                                                        .map { it.song.toMediaItem() }
                                                 )
                                             )
                                         },
@@ -479,14 +485,14 @@ fun TopPlaylistScreen(
                 if (filteredSongs != null) {
                     itemsIndexed(
                         items = filteredSongs,
-                        key = { _, song -> song.id },
+                        key = { _, song -> song.song.id },
                         contentType = { _, _ -> CONTENT_TYPE_SONG }
                     ) { index, songWrapper ->
                         val onCheckedChange: (Boolean) -> Unit = {
                             if (it) {
-                                selection.add(songWrapper.id)
+                                selection.add(songWrapper.song.id)
                             } else {
-                                selection.remove(songWrapper.id)
+                                selection.remove(songWrapper.song.id)
                             }
                         }
                         if (index == 0) {
@@ -509,14 +515,14 @@ fun TopPlaylistScreen(
                             }
                         }
                         SongListItem(
-                            song = songWrapper,
+                            song = songWrapper.song,
                             isActive = songWrapper.song.id == mediaMetadata?.id,
                             showInLibraryIcon = true,
                             isPlaying = isPlaying,
                             trailingContent = {
                                 if (inSelectMode) {
                                     Checkbox(
-                                        checked = songWrapper.id in selection,
+                                        checked = songWrapper.song.id in selection,
                                         onCheckedChange = onCheckedChange
                                     )
                                 } else {
@@ -524,7 +530,7 @@ fun TopPlaylistScreen(
                                         onClick = {
                                             menuState.show {
                                                 SongMenu(
-                                                    originalSong = songWrapper,
+                                                    originalSong = songWrapper.song,
                                                     navController = navController,
                                                     onDismiss = menuState::dismiss
                                                 )
@@ -543,15 +549,15 @@ fun TopPlaylistScreen(
                                 .combinedClickable(
                                     onClick = {
                                         if (inSelectMode) {
-                                            onCheckedChange(songWrapper.id !in selection)
-                                        } else if (songWrapper.id == mediaMetadata?.id) {
+                                            onCheckedChange(songWrapper.song.id !in selection)
+                                        } else if (songWrapper.song.id == mediaMetadata?.id) {
                                             playerConnection.player.togglePlayPause()
                                         } else {
                                             playerConnection.playQueue(
                                                 ListQueue(
                                                     title = context.getString(R.string.my_top),
-                                                    items = songs!!.map { it.toMediaItem() },
-                                                    startIndex = songs!!.indexOfFirst { it.song.id == songWrapper.id }
+                                                    items = songs!!.map { it.song.toMediaItem() },
+                                                    startIndex = songs!!.indexOfFirst { it.song.id == songWrapper.song.id }
                                                 )
                                             )
                                         }
@@ -593,7 +599,7 @@ fun TopPlaylistScreen(
                             selection.clear()
                         } else {
                             selection.clear()
-                            selection.addAll(filteredSongs?.map { it.id }.orEmpty())
+                            selection.addAll(filteredSongs?.map { it.song.song.id }.orEmpty())
                         }
                     }
                 )
@@ -604,7 +610,7 @@ fun TopPlaylistScreen(
                             SongSelectionMenu(
                                 navController = navController,
                                 selection = selection.mapNotNull { songId ->
-                                    songs?.find { it.id == songId }
+                                    songs?.find { it.song.id == songId }?.song
                                 },
                                 onDismiss = menuState::dismiss,
                                 onExitSelectionMode = onExitSelectionMode

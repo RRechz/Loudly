@@ -6,12 +6,13 @@ import com.babelsoftware.loudly.constants.StatPeriod
 import com.babelsoftware.loudly.db.MusicDatabase
 import com.babelsoftware.innertube.YouTube
 import com.babelsoftware.loudly.reportException
+import com.babelsoftware.loudly.models.SongWithPlayCount // Yeni modeli import et
+import kotlinx.coroutines.flow.map // map operatörünü import et
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Duration
@@ -25,16 +26,26 @@ class StatsViewModel @Inject constructor(
 ) : ViewModel() {
     val statPeriod = MutableStateFlow(StatPeriod.`1_WEEK`)
 
-    val mostPlayedSongs = statPeriod.flatMapLatest { period ->
-        database.mostPlayedSongs(period.toTimeMillis())
+    // DAO'dan tek bir seferde daha uzun bir liste çekelim (örneğin 20 öğe)
+    private val allMostPlayedSongs = statPeriod.flatMapLatest { period ->
+        // DAO'daki yeni fonksiyonu çağırıyoruz ve limiti artırıyoruz
+        database.mostPlayedSongsWithPlayCount(period.toTimeMillis(), limit = 20)
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
+    // Özet görünüm için kısa liste (ilk 5)
+    val summaryMostPlayedSongs = allMostPlayedSongs.map { it.take(5) }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    // Genişletilmiş görünüm için tam liste
+    val detailedMostPlayedSongs = allMostPlayedSongs
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    // Sanatçılar ve albümler için şimdilik aynı mantığı koruyabiliriz.
     val mostPlayedArtists = statPeriod.flatMapLatest { period ->
         database.mostPlayedArtists(period.toTimeMillis()).map { artists ->
             artists.filter { it.artist.isYouTubeArtist }
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
 
     val mostPlayedAlbums = statPeriod.flatMapLatest { period ->
         database.mostPlayedAlbums(period.toTimeMillis())

@@ -337,7 +337,7 @@ class LibraryPlaylistsViewModel @Inject constructor(
                     }
                 }
         }
-    val topSongs = database.mostPlayedSongs(0, 100)
+    val topSongs = database.mostPlayedSongsWithPlayCount(0, 100)
     val localSongsCount = database.localSongsCount()
         .stateIn(viewModelScope, SharingStarted.Lazily, 0)
     fun sync() { viewModelScope.launch(Dispatchers.IO) { syncUtils.syncSavedPlaylists() } }
@@ -450,7 +450,7 @@ class LibraryMixViewModel @Inject constructor(
                     }
                 }
         }
-    val topSongs = database.mostPlayedSongs(0, 100)
+    val topSongs = database.mostPlayedSongsWithPlayCount(0, 100)
     val localSongsCount = database.localSongsCount()
         .stateIn(viewModelScope, SharingStarted.Lazily, 0)
 }

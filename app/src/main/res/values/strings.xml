@@ -58,6 +58,8 @@
     <string name="history_empty">Your history will show up here</string>
     <string name="stats_empty">Your stats will show up here</string>
     <string name="stats">Stats</string>
+    <string name="show_less">Show Less</string>
+    <string name="show_more">Show More</string>
     <string name="mood_and_genres">Mood and Genres</string>
     <string name="account">Account</string>
     <string name="quick_picks">Quick picks</string>
