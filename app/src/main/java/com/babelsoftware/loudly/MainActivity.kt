@@ -27,6 +27,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -144,6 +145,7 @@ import com.babelsoftware.loudly.playback.MusicService
 import com.babelsoftware.loudly.playback.MusicService.MusicBinder
 import com.babelsoftware.loudly.playback.PlayerConnection
 import com.babelsoftware.loudly.playback.queues.YouTubeQueue
+import com.babelsoftware.loudly.ui.component.ActionChipButton
 import com.babelsoftware.loudly.ui.component.BottomSheetMenu
 import com.babelsoftware.loudly.ui.component.IconButton
 import com.babelsoftware.loudly.ui.component.LocalMenuState
@@ -773,37 +775,47 @@ class MainActivity : ComponentActivity() {
                                     )
                                 },
                                 actions = {
-                                    IconButton(
-                                        onClick = { navController.navigate("history") }
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        modifier = Modifier.padding(end = 8.dp)
                                     ) {
-                                        Icon(
-                                            painterResource(R.drawable.history),
-                                            contentDescription = stringResource(R.string.history)
+                                        ActionChipButton(
+                                            onClick = { navController.navigate("stats") },
+                                            icon = {
+                                                Icon(
+                                                    painter = painterResource(R.drawable.trending_up),
+                                                    contentDescription = stringResource(R.string.stats)
+                                                )
+                                            },
+                                            text = stringResource(R.string.stats)
                                         )
-                                    }
-                                    IconButton(
-                                        onClick = { navController.navigate("stats") }
-                                    ) {
-                                        Icon(
-                                            painterResource(R.drawable.trending_up),
-                                            contentDescription = stringResource(R.string.stats)
+                                        ActionChipButton(
+                                            onClick = { navController.navigate("history") },
+                                            icon = {
+                                                Icon(
+                                                    painter = painterResource(R.drawable.history),
+                                                    contentDescription = stringResource(R.string.history)
+                                                )
+                                            }
                                         )
-                                    }
-                                    IconButton(
-                                        onClick = { navController.navigate("settings") }
-                                    ) {
-                                        BadgedBox(
-                                            badge = {
-                                                if (latestVersionName != BuildConfig.VERSION_NAME) {
-                                                    Badge()
+                                        ActionChipButton(
+                                            onClick = { navController.navigate("settings") },
+                                            icon = {
+                                                BadgedBox(
+                                                    badge = {
+                                                        if (latestVersionName != BuildConfig.VERSION_NAME) {
+                                                            Badge()
+                                                        }
+                                                    }
+                                                ) {
+                                                    Icon(
+                                                        painterResource(R.drawable.settings),
+                                                        contentDescription = stringResource(R.string.settings)
+                                                    )
                                                 }
                                             }
-                                        ) {
-                                            Icon(
-                                                painterResource(R.drawable.settings),
-                                                contentDescription = stringResource(R.string.settings)
-                                            )
-                                        }
+                                        )
                                     }
                                 },
                                 scrollBehavior = searchBarScrollBehavior
