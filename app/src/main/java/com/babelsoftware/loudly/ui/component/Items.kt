@@ -420,18 +420,19 @@ fun SongListItem(
                                     .size(ListThumbnailSize)
                                     .clip(RoundedCornerShape(ThumbnailCornerRadius))
                             )
-                            PlayingIndicatorBox(
-                                isActive = isActive,
-                                playWhenReady = isPlaying,
-                                color = Color.White,
-                                modifier = Modifier.Companion
-                                    .size(ListThumbnailSize)
-                                    .align(alignment = Alignment.CenterVertically)
-                                    .background(
-                                        color = Color.Black.copy(alpha = ActiveBoxAlpha),
-                                        shape = RoundedCornerShape(ThumbnailCornerRadius)
-                                    )
-                            )
+                            AnimatedVisibility(visible = isActive, enter = fadeIn(), exit = fadeOut()) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(ListThumbnailSize)
+                                        .background(
+                                            color = Color.Black.copy(alpha = 0.5f),
+                                            shape = RoundedCornerShape(ThumbnailCornerRadius)
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    AnimatedSoundWave(isPlaying = isPlaying, barColor = Color.White)
+                                }
+                            }
                         }
                     } else {
                         ItemThumbnail(
@@ -499,21 +500,6 @@ fun SongListItem(
         )
     }
 }
-
-@Composable
-fun SongFolderItem(
-    folderTitle: String,
-    modifier: Modifier = Modifier,
-
-    ) = ListItem(title = folderTitle, thumbnailContent = {
-    Icon(
-        Icons.Rounded.Folder,
-        contentDescription = null,
-        modifier = modifier.size(48.dp)
-    )
-},
-    modifier = modifier
-)
 
 @Composable
 fun SongFolderItem(
@@ -621,17 +607,19 @@ fun SongGridItem(
                         .size(GridThumbnailHeight)
                         .clip(RoundedCornerShape(ThumbnailCornerRadius))
                 )
-                PlayingIndicatorBox(
-                    isActive = isActive,
-                    playWhenReady = isPlaying,
-                    color = Color.White,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            color = Color.Black.copy(alpha = ActiveBoxAlpha),
-                            shape = RoundedCornerShape(ThumbnailCornerRadius)
-                        )
-                )
+                AnimatedVisibility(visible = isActive, enter = fadeIn(), exit = fadeOut()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                color = Color.Black.copy(alpha = 0.5f),
+                                shape = RoundedCornerShape(ThumbnailCornerRadius)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AnimatedSoundWave(isPlaying = isPlaying, barColor = Color.White)
+                    }
+                }
             }
         } else {
             ItemThumbnail(
@@ -1402,19 +1390,29 @@ fun ItemThumbnail(
             )
         }
 
-        PlayingIndicatorBox(
-            isActive = isActive,
-            playWhenReady = isPlaying,
-            color = if (albumIndex != null) MaterialTheme.colorScheme.onBackground else Color.White,
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    color = if (albumIndex != null) Color.Transparent else Color.Black.copy(
-                        alpha = 0.4f
+        AnimatedVisibility(
+            visible = isActive,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            // Animasyonun resim üzerinde daha iyi görünmesi için yarı saydam bir arka plan
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        color = if (albumIndex != null) Color.Transparent else Color.Black.copy(
+                            alpha = 0.5f // Alpha değerini biraz artırdık
+                        ),
+                        shape = shape
                     ),
-                    shape = shape
+                contentAlignment = Alignment.Center
+            ) {
+                AnimatedSoundWave(
+                    isPlaying = isPlaying,
+                    barColor = if (albumIndex != null) MaterialTheme.colorScheme.onBackground else Color.White
                 )
-        )
+            }
+        }
     }
 }
 
