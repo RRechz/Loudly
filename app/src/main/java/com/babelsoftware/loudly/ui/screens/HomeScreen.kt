@@ -1,10 +1,15 @@
 package com.babelsoftware.loudly.ui.screens
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +36,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,17 +56,23 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.babelsoftware.loudly.LocalDatabase
 import com.babelsoftware.loudly.LocalPlayerAwareWindowInsets
 import com.babelsoftware.loudly.LocalPlayerConnection
@@ -117,6 +129,8 @@ import com.babelsoftware.innertube.models.YTItem
 import com.babelsoftware.innertube.pages.HomePage
 import com.babelsoftware.innertube.utils.parseCookieString
 import com.babelsoftware.loudly.R
+import com.babelsoftware.loudly.constants.HeaderImageKey
+import com.babelsoftware.loudly.ui.component.FeaturedContentCard
 import java.util.Calendar
 import kotlin.collections.forEach
 import kotlin.math.min
@@ -430,29 +444,19 @@ fun HomeScreen(
                 }
             }
 
+            if (selectedChip == null) {
+                item {
+                    HomeGreetingCard(
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp)
+                            .animateItem()
+                    )
+                }
+            }
+
             if (selectedChip == null && showRecentActivity && isLoggedIn && !recentActivity.isNullOrEmpty()) {
                 item {
-                    val accountName by rememberPreference(AccountNameKey, "")
-                    val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-                    val greeting = when (currentHour) {
-                        in 6..11 -> stringResource(R.string.good_morning)
-                        in 12..17 -> stringResource(R.string.good_afternoon)
-                        in 18..23 -> stringResource(R.string.good_evening)
-                        else -> stringResource(R.string.good_night)
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = greeting
-                        )
-                        Text(
-                            text = accountName
-                        )
-                    }
+                    NavigationTitle(title = stringResource(R.string.recent_activity))
                 }
                 item {
                     LazyHorizontalGrid(
@@ -652,29 +656,51 @@ fun HomeScreen(
                     }
                 }
 
-                keepListening?.takeIf { it.isNotEmpty() }?.let { keepListening ->
-                    item {
-                        NavigationTitle(
-                            title = stringResource(R.string.keep_listening),
-                            modifier = Modifier.animateItem()
-                        )
+                keepListening?.takeIf { it.isNotEmpty() }?.let { fullList ->
+                    val featuredItem = fullList.firstOrNull { it is Album || it is Artist }
+                    val remainingItems = if (featuredItem != null) fullList.minus(featuredItem) else fullList
+                    if (featuredItem != null) {
+                        item {
+                            FeaturedContentCard(
+                                item = featuredItem,
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    .animateItem(),
+                                onClick = {
+                                    when (featuredItem) {
+                                        is Album -> navController.navigate("album/${featuredItem.id}")
+                                        is Artist -> navController.navigate("artist/${featuredItem.id}")
+                                        else -> {
+                                        }
+                                    }
+                                }
+                            )
+                        }
                     }
 
-                    item {
-                        val rows = if (keepListening.size > 6) 2 else 1
-                        LazyHorizontalGrid(
-                            state = rememberLazyGridState(),
-                            rows = GridCells.Fixed(rows),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height((GridThumbnailHeight + 24.dp + with(LocalDensity.current) {
-                                    MaterialTheme.typography.bodyLarge.lineHeight.toDp() * 2 +
-                                            MaterialTheme.typography.bodyMedium.lineHeight.toDp() * 2
-                                }) * rows)
-                                .animateItem()
-                        ) {
-                            items(keepListening) {
-                                localGridItem(it)
+                    if (remainingItems.isNotEmpty()) {
+                        item {
+                            NavigationTitle(
+                                title = stringResource(R.string.keep_listening),
+                                modifier = Modifier.animateItem()
+                            )
+                        }
+                        item {
+                            val rows = if (remainingItems.size > 6) 2 else 1
+                            LazyHorizontalGrid(
+                                state = rememberLazyGridState(),
+                                rows = GridCells.Fixed(rows),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height((GridThumbnailHeight + 24.dp + with(LocalDensity.current) {
+                                        MaterialTheme.typography.bodyLarge.lineHeight.toDp() * 2 +
+                                                MaterialTheme.typography.bodyMedium.lineHeight.toDp() * 2
+                                    }) * rows)
+                                    .animateItem()
+                            ) {
+                                items(remainingItems) {
+                                    localGridItem(it)
+                                }
                             }
                         }
                     }
@@ -856,5 +882,90 @@ fun HomeScreen(
                 .align(Alignment.TopCenter)
                 .padding(LocalPlayerAwareWindowInsets.current.asPaddingValues()),
         )
+    }
+}
+
+@Composable
+private fun HomeGreetingCard(
+    modifier: Modifier = Modifier
+) {
+    val accountName by rememberPreference(AccountNameKey, "")
+    val innerTubeCookie by rememberPreference(InnerTubeCookieKey, "")
+    val isLoggedIn = remember(innerTubeCookie) { "SAPISID" in parseCookieString(innerTubeCookie) }
+    val (headerImageKey, _) = rememberPreference(HeaderImageKey, "Loudly-1")
+
+    val painter = when {
+        headerImageKey.startsWith("content://") -> {
+            rememberAsyncImagePainter(model = Uri.parse(headerImageKey))
+        }
+        headerImageKey == "Loudly-1" -> painterResource(id = R.drawable.loudly_picutre_1)
+        headerImageKey == "Loudly-2" -> painterResource(id = R.drawable.loudly_picutre_2)
+        headerImageKey == "Loudly-3" -> painterResource(id = R.drawable.loudly_picutre_3)
+        else -> painterResource(id = R.drawable.loudly_picutre_1)
+    }
+
+    val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+    val greeting = when (currentHour) {
+        in 6..11 -> stringResource(R.string.good_morning)
+        in 12..17 -> stringResource(R.string.good_afternoon)
+        in 18..23 -> stringResource(R.string.good_evening)
+        else -> stringResource(R.string.good_night)
+    }
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(120.dp),
+        shape = RoundedCornerShape(24.dp)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomStart
+        ) {
+            Image(
+                painter = painter,
+                contentDescription = "Header Background",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
+                            startY = 150f
+                        )
+                    )
+            )
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.Bottom
+            ) {
+                if (isLoggedIn && accountName.isNotBlank()) {
+                    Text(
+                        text = greeting,
+                        color = Color.White.copy(alpha = 0.8f),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = accountName.replace("@", ""),
+                        color = Color.White,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                } else {
+                    Text(
+                        stringResource(R.string.welcome_to_loudly),
+                        color = Color.White,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
     }
 }

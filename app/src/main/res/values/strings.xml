@@ -71,6 +71,7 @@
     <string name="new_release_albums">New release albums</string>
     <string name="not_internet">No Internet Сoonnection</string>
     <string name="internet_required">It looks like you have no Internet connection. Please check your network.</string>
+    <string name="featured_for_you">Featured for You</string>
 
     <!-- History -->
     <string name="today">Today</string>
