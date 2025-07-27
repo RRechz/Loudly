@@ -1,7 +1,6 @@
 package com.babelsoftware.loudly
 
 import android.Manifest
-import android.R.attr.maxHeight
 import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
@@ -16,7 +15,6 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -50,8 +48,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -64,15 +60,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
 import androidx.compose.material3.contentColorFor
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -95,7 +90,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
-import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
@@ -110,7 +104,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.imageLoader
 import coil.request.ImageRequest
-import com.valentinilk.shimmer.LocalShimmerTheme
 import com.babelsoftware.innertube.YouTube
 import com.babelsoftware.innertube.models.SongItem
 import com.babelsoftware.innertube.models.WatchEndpoint
@@ -166,31 +159,31 @@ import com.babelsoftware.loudly.ui.theme.ColorSaver
 import com.babelsoftware.loudly.ui.theme.DefaultThemeColor
 import com.babelsoftware.loudly.ui.theme.LoudlyTheme
 import com.babelsoftware.loudly.ui.theme.extractThemeColor
-import com.babelsoftware.loudly.utils.SyncUtils
 import com.babelsoftware.loudly.ui.utils.appBarScrollBehavior
 import com.babelsoftware.loudly.ui.utils.backToMain
 import com.babelsoftware.loudly.ui.utils.imageCache
 import com.babelsoftware.loudly.ui.utils.resetHeightOffset
+import com.babelsoftware.loudly.utils.SyncUtils
 import com.babelsoftware.loudly.utils.Updater
 import com.babelsoftware.loudly.utils.dataStore
 import com.babelsoftware.loudly.utils.get
 import com.babelsoftware.loudly.utils.rememberEnumPreference
 import com.babelsoftware.loudly.utils.rememberPreference
-import com.babelsoftware.loudly.utils.*
 import com.babelsoftware.loudly.utils.urlEncode
+import com.valentinilk.shimmer.LocalShimmerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import java.net.URLDecoder
-import javax.inject.Inject
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.URL
+import java.net.URLDecoder
 import java.util.Locale
+import javax.inject.Inject
 import kotlin.time.Duration.Companion.days
 
 @Suppress("NAME_SHADOWING")
@@ -625,6 +618,10 @@ class MainActivity : ComponentActivity() {
                         onDispose { removeOnNewIntentListener(listener) }
                     }
 
+                    val updateAvailable = remember(latestVersionName) {
+                        isNewerVersion(latestVersionName, BuildConfig.VERSION_NAME)
+                    }
+
                     CompositionLocalProvider(
                         LocalDatabase provides database,
                         LocalContentColor provides contentColorFor(MaterialTheme.colorScheme.surface),
@@ -691,7 +688,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                     )
                             ) {
-                                navigationBuilder(navController, topAppBarScrollBehavior)
+                                navigationBuilder(navController, topAppBarScrollBehavior, updateAvailable)
                             }
                         } else {
                             NavHost(
@@ -749,7 +746,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                     )
                             ) {
-                                navigationBuilder(navController, topAppBarScrollBehavior)
+                                navigationBuilder(navController, topAppBarScrollBehavior, updateAvailable)
                             }
                         }
 

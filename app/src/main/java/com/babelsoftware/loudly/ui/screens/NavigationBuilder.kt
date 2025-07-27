@@ -50,9 +50,13 @@ import com.babelsoftware.loudly.ui.screens.settings.import_from_spotify.ImportFr
 fun NavGraphBuilder.navigationBuilder(
     navController: NavHostController,
     scrollBehavior: TopAppBarScrollBehavior,
+    updateAvailable: Boolean
 ) {
     composable(Screens.Home.route) {
-        HomeScreen(navController)
+        HomeScreen(
+            navController = navController,
+            updateAvailable = updateAvailable
+        )
     }
     composable(Screens.Explore.route) {
         ExploreScreen(navController)

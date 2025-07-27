@@ -91,7 +91,7 @@ class HomeViewModel @Inject constructor(
         val fromTimeStamp = System.currentTimeMillis() - 86400000 * 7 * 2
         val keepListeningSongs = database.mostPlayedSongsWithPlayCount(fromTimeStamp, limit = 15)
             .first()
-            .map { it.song } // SongWithPlayCount -> Song dönüşümü
+            .map { it.song }
             .shuffled()
             .take(10)
         val keepListeningAlbums = database.mostPlayedAlbums(fromTimeStamp, limit = 8, offset = 2)
@@ -117,7 +117,7 @@ class HomeViewModel @Inject constructor(
                 .filter { it.artist.isYouTubeArtist }
                 .shuffled().take(3)
                 .mapNotNull { artistWithData ->
-                val items = mutableListOf<YTItem>()
+                    val items = mutableListOf<YTItem>()
                     YouTube.artist(artistWithData.artist.id).onSuccess { page ->
                         items += page.sections.getOrNull(page.sections.size - 2)?.items.orEmpty()
                         items += page.sections.lastOrNull()?.items.orEmpty()
@@ -132,11 +132,9 @@ class HomeViewModel @Inject constructor(
                 }
         val songRecommendations =
             database.mostPlayedSongsWithPlayCount(fromTimeStamp, limit = 10).first()
-                // DÜZELTME: 'it.album' yerine 'it.song.album' kullanılıyor.
                 .filter { it.song.album != null }
                 .shuffled().take(2)
-                .mapNotNull { songWithCount -> // DÜZELTME: Değişken adı daha anlaşılır hale getirildi.
-                    // DÜZELTME: `song` nesnesine `songWithCount.song` üzerinden erişiliyor.
+                .mapNotNull { songWithCount ->
                     val endpoint = YouTube.next(WatchEndpoint(videoId = songWithCount.song.id)).getOrNull()?.relatedEndpoint ?: return@mapNotNull null
                     val page = YouTube.related(endpoint).getOrNull() ?: return@mapNotNull null
                     SimilarRecommendation(

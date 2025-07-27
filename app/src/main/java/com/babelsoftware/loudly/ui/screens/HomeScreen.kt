@@ -3,6 +3,12 @@ package com.babelsoftware.loudly.ui.screens
 import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -49,6 +55,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -66,6 +73,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -131,6 +139,7 @@ import com.babelsoftware.innertube.utils.parseCookieString
 import com.babelsoftware.loudly.R
 import com.babelsoftware.loudly.constants.HeaderImageKey
 import com.babelsoftware.loudly.ui.component.FeaturedContentCard
+import kotlinx.coroutines.delay
 import java.util.Calendar
 import kotlin.collections.forEach
 import kotlin.math.min
@@ -142,6 +151,7 @@ import kotlin.random.Random
 fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel(),
+    updateAvailable: Boolean
 ) {
     val menuState = LocalMenuState.current
     val database = LocalDatabase.current
@@ -447,6 +457,7 @@ fun HomeScreen(
             if (selectedChip == null) {
                 item {
                     HomeGreetingCard(
+                        updateAvailable = updateAvailable,
                         modifier = Modifier
                             .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp)
                             .animateItem()
@@ -887,7 +898,8 @@ fun HomeScreen(
 
 @Composable
 private fun HomeGreetingCard(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    updateAvailable: Boolean
 ) {
     val accountName by rememberPreference(AccountNameKey, "")
     val innerTubeCookie by rememberPreference(InnerTubeCookieKey, "")
@@ -910,6 +922,15 @@ private fun HomeGreetingCard(
         in 12..17 -> stringResource(R.string.good_afternoon)
         in 18..23 -> stringResource(R.string.good_evening)
         else -> stringResource(R.string.good_night)
+    }
+
+    var showGreeting by remember { mutableStateOf(true) }
+    LaunchedEffect(updateAvailable) {
+        showGreeting = true
+        if (updateAvailable) {
+            delay(3000)
+            showGreeting = false
+        }
     }
 
     Card(
@@ -938,32 +959,60 @@ private fun HomeGreetingCard(
                         )
                     )
             )
-            Column(
+            AnimatedContent(
+                targetState = showGreeting,
                 modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.Bottom
-            ) {
-                if (isLoggedIn && accountName.isNotBlank()) {
-                    Text(
-                        text = greeting,
-                        color = Color.White.copy(alpha = 0.8f),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = accountName.replace("@", ""),
-                        color = Color.White,
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                } else {
-                    Text(
-                        stringResource(R.string.welcome_to_loudly),
-                        color = Color.White,
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
-                    )
+                transitionSpec = {
+                    (slideInVertically { height -> height } + fadeIn())
+                        .togetherWith(slideOutVertically { height -> -height } + fadeOut())
+                },
+                label = "GreetingCardAnimation"
+            ) { isGreetingVisible ->
+                Column(
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    if (isGreetingVisible || !updateAvailable) {
+                        if (isLoggedIn && accountName.isNotBlank()) {
+                            Text(
+                                text = greeting,
+                                color = Color.White.copy(alpha = 0.8f),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = accountName.replace("@", ""),
+                                color = Color.White,
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        } else {
+                            Text(
+                                stringResource(R.string.welcome_to_loudly),
+                                color = Color.White,
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    } else {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                text = stringResource(R.string.new_version_available),
+                                color = Color.White,
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = stringResource(R.string.home_card_update_desc),
+                                color = Color.White.copy(alpha = 0.9f),
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
                 }
             }
         }
