@@ -493,10 +493,10 @@
     <string name="app_version">App version</string>
     <string name="checking_for_update">Checking for updates...</string>
     <string name="update_card_version_ready_to_download">version %1$s available for download.</string>
-    <string name="update_card_downloading">Downloading... %1$d%%</string>
+    <string name="update_card_downloading">Downloading... %1$s</string>
     <string name="install">Upgrade</string>
     <string name="try_again">Try Again</string>
-    <string name="download_now">Download Noew</string>
+    <string name="download_now">Download Now</string>
     <string name="app_type">App Type</string>
 
     <string name="new_version_available">New version available</string>
@@ -536,6 +536,15 @@
     <string name="select_from_gallery">Select from gallery</string>
     <string name="edit_photo">Edit Photo</string>
     <string name="cancel">Cancel</string>
+
+    <string name="send_to_developer">Send to Developer</string>
+    <string name="close">Close</string>
+    <string name="update_error_details">Show Error Details</string>
+    <string name="download_failed">Download Failed</string>
+    <string name="show_error">Show Error</string>
+    <string name="go_to_update_link">Manuel Update</string>
+    <string name="home_card_update_desc">Check the settings page for details</string>
+    <string name="app_up_to_date">Software Up To Date</string>
 
     <!-- Playback Error -->
     <string name="error_network_title">Network Error</string>

@@ -1,4 +1,3 @@
-// com/babelsoftware/loudly/ui/screens/settings/AboutScreen.kt
 package com.babelsoftware.loudly.ui.screens.settings
 
 import android.content.Context
@@ -10,13 +9,15 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,8 +27,11 @@ import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.InstallMobile
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -61,6 +65,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.babelsoftware.loudly.BuildConfig
 import com.babelsoftware.loudly.R
+import com.babelsoftware.loudly.ui.component.ErrorDetailDialog
 import com.babelsoftware.loudly.ui.screens.settings.card_design.ActionType
 import com.babelsoftware.loudly.ui.screens.settings.card_design.IconResource
 import com.babelsoftware.loudly.ui.screens.settings.card_design.SettingsBox
@@ -142,7 +147,7 @@ fun AboutScreen(
                     title = stringResource(R.string.bugs),
                     description = stringResource(R.string.bugs_text),
                     icon = IconResource.Drawable(painterResource(id = R.drawable.bug_report)),
-                    onClick = { uriHandler.openUri("t.me/by_babelSoftware") }
+                    onClick = { uriHandler.openUri("t.me/by_BabelSoftware") }
                 )
             }
         }
@@ -159,6 +164,15 @@ fun UpdateCard(
     var latestReleaseInfo by remember { mutableStateOf<ReleaseInfo?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var updateAvailable by remember { mutableStateOf(false) }
+    var errorToShow by remember { mutableStateOf<String?>(null) }
+
+    errorToShow?.let { error ->
+        ErrorDetailDialog(
+            errorTitle = stringResource(R.string.update_error_details),
+            errorMessage = error,
+            onDismiss = { errorToShow = null }
+        )
+    }
 
     LaunchedEffect(key1 = true) {
         isLoading = true
@@ -193,54 +207,58 @@ fun UpdateCard(
                 .padding(16.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.padding(vertical = 8.dp))
                 Text(text = stringResource(R.string.checking_for_update), style = MaterialTheme.typography.bodyMedium)
             } else if (updateAvailable && latestReleaseInfo != null) {
                 UpdateAvailableContent(
-                    latestReleaseInfo!!,
-                    updateState,
-                    updateViewModel,
-                    context,
-                    installPermissionLauncher
+                    info = latestReleaseInfo!!,
+                    state = updateState,
+                    updateViewModel = updateViewModel,
+                    context = context,
+                    installPermissionLauncher = installPermissionLauncher,
+                    onShowError = { error ->
+                        errorToShow = error
+                    }
                 )
             } else {
-                // Güncel Durum
                 UpToDateContent()
             }
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun UpdateAvailableContent(
     info: ReleaseInfo,
     state: UpdateState,
     updateViewModel: AppUpdateViewModel,
     context: Context,
-    installPermissionLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
+    installPermissionLauncher: androidx.activity.result.ActivityResultLauncher<Intent>,
+    onShowError: (String) -> Unit
 ) {
+    val uriHandler = LocalUriHandler.current
+
     Icon(
-        imageVector = Icons.Filled.CloudDownload,
+        imageVector = if (state is UpdateState.Failed) Icons.Filled.Error else Icons.Filled.CloudDownload,
         contentDescription = stringResource(R.string.new_version_available),
         modifier = Modifier.size(48.dp),
-        tint = MaterialTheme.colorScheme.primary
+        tint = if (state is UpdateState.Failed) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
     )
 
     Text(
-        text = stringResource(R.string.new_version_available),
+        text = if (state is UpdateState.Failed) stringResource(R.string.download_failed) else stringResource(R.string.new_version_available),
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold
     )
     Text(
-        text = stringResource(R.string.update_card_version_ready_to_download),
+        text = stringResource(R.string.update_card_version_ready_to_download, info.tagName),
         style = MaterialTheme.typography.bodyLarge,
         textAlign = TextAlign.Center
     )
-
-    Spacer(modifier = Modifier.height(8.dp))
 
     when (state) {
         is UpdateState.Idle -> {
@@ -270,11 +288,46 @@ private fun UpdateAvailableContent(
             }
         }
         is UpdateState.Failed -> {
-            Text(state.error, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
-            Button(onClick = { updateViewModel.resetState() }) {
-                Icon(Icons.Filled.Refresh, null)
-                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                Text(stringResource(R.string.try_again))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+            ) {
+                AssistChip(
+                    onClick = { onShowError(state.error) },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.show_error),
+                            maxLines = 1,
+                            softWrap = false,
+                            modifier = Modifier.basicMarquee()
+                        )
+                    },
+                    leadingIcon = { Icon(Icons.Filled.Error, null, modifier = Modifier.size(18.dp)) }
+                )
+                AssistChip(
+                    onClick = { info.apkDownloadUrl?.let { updateViewModel.downloadAndInstallApk(it) } },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.try_again),
+                            maxLines = 1,
+                            softWrap = false,
+                            modifier = Modifier.basicMarquee()
+                        )
+                    },
+                    leadingIcon = { Icon(Icons.Filled.Refresh, null, modifier = Modifier.size(18.dp)) }
+                )
+                AssistChip(
+                    onClick = { uriHandler.openUri("https://github.com/RRechz/Loudly/releases/latest") },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.go_to_update_link),
+                            maxLines = 1,
+                            softWrap = false,
+                            modifier = Modifier.basicMarquee()
+                        )
+                    },
+                    leadingIcon = { Icon(Icons.Filled.Link, null, modifier = Modifier.size(18.dp)) }
+                )
             }
         }
     }
@@ -284,18 +337,18 @@ private fun UpdateAvailableContent(
 private fun UpToDateContent() {
     Icon(
         imageVector = Icons.Filled.CheckCircle,
-        contentDescription = "Uygulama güncel",
+        contentDescription = "App up to date",
         modifier = Modifier.size(24.dp),
         tint = MaterialTheme.colorScheme.secondary
     )
     Text(
-        text = "Uygulama Güncel",
+        text = stringResource(R.string.app_up_to_date),
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold
     )
 }
 
-// Helper fonksiyonlar
+// Helper fun
 private fun installApk(context: Context, uri: Uri) {
     val intent = Intent(Intent.ACTION_VIEW).apply {
         setDataAndType(uri, "application/vnd.android.package-archive")

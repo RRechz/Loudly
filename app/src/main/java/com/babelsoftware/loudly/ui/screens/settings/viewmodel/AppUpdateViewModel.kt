@@ -5,17 +5,26 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.babelsoftware.loudly.BuildConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.prepareGet
+import io.ktor.client.statement.bodyAsChannel
+import io.ktor.http.contentLength
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.util.cio.writeChannel
+import io.ktor.utils.io.copyAndClose
+import io.ktor.utils.io.readAvailable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileOutputStream
-import java.net.URL
 import javax.inject.Inject
 
-// Güncelleme sürecinin farklı durumlarını temsil eden sealed class
 sealed class UpdateState {
     object Idle : UpdateState()
     data class Downloading(val progress: Int) : UpdateState()
@@ -31,33 +40,51 @@ class AppUpdateViewModel @Inject constructor(
     private val _updateState = MutableStateFlow<UpdateState>(UpdateState.Idle)
     val updateState = _updateState.asStateFlow()
 
+    private val client = HttpClient(CIO) {
+        install(ContentNegotiation) {
+            json()
+        }
+
+        install(HttpTimeout) {
+            requestTimeoutMillis = 600000L // Timeout for the entire request (default 10 minutes)
+            connectTimeoutMillis = 60000L  // Timeout for connecting to the server (default 1 minute)
+            socketTimeoutMillis = 60000L   // Wait time between data packets (default 1 minute)
+        }
+    }
+
     fun downloadAndInstallApk(downloadUrl: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _updateState.value = UpdateState.Downloading(0)
-                val url = URL(downloadUrl)
-                val connection = url.openConnection()
-                connection.connect()
-                val fileSize = connection.contentLength
-                val inputStream = connection.getInputStream()
                 val file = File(app.cacheDir, "update.apk")
-                val outputStream = FileOutputStream(file)
-                var total: Long = 0
-                val data = ByteArray(1024)
-                var count: Int
-                while (inputStream.read(data).also { count = it } != -1) {
-                    total += count.toLong()
-                    outputStream.write(data, 0, count)
-                    val progress = (total * 100 / fileSize).toInt()
-                    _updateState.value = UpdateState.Downloading(progress)
-                }
-                outputStream.flush()
-                outputStream.close()
-                inputStream.close()
 
-                val authority = "${app.packageName}.provider"
+                client.prepareGet(downloadUrl).execute { httpResponse ->
+                    val fileSize = httpResponse.contentLength() ?: 0L
+                    val fileOutputStream = file.outputStream()
+
+                    val byteChannel = httpResponse.bodyAsChannel()
+                    var totalBytesRead = 0L
+
+                    val buffer = ByteArray(1024)
+                    var bytesRead: Int
+
+                    while (byteChannel.readAvailable(buffer).also { bytesRead = it } != -1) {
+                        fileOutputStream.write(buffer, 0, bytesRead)
+                        totalBytesRead += bytesRead
+                        if (fileSize > 0) {
+                            val progress = ((totalBytesRead * 100) / fileSize).toInt()
+                            _updateState.value = UpdateState.Downloading(progress)
+                        }
+                    }
+
+                    fileOutputStream.flush()
+                    fileOutputStream.close()
+                }
+
+                val authority = "${BuildConfig.APPLICATION_ID}.provider"
                 val apkUri = FileProvider.getUriForFile(app, authority, file)
                 _updateState.value = UpdateState.ReadyToInstall(apkUri)
+
             } catch (e: Exception) {
                 e.printStackTrace()
                 _updateState.value = UpdateState.Failed("Güncelleme indirilirken bir hata oluştu: ${e.message}")
