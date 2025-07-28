@@ -556,6 +556,7 @@
     <string name="error_playback_failed_title">Playback Failed</string>
     <string name="error_playback_failed_description">An unknown error has occurred. Please try again.</string>
     <string name="recovering_playback">Trying again…</string>
+    <string name="vpn_info_message">Using a VPN may affect your connection quality. If you are experiencing network problems, disconnect your VPN connection or use a proxy. You can configure this in “Settings >> Content >> Proxy.”</string>
 
     <!--scanner page settings-->
     <string name="sync_local_songs_toast">Sync local songs successfully</string>

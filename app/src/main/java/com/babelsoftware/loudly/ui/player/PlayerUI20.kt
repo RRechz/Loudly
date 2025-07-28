@@ -56,6 +56,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.VpnLock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -111,6 +113,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.navigation.NavController
@@ -145,22 +148,143 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-private const val HQ_BITRATE = 25000
+private const val HQ_BITRATE = 45000
 
-enum class NetworkType {
-    WIFI, CELLULAR, NONE
+sealed class NetworkInfo {
+    data object None : NetworkInfo()
+    data class Wifi(val isVpn: Boolean) : NetworkInfo()
+    data class Cellular(val isVpn: Boolean) : NetworkInfo()
 }
 
-fun getCurrentNetworkType(context: Context): NetworkType {
+fun getNetworkInfo(context: Context): NetworkInfo {
     val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    val network = connectivityManager.activeNetwork ?: return NetworkType.NONE
-    val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return NetworkType.NONE
+    val network = connectivityManager.activeNetwork ?: return NetworkInfo.None
+    val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return NetworkInfo.None
+
+    val isVpn = activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
 
     return when {
-        activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> NetworkType.WIFI
-        activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> NetworkType.CELLULAR
-        else -> NetworkType.NONE
+        activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> NetworkInfo.Wifi(isVpn)
+        activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> NetworkInfo.Cellular(isVpn)
+        else -> NetworkInfo.None
+    }
+}
+
+@Composable
+private fun NetworkStatusChip() {
+    val context = LocalContext.current
+    val networkInfo = remember { getNetworkInfo(context) }
+    var showVpnMessage by remember { mutableStateOf(false) }
+
+    when (networkInfo) {
+        is NetworkInfo.Wifi -> {
+            if (networkInfo.isVpn) {
+                Box {
+                    Card(
+                        onClick = { showVpnMessage = !showVpnMessage },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.25f))
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.VpnLock,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = Color.White
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = "Wi-Fi with VPN",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                color = Color.White
+                            )
+                        }
+                    }
+                    if (showVpnMessage) {
+                        Popup(
+                            alignment = Alignment.TopCenter,
+                            onDismissRequest = { showVpnMessage = false }
+                        ) {
+                            Spacer(modifier = Modifier.height(40.dp))
+                            Card(
+                                shape = RoundedCornerShape(8.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.vpn_info_message),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                InfoChip(icon = R.drawable.wifi, text = "Wi-Fi",  color = Color.White, onClick = {})
+            }
+        }
+        is NetworkInfo.Cellular -> {
+            if (networkInfo.isVpn) {
+                Box {
+                    Card(
+                        onClick = { showVpnMessage = !showVpnMessage },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.25f))
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.VpnLock,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = Color.White
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = "Mobile Data with VPN",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                color = Color.White
+                            )
+                        }
+                    }
+                    if (showVpnMessage) {
+                        Popup(
+                            alignment = Alignment.TopCenter,
+                            onDismissRequest = { showVpnMessage = false }
+                        ) {
+                            Spacer(modifier = Modifier.height(40.dp))
+                            Card(
+                                shape = RoundedCornerShape(8.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.vpn_info_message),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                InfoChip(icon = R.drawable.signal_cellular_alt, text = "Mobile Data", color = Color.White, onClick = {})
+            }
+        }
+        is NetworkInfo.None -> {}
     }
 }
 
@@ -357,7 +481,9 @@ fun NowPlayingScreen(
                     )
                 }
             }
-            AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) { NetworkStatusChip() }
+            AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) {
+                NetworkStatusChip()
+            }
         }
 
         Box(
@@ -431,30 +557,6 @@ fun NowPlayingScreen(
         )
     }
 }
-
-@Composable
-private fun NetworkStatusChip() {
-    val context = LocalContext.current
-    val networkType = remember { getCurrentNetworkType(context) }
-
-    AnimatedVisibility(visible = networkType != NetworkType.NONE) {
-        val icon = when (networkType) {
-            NetworkType.WIFI -> R.drawable.wifi
-            NetworkType.CELLULAR -> R.drawable.signal_cellular_alt
-            else -> null
-        }
-        val text = when (networkType) {
-            NetworkType.WIFI -> "Wi-Fi"
-            NetworkType.CELLULAR -> "Mobile Data"
-            else -> null
-        }
-
-        if (icon != null) {
-            InfoChip(icon = icon, text = text, onClick = {})
-        }
-    }
-}
-
 
 @Composable
 fun ContextualInfoRow(
@@ -559,6 +661,7 @@ fun ContextualInfoRow(
         InfoChip(
             text = stringResource(R.string.queue),
             icon = R.drawable.queue_music,
+            color = Color.White,
             onClick = onShowPlaylist
         )
 
@@ -567,6 +670,7 @@ fun ContextualInfoRow(
         InfoChip(
             icon = R.drawable.more_vert,
             text = stringResource(R.string.menu),
+            color = Color.White,
             onClick = {
                 menuState.show {
                     PlayerMenu(
