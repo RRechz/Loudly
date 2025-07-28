@@ -69,6 +69,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
@@ -104,11 +105,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -128,6 +131,10 @@ import com.babelsoftware.innertube.YouTube
 import com.babelsoftware.loudly.LocalDatabase
 import com.babelsoftware.loudly.LocalPlayerConnection
 import com.babelsoftware.loudly.R
+import com.babelsoftware.loudly.constants.LyricsBackgroundDimKey
+import com.babelsoftware.loudly.constants.LyricFontSizeKey
+import com.babelsoftware.loudly.constants.ShowLyricsKey
+import com.babelsoftware.loudly.constants.TranslateLyricsKey
 import com.babelsoftware.loudly.extensions.metadata
 import com.babelsoftware.loudly.extensions.togglePlayPause
 import com.babelsoftware.loudly.extensions.toggleRepeatMode
@@ -142,12 +149,14 @@ import com.babelsoftware.loudly.ui.menu.AddToPlaylistDialog
 import com.babelsoftware.loudly.ui.menu.PlayerMenu
 import com.babelsoftware.loudly.ui.theme.extractGradientColors
 import com.babelsoftware.loudly.utils.makeTimeString
+import com.babelsoftware.loudly.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.absoluteValue
 import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
 private const val HQ_BITRATE = 45000
@@ -303,10 +312,10 @@ fun PlayerUI20(
     modifier: Modifier = Modifier
 ) {
     var showPlaylist by remember { mutableStateOf(false) }
+    var showLyrics by rememberPreference(ShowLyricsKey, defaultValue = false)
     val playerConnection = LocalPlayerConnection.current ?: return
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
     val context = LocalContext.current
-
     var dominantColor by remember { mutableStateOf<Color?>(null) }
 
     LaunchedEffect(mediaMetadata?.id) {
@@ -345,38 +354,54 @@ fun PlayerUI20(
                     .background(Color.Black.copy(alpha = 0.6f))
             )
         }
-
-        AnimatedContent(
-            targetState = showPlaylist,
-            transitionSpec = {
-                if (targetState) {
-                    slideInVertically { height -> height } + fadeIn() togetherWith
-                            slideOutVertically { height -> -height } + fadeOut()
+        AnimatedVisibility(
+            visible = !showLyrics,
+            enter = fadeIn(animationSpec = tween(300)),
+            exit = fadeOut(animationSpec = tween(300))
+        ) {
+            AnimatedContent(
+                targetState = showPlaylist,
+                transitionSpec = {
+                    if (targetState) {
+                        slideInVertically { height -> height } + fadeIn() togetherWith
+                                slideOutVertically { height -> -height } + fadeOut()
+                    } else {
+                        slideInVertically { height -> -height } + fadeIn() togetherWith
+                                slideOutVertically { height -> height } + fadeOut()
+                    }
+                },
+                label = "Player/Playlist"
+            ) { isPlaylistVisible ->
+                if (isPlaylistVisible) {
+                    PlaylistScreen(
+                        onClose = { showPlaylist = false },
+                        dominantColor = dominantColor ?: MaterialTheme.colorScheme.primary,
+                        navController = navController,
+                        bottomSheetState = bottomSheetState
+                    )
                 } else {
-                    slideInVertically { height -> -height } + fadeIn() togetherWith
-                            slideOutVertically { height -> height } + fadeOut()
+                    NowPlayingScreen(
+                        position = position,
+                        duration = duration,
+                        navController = navController,
+                        bottomSheetState = bottomSheetState,
+                        onShowPlaylist = { showPlaylist = true },
+                        onClose = { bottomSheetState.collapseSoft() },
+                        dominantColor = dominantColor,
+                        onToggleLyrics = { showLyrics = !showLyrics }
+                    )
                 }
-            },
-            label = "Player/Playlist"
-        ) { isPlaylistVisible ->
-            if (isPlaylistVisible) {
-                PlaylistScreen(
-                    onClose = { showPlaylist = false },
-                    dominantColor = dominantColor ?: MaterialTheme.colorScheme.primary,
-                    navController = navController,
-                    bottomSheetState = bottomSheetState
-                )
-            } else {
-                NowPlayingScreen(
-                    position = position,
-                    duration = duration,
-                    navController = navController,
-                    bottomSheetState = bottomSheetState,
-                    onShowPlaylist = { showPlaylist = true },
-                    onClose = { bottomSheetState.collapseSoft() },
-                    dominantColor = dominantColor
-                )
             }
+        }
+        AnimatedVisibility(
+            visible = showLyrics,
+            enter = slideInVertically { it } + fadeIn(),
+            exit = slideOutVertically { it } + fadeOut()
+        ) {
+            LyricsScreen(
+                position = position,
+                onDismiss = { showLyrics = false }
+            )
         }
     }
 }
@@ -392,14 +417,12 @@ fun NowPlayingScreen(
     bottomSheetState: BottomSheetState,
     onShowPlaylist: () -> Unit,
     onClose: () -> Unit,
-    dominantColor: Color?
+    dominantColor: Color?,
+    onToggleLyrics: () -> Unit
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
     val isPlaying by playerConnection.isPlaying.collectAsState()
-
     var sliderPosition by remember { mutableStateOf<Long?>(null) }
-    var showLyrics by remember { mutableStateOf(false) }
-
     val errorState by playerConnection.errorManagerState.collectAsState()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
     val context = LocalContext.current
@@ -458,40 +481,27 @@ fun NowPlayingScreen(
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            AnimatedContent(
-                targetState = showLyrics,
-                transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "Player/Lyrics"
-            ) { lyricsVisible ->
-                if (lyricsVisible) {
-                    LyricsScreen(
-                        position = position,
-                        onDismiss = { showLyrics = false }
-                    )
-                } else {
-                    CircularArcPlayer(
-                        position = sliderPosition ?: position,
-                        duration = duration,
-                        mediaMetadata = playerConnection.mediaMetadata.collectAsState().value,
-                        dominantColor = dominantColor,
-                        isPlaying = isPlaying,
-                        modifier = Modifier
-                            .padding(vertical = 16.dp)
-                            .fillMaxWidth(0.85f),
-                        onSeek = { newPosition ->
-                            playerConnection.player.seekTo(newPosition)
-                            sliderPosition = null
-                        },
-                        onSeekChange = { tempPosition ->
-                            sliderPosition = tempPosition
-                        },
-                        onSwipe = { direction ->
-                            if (direction > 0) playerConnection.player.seekToPrevious()
-                            else playerConnection.player.seekToNext()
-                        }
-                    )
+            CircularArcPlayer(
+                position = sliderPosition ?: position,
+                duration = duration,
+                mediaMetadata = playerConnection.mediaMetadata.collectAsState().value,
+                dominantColor = dominantColor,
+                isPlaying = isPlaying,
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .fillMaxWidth(0.85f),
+                onSeek = { newPosition ->
+                    playerConnection.player.seekTo(newPosition)
+                    sliderPosition = null
+                },
+                onSeekChange = { tempPosition ->
+                    sliderPosition = tempPosition
+                },
+                onSwipe = { direction ->
+                    if (direction > 0) playerConnection.player.seekToPrevious()
+                    else playerConnection.player.seekToNext()
                 }
-            }
+            )
         }
 
         ContextualInfoRow(
@@ -516,7 +526,7 @@ fun NowPlayingScreen(
             onPrevious = playerConnection.player::seekToPrevious,
             onNext = playerConnection.player::seekToNext,
             onRepeat = playerConnection.player::toggleRepeatMode,
-            onToggleLyrics = { showLyrics = !showLyrics },
+            onToggleLyrics = onToggleLyrics,
             canSkipPrevious = playerConnection.canSkipPrevious.collectAsState().value,
             canSkipNext = playerConnection.canSkipNext.collectAsState().value,
             navController = navController
@@ -1509,8 +1519,95 @@ fun InfoChip(
 }
 
 /**
+ * Composable containing all new control buttons (font, translation, share, etc.) on the song lyrics screen.
+ */
+@Composable
+private fun LyricsControls(
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+    val playerConnection = LocalPlayerConnection.current ?: return
+    val lyricsEntity by playerConnection.currentLyrics.collectAsState()
+
+    var fontSize by rememberPreference(LyricFontSizeKey, 22)
+    var backgroundDim by rememberPreference(LyricsBackgroundDimKey, 0)
+    var translate by rememberPreference(TranslateLyricsKey, false)
+
+    val onSurfaceColor = Color.White
+    val onSurfaceVariantColor = Color.White.copy(alpha = 0.7f)
+
+    Card(
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
+        ),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.25f)),
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text("A-", color = onSurfaceVariantColor, modifier = Modifier.clickable { if (fontSize > 14) fontSize -= 2 })
+            Slider(
+                value = fontSize.toFloat(),
+                onValueChange = { fontSize = it.roundToInt() },
+                valueRange = 14f..40f,
+                modifier = Modifier.weight(1f)
+            )
+            Text("A+", color = onSurfaceVariantColor, modifier = Modifier.clickable { if (fontSize < 40) fontSize += 2 })
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Icon(painterResource(R.drawable.dark_mode), contentDescription = "Dim", tint = onSurfaceVariantColor)
+            Slider(
+                value = backgroundDim.toFloat(),
+                onValueChange = { backgroundDim = it.roundToInt() },
+                valueRange = 0f..100f,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            IconButton(onClick = { translate = !translate }) {
+                Icon(
+                    painter = painterResource(R.drawable.translate),
+                    contentDescription = stringResource(R.string.translate),
+                    tint = if (translate) MaterialTheme.colorScheme.primary else onSurfaceVariantColor
+                )
+            }
+            IconButton(onClick = {
+                val sendIntent: Intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, lyricsEntity?.lyrics ?: "")
+                    type = "text/plain"
+                }
+                context.startActivity(Intent.createChooser(sendIntent, null))
+            }) {
+                Icon(painterResource(R.drawable.share), contentDescription = stringResource(R.string.share), tint = onSurfaceVariantColor)
+            }
+            IconButton(onClick = {
+                clipboardManager.setText(AnnotatedString(lyricsEntity?.lyrics ?: ""))
+            }) {
+                Icon(painterResource(R.drawable.content_copy), contentDescription = stringResource(R.string.copy), tint = onSurfaceVariantColor)
+            }
+            IconButton(onClick = { playerConnection.saveCurrentLyrics() }) {
+                Icon(painterResource(R.drawable.save), contentDescription = "Save Offline", tint = onSurfaceVariantColor)
+            }
+            IconButton(onClick = onDismiss) {
+                Icon(painterResource(R.drawable.arrow_upward), contentDescription = "Back to Player", tint = onSurfaceColor)
+            }
+        }
+    }
+}
+
+/**
  * A special Composable that manages and displays song lyrics.
- * Handles loading, not found, and display states.
+ * Handles loading, not found, and display states with new features.
  */
 @Composable
 private fun LyricsScreen(
@@ -1522,6 +1619,9 @@ private fun LyricsScreen(
     val lyricsEntity by playerConnection.currentLyrics.collectAsState()
     val isTranslating by playerConnection.translating.collectAsState()
     val onSurfaceColor = Color.White
+
+    val fontSize by rememberPreference(LyricFontSizeKey, 22)
+    val backgroundDim by rememberPreference(LyricsBackgroundDimKey, 0)
 
     val parsedLyrics: List<LyricsEntry> = remember(lyricsEntity) {
         LyricsUtils.parseLyrics(lyricsEntity?.lyrics ?: "", trim = true, multilineEnable = false)
@@ -1537,70 +1637,90 @@ private fun LyricsScreen(
         }
     }
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .clickable(onClick = onDismiss)
-            .padding(horizontal = 24.dp, vertical = 48.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        when {
-            lyricsEntity == null || isTranslating -> {
-                CircularProgressIndicator(color = onSurfaceColor)
-            }
-            parsedLyrics.isEmpty() -> {
-                Text(
-                    text = "No lyrics were found for this song.",
-                    color = onSurfaceColor.copy(alpha = 0.7f),
-                    style = MaterialTheme.typography.headlineSmall,
-                    textAlign = TextAlign.Center
-                )
-            }
-            else -> {
-                val listState = rememberLazyListState()
+    val dimColor = if (isSystemInDarkTheme()) Color.Black else MaterialTheme.colorScheme.surface
 
-                LaunchedEffect(currentLineIndex) {
-                    if (currentLineIndex != -1 && currentLineIndex < listState.layoutInfo.totalItemsCount) {
-                        listState.animateScrollToItem(index = currentLineIndex, scrollOffset = -250)
+    Box(modifier = modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                .background(dimColor.copy(alpha = backgroundDim.toFloat() / 100f))
+                .clickable(onClick = onDismiss)
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp)
+                .windowInsetsPadding(WindowInsets.systemBars),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                when {
+                    lyricsEntity == null || isTranslating -> {
+                        CircularProgressIndicator(color = onSurfaceColor)
                     }
-                }
-
-                LazyColumn(
-                    state = listState,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    item { Spacer(modifier = Modifier.height(200.dp)) }
-
-                    itemsIndexed(parsedLyrics) { index, line ->
-                        if (line.isTranslation) return@itemsIndexed
-
-                        val isActive = index == currentLineIndex
-
-                        val color by animateColorAsState(
-                            targetValue = if (isActive) onSurfaceColor else onSurfaceColor.copy(alpha = 0.6f),
-                            label = "LyricColor"
-                        )
-                        val fontSize by animateFloatAsState(
-                            targetValue = if (isActive) 26f else 22f,
-                            label = "LyricFontSize"
-                        )
-                        val fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal
-
+                    parsedLyrics.isEmpty() -> {
                         Text(
-                            text = line.text,
-                            color = color,
-                            fontSize = fontSize.sp,
-                            fontWeight = fontWeight,
-                            textAlign = TextAlign.Center,
-                            lineHeight = 36.sp
+                            text = "No lyrics were found for this song.",
+                            color = onSurfaceColor.copy(alpha = 0.7f),
+                            style = MaterialTheme.typography.headlineSmall,
+                            textAlign = TextAlign.Center
                         )
                     }
+                    else -> {
+                        val listState = rememberLazyListState()
 
-                    item { Spacer(modifier = Modifier.height(200.dp)) }
+                        LaunchedEffect(currentLineIndex) {
+                            if (currentLineIndex != -1 && currentLineIndex < listState.layoutInfo.totalItemsCount) {
+                                listState.animateScrollToItem(index = currentLineIndex, scrollOffset = -250)
+                            }
+                        }
+
+                        LazyColumn(
+                            state = listState,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            item { Spacer(modifier = Modifier.height(200.dp)) }
+
+                            itemsIndexed(parsedLyrics) { index, line ->
+                                if (line.isTranslation) return@itemsIndexed
+
+                                val isActive = index == currentLineIndex
+
+                                val color by animateColorAsState(
+                                    targetValue = if (isActive) onSurfaceColor else onSurfaceColor.copy(alpha = 0.6f),
+                                    label = "LyricColor"
+                                )
+                                val dynamicFontSize by animateFloatAsState(
+                                    targetValue = if (isActive) (fontSize + 4).toFloat() else fontSize.toFloat(),
+                                    label = "LyricFontSize"
+                                )
+                                val fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal
+
+                                Text(
+                                    text = line.text,
+                                    color = color,
+                                    fontSize = dynamicFontSize.sp,
+                                    fontWeight = fontWeight,
+                                    textAlign = TextAlign.Center,
+                                    lineHeight = (dynamicFontSize * 1.5).sp,
+                                    modifier = Modifier.clickable {
+                                        playerConnection.player.seekTo(line.time)
+                                    }
+                                )
+                            }
+
+                            item { Spacer(modifier = Modifier.height(200.dp)) }
+                        }
+                    }
                 }
             }
+            LyricsControls(onDismiss = onDismiss)
         }
     }
 }

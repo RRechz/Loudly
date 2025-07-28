@@ -196,6 +196,13 @@ class PlayerConnection(
         }
     }
 
+    fun saveCurrentLyrics() {
+        val lyricsToSave = currentLyrics.value ?: return
+        database.query {
+            upsert(lyricsToSave)
+        }
+    }
+
     fun togglePlayPause() {
        instance?.player?.playWhenReady =
             !instance?.player?.playWhenReady!!

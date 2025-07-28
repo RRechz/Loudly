@@ -546,6 +546,10 @@
     <string name="home_card_update_desc">Check the settings page for details</string>
     <string name="app_up_to_date">Software Up To Date</string>
 
+    <!-- Player UI -->
+    <string name="translate">Translate (BETA)</string>
+    <string name="copy">Copy</string>
+
     <!-- Playback Error -->
     <string name="error_network_title">Network Error</string>
     <string name="error_network_description">Check your internet connection and try again.</string>
