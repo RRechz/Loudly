@@ -29,21 +29,17 @@ class PlayerErrorManager(
             else -> {
                 onStateChange(State.RECOVERING)
                 recoveryJob = scope.launch {
-                    var needsLongerDelay = false
+                    var isFirstAttempt = true
                     while (isActive && !player.isPlaying && player.currentMediaItem != null) {
-                        if (needsLongerDelay) {
+                        if (!isFirstAttempt) {
                             delay(5000)
                         }
 
                         player.prepare()
+                        player.forceResume()
 
-                        var attempt = 0
-                        while (isActive && attempt < 5 && !player.isPlaying) {
-                            player.forceResume()
-                            delay(1000)
-                            attempt++
-                        }
-                        needsLongerDelay = !player.isPlaying
+                        isFirstAttempt = false
+                        delay(1000)
                     }
                     onStateChange(State.IDLE)
                 }

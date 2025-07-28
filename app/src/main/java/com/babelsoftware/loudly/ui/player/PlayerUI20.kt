@@ -409,17 +409,6 @@ fun NowPlayingScreen(
         )
     }
 
-    var showPersistentErrorUI by remember { mutableStateOf(false) }
-
-    LaunchedEffect(errorState) {
-        if (errorState == PlayerErrorManager.State.RECOVERING) {
-            delay(5000)
-            if (playerConnection.errorManagerState.value == PlayerErrorManager.State.RECOVERING) {
-                showPersistentErrorUI = true
-            }
-        } else { showPersistentErrorUI = false }
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -447,39 +436,12 @@ fun NowPlayingScreen(
             }
 
             AnimatedVisibility(visible = errorState == PlayerErrorManager.State.RECOVERING) {
-                if (showPersistentErrorUI) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        val error by playerConnection.error.collectAsState()
-                        if (error != null) {
-                            PlaybackError(
-                                error = error!!,
-                                retry = { /* Retrying is now fully automated */ }
-                            )
-                            Spacer(Modifier.height(8.dp))
-                            Button(
-                                onClick = {
-                                    LogReportHelper.createAndShareErrorReport(
-                                        context,
-                                        error!!,
-                                        mediaMetadata?.id
-                                    )
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                            ) {
-                                Icon(painterResource(R.drawable.share), contentDescription = null)
-                                Spacer(Modifier.width(8.dp))
-                                Text("Share Error Report")
-                            }
-                        }
-                    }
-                } else {
-                    InfoChip(
-                        icon = R.drawable.ic_autorenew,
-                        text = stringResource(R.string.recovering_playback),
-                        color = onSurfaceColor.copy(alpha = 0.8f),
-                        onClick = {}
-                    )
-                }
+                InfoChip(
+                    icon = R.drawable.ic_autorenew,
+                    text = stringResource(R.string.recovering_playback),
+                    color = onSurfaceColor.copy(alpha = 0.8f),
+                    onClick = {}
+                )
             }
             AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) {
                 NetworkStatusChip()
