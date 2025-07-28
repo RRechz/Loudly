@@ -57,9 +57,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.rounded.PlaylistRemove
 import androidx.compose.material.icons.rounded.VpnLock
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -69,8 +69,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -97,6 +100,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -137,10 +141,8 @@ import com.babelsoftware.loudly.ui.component.ResizableIconButton
 import com.babelsoftware.loudly.ui.menu.AddToPlaylistDialog
 import com.babelsoftware.loudly.ui.menu.PlayerMenu
 import com.babelsoftware.loudly.ui.theme.extractGradientColors
-import com.babelsoftware.loudly.utils.LogReportHelper
 import com.babelsoftware.loudly.utils.makeTimeString
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.absoluteValue
@@ -360,7 +362,9 @@ fun PlayerUI20(
             if (isPlaylistVisible) {
                 PlaylistScreen(
                     onClose = { showPlaylist = false },
-                    dominantColor = dominantColor ?: MaterialTheme.colorScheme.primary
+                    dominantColor = dominantColor ?: MaterialTheme.colorScheme.primary,
+                    navController = navController,
+                    bottomSheetState = bottomSheetState
                 )
             } else {
                 NowPlayingScreen(
@@ -1094,13 +1098,52 @@ fun CircularProgressBar(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlaylistScreen(onClose: () -> Unit, dominantColor: Color) {
+fun SwipeBackground(
+    dismissValue: SwipeToDismissBoxValue,
+    icon: ImageVector,
+    text: String,
+    alignment: Alignment,
+    color: Color
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color)
+            .padding(horizontal = 24.dp),
+        contentAlignment = alignment
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = text,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PlaylistScreen(
+    onClose: () -> Unit,
+    dominantColor: Color,
+    navController: NavController,
+    bottomSheetState: BottomSheetState
+) {
     val playerConnection = LocalPlayerConnection.current ?: return
     val queueWindows by playerConnection.queueWindows.collectAsState()
     val currentWindowIndex by playerConnection.currentWindowIndex.collectAsState()
     val lazyListState = rememberLazyListState()
     val queueTitle by playerConnection.queueTitle.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
 
 
     LaunchedEffect(currentWindowIndex) {
@@ -1118,21 +1161,77 @@ fun PlaylistScreen(onClose: () -> Unit, dominantColor: Color) {
             contentPadding = PaddingValues(top = 280.dp, bottom = 16.dp)
         ) {
             itemsIndexed(queueWindows, key = { _, window -> window.mediaItem.mediaId }) { index, window ->
-                SimplePlaylistItem(
-                    metadata = window.mediaItem.metadata!!,
-                    isActive = index == currentWindowIndex,
-                    activeColor = dominantColor,
-                    onClick = {
-                        if (index == currentWindowIndex) {
-                            playerConnection.player.togglePlayPause()
-                        } else {
-                            playerConnection.player.seekToDefaultPosition(index)
-                            if (!playerConnection.player.playWhenReady) {
-                                playerConnection.player.playWhenReady = true
+                val currentItem by rememberUpdatedState(window.mediaItem)
+                val dismissState = rememberSwipeToDismissBoxState()
+
+                LaunchedEffect(dismissState.targetValue) {
+                    if (dismissState.targetValue != SwipeToDismissBoxValue.Settled) {
+                        when (dismissState.targetValue) {
+                            // ---> Swipe right => Go to artist
+                            SwipeToDismissBoxValue.StartToEnd -> {
+                                val artistId = currentItem.metadata?.artists?.firstOrNull { it.id != null }?.id
+                                if (artistId != null) {
+                                    navController.navigate("artist/$artistId")
+                                    bottomSheetState.collapseSoft()
+                                }
+                            }
+                            // <---
+
+                            // ---> Swipe left -> Remove from list
+                            SwipeToDismissBoxValue.EndToStart -> {
+                                playerConnection.player.removeMediaItem(index)
+                            }
+                            // <---
+                            else -> {}
+                        }
+                        dismissState.reset() // Restore the action bar to its previous state
+                    }
+                }
+
+                SwipeToDismissBox(
+                    state = dismissState,
+                    backgroundContent = {
+                        val direction = dismissState.dismissDirection
+                        when (direction) {
+                            SwipeToDismissBoxValue.StartToEnd -> {
+                                SwipeBackground(
+                                    dismissValue = direction,
+                                    icon = Icons.Default.Person,
+                                    text = stringResource(R.string.view_artist),
+                                    alignment = Alignment.CenterStart,
+                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                                )
+                            }
+                            SwipeToDismissBoxValue.EndToStart -> {
+                                SwipeBackground(
+                                    dismissValue = direction,
+                                    icon = Icons.Rounded.PlaylistRemove,
+                                    text = stringResource(R.string.remove_from_queue),
+                                    alignment = Alignment.CenterEnd,
+                                    color = MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
+                                )
+                            }
+                            SwipeToDismissBoxValue.Settled -> {}
+                        }
+                    },
+                    modifier = Modifier.animateItem()
+                ) {
+                    SimplePlaylistItem(
+                        metadata = window.mediaItem.metadata!!,
+                        isActive = index == currentWindowIndex,
+                        activeColor = dominantColor,
+                        onClick = {
+                            if (index == currentWindowIndex) {
+                                playerConnection.player.togglePlayPause()
+                            } else {
+                                playerConnection.player.seekToDefaultPosition(index)
+                                if (!playerConnection.player.playWhenReady) {
+                                    playerConnection.player.playWhenReady = true
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
 
@@ -1181,6 +1280,7 @@ fun SimplePlaylistItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
             .clickable(onClick = onClick)
             .padding(horizontal = 24.dp, vertical = 12.dp)
     ) {
