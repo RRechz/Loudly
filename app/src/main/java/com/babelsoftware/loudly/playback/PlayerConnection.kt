@@ -35,7 +35,7 @@ import kotlinx.coroutines.flow.stateIn
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlayerConnection(
-    context: Context,
+    private val context: Context,
     binder: MusicService.MusicBinder,
     val database: MusicDatabase,
     scope: CoroutineScope,
@@ -138,10 +138,12 @@ class PlayerConnection(
     override fun onPlaybackStateChanged(state: Int) {
         playbackState.value = state
         error.value = player.playerError
+        sendWidgetUpdateBroadcast()
     }
 
     override fun onPlayWhenReadyChanged(newPlayWhenReady: Boolean, reason: Int) {
         playWhenReady.value = newPlayWhenReady
+        sendWidgetUpdateBroadcast()
     }
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -149,6 +151,7 @@ class PlayerConnection(
         currentMediaItemIndex.value = player.currentMediaItemIndex
         currentWindowIndex.value = player.getCurrentQueueIndex()
         updateCanSkipPreviousAndNext()
+        sendWidgetUpdateBroadcast()
     }
 
     override fun onTimelineChanged(timeline: Timeline, reason: Int) {
@@ -157,6 +160,7 @@ class PlayerConnection(
         currentMediaItemIndex.value = player.currentMediaItemIndex
         currentWindowIndex.value = player.getCurrentQueueIndex()
         updateCanSkipPreviousAndNext()
+        sendWidgetUpdateBroadcast()
     }
 
     override fun onShuffleModeEnabledChanged(enabled: Boolean) {
@@ -214,6 +218,11 @@ class PlayerConnection(
         @Volatile
         var instance: PlayerConnection? = null
             private set
+    }
+    private fun sendWidgetUpdateBroadcast() {
+        context.sendBroadcast(Intent(MusicWidget.ACTION_STATE_CHANGED).apply {
+            setPackage(context.packageName)
+        })
     }
     init {
         instance = this
