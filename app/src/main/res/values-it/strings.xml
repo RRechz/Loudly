@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Bottom navigation -->
+    <string name="next">Successivo</string>
+    <string name="previous">Prima di</string>
     <string name="home">Home</string>
+    <string name="explore">Scopri</string>
     <string name="songs">Brani</string>
     <string name="artists">Artisti</string>
     <string name="albums">Album</string>
@@ -15,12 +18,14 @@
     <!-- Home -->
     <string name="history">Cronologia</string>
     <string name="stats">Statistiche</string>
+    <string name="show_more">Mostra altro</string>
     <string name="mood_and_genres">Mood e Generi</string>
     <string name="account">Account</string>
     <string name="quick_picks">Scelte rapide</string>
     <string name="quick_picks_empty">Ascolta alcuni brani per generare le tue scelte rapide</string>
     <string name="new_release_albums">Nuovi album in uscita</string>
     <!-- History -->
+    <string name="featured_for_you">In primo piano per te</string>
     <string name="today">Oggi</string>
     <string name="yesterday">Ieri</string>
     <string name="this_week">Questa settimana</string>
@@ -186,6 +191,7 @@
     <!-- Settings -->
     <string name="settings">Impostazioni</string>
     <string name="appearance">Aspetto</string>
+    <string name="proxy">Proxy</string>
     <string name="enable_dynamic_theme">Abilita il tema dinamico</string>
     <string name="dark_theme">Tema scuro</string>
     <string name="dark_theme_on">Attivato</string>
@@ -224,6 +230,7 @@
     <string name="song_cache">Cache dei brani</string>
     <string name="max_cache_size">Dimensione massima della cache</string>
     <string name="unlimited">Illimitata</string>
+    <string name="audio_offload_description">Utilizza il percorso di offload audio per la riproduzione audio. Disabilitare questa opzione può aumentare il consumo energetico, ma può essere utile se si verificano problemi con la riproduzione audio o la post-elaborazione.</string>
     <string name="clear_all_downloads">Cancella tutti i download</string>
     <string name="max_image_cache_size">Grandezza massima della cache delle immagini</string>
     <string name="clear_image_cache">Pulisci la cache delle immagini</string>
@@ -278,4 +285,57 @@
     <string name="skip_duplicates">Salta duplicati</string>
     <string name="library_artist_empty">Gli artisti della libreria verranno visualizzati qui</string>
     <string name="action_like_all">Mi piace a tutto</string>
+    <string name="show_less">Mostra meno</string>
+    <string name="send_to_developer">Invia allo sviluppatore</string>
+    <string name="close">Chiudi</string>
+    <string name="update_error_details">Mostra dettagli errore</string>
+    <string name="download_failed">Download non riuscito</string>
+    <string name="show_error">Mostra errore</string>
+    <string name="go_to_update_link">Aggiornamento manuale</string>
+    <string name="home_card_update_desc">Controlla la pagina delle impostazioni per i dettagli.</string>
+    <string name="app_up_to_date">Software aggiornato</string>
+    <string name="translate">Traduci (BETA)</string>
+    <string name="copy">Copia</string>
+    <string name="error_network_title">Errore di rete</string>
+    <string name="error_network_description">Controlla la tua connessione Internet e riprova.</string>
+    <string name="error_unsupported_format_title">Contenuti non supportati</string>
+    <string name="error_unsupported_format_description">Questo formato musicale non è supportato dal tuo dispositivo.</string>
+    <string name="error_behind_live_window_title">Errore nella trasmissione in diretta</string>
+    <string name="error_behind_live_window_description">C\'è un problema con lo streaming live. Si prega di riavviare.</string>
+    <string name="error_playback_failed_title">Riproduzione non riuscita</string>
+    <string name="error_playback_failed_description">Si è verificato un errore sconosciuto. Riprova.</string>
+    <string name="recovering_playback">Riprovo...</string>
+    <string name="vpn_info_message">L\'uso di una VPN può influire sulla qualità della connessione. Se riscontri problemi di rete, disconnetti la connessione VPN o utilizza un proxy. Puoi configurarlo in “Impostazioni >> Contenuto >> Proxy”.</string>
+    <string name="visit_spotify_for_developers">1. Visita Spotify per sviluppatori, vai alla dashboard Spotify per sviluppatori e clicca su Crea app.</string>
+    <string name="enter_the_necessary_details">2. Inserisci i dettagli necessari e utilizza http://127.0.0.1:45454 come URI di reindirizzamento.</string>
+    <string name="make_sure_to_click">3. Assicurati di fare clic su Aggiungi dopo aver inserito il percorso locale sopra indicato.</string>
+    <string name="toggle_wep_api">4. Attiva/disattiva l\'API Web. La casella di controllo dovrebbe ora essere spuntata.</string>
+    <string name="accept_the_terms_of_service">5. Accetta i termini di servizio e clicca su Salva.</string>
+    <string name="compose">Comporre</string>
+    <string name="import_from_spotify">Importa da Spotify</string>
+    <string name="title_spotify">Spotfiy</string>
+    <string name="title_discord">Discordia</string>
+    <string name="discord_integration">Integrazione con Discord</string>
+    <string name="discord_information">Loudly utilizza la libreria KizzyRPC per impostare lo stato del tuo account Discord. Ciò comporta l\'utilizzo della connessione Discord Gateway, che potrebbe essere considerata una violazione dei Termini di servizio di Discord. Tuttavia, non sono noti casi di account utente sospesi per questo motivo. Utilizza a tuo rischio e pericolo.</string>
+    <string name="yt_music_fingertips">YouTube Music a portata di mano</string>
+    <string name="ytm_account_sync">Sincronizzazione dell\'account YT Music</string>
+    <string name="minimalist_music_widget_description">Widget musicale “Quik” ispirato al design del pulsante Impostazioni rapide di Android 16.</string>
+    <string name="new_playlist_named">Una nuova playlist chiamata “Brani preferiti”</string>
+    <string name="good_afternoon">Buon pomeriggio</string>
+    <string name="storage_description">Download · Cache · Immagini</string>
+    <string name="update_card_downloading">Download in corso... %1$s</string>
+    <string name="dont_close_app_message">Non chiudere l\'app e non tornare indietro. Questa operazione non viene eseguita in background, quindi resta lì finché non è completata!</string>
+    <string name="ytm_sync">NON TI SPAVENTARE SE SEMBRA BLOCCATA; a volte il recupero può richiedere un po\' di tempo.</string>
+    <string name="scanner_strict_file_name_title">Nomi dei file rigorosi</string>
+    <string name="appearance_description">Tema · Slider · Lettore</string>
+    <string name="header_background">Immagine della scheda profilo</string>
+    <string name="main">Principale</string>
+    <string name="wifi_only">Solo Wi-Fi</string>
+    <string name="classic_music_widget_description">Accedi rapidamente a tutti i controlli e alle informazioni sui brani dalla schermata iniziale.</string>
+    <string name="select_from_gallery">Seleziona dalla galleria</string>
+    <string name="remove_from_cache">Rimuovi dalla cache</string>
+    <string name="login_with_spotify">Accedi con le credenziali API di Spotify</string>
+    <string name="keep_alive_description">Utilizza una notifica in primo piano per impedire che Loudly venga chiuso casualmente dal sistema.</string>
+    <string name="use_login_for_browse">Utilizza il login per navigare nei contenuti</string>
+    <string name="select_all">Seleziona tutto</string>
 </resources>

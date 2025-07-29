@@ -1,6 +1,8 @@
 <resources>
     <!-- Bottom navigation -->
+    <string name="previous">Πρώτα</string>
     <string name="home">Αρχική</string>
+    <string name="explore">Αρχική σελίδα</string>
     <string name="songs">Τραγούδια</string>
     <string name="artists">Καλλιτέχνες</string>
     <string name="albums">Άλμπουμ</string>

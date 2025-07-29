@@ -514,7 +514,7 @@
     <string name="cancel">İptal</string>
 
     <string name="recovering_playback">Yeniden Deneniyor...</string>
-    <string name="vpn_info_message">Using a VPN may affect your connection quality. If you are experiencing network problems, disconnect your VPN connection or use a proxy. You can configure this in “Settings >> Content >> Proxy.”</string>
+    <string name="vpn_info_message">VPN kullanmak bağlantı kalitenizi etkileyebilir. Ağ sorunları yaşıyorsanız, VPN bağlantınızı kesin veya bir proxy kullanın. Bunu “Ayarlar >> İçerik >> Proxy” bölümünden yapılandırabilirsiniz.</string>
     <string name="sync_local_songs_toast">Yerel şarkılar başarıyla senkronize edildi</string>
     <string name="local_scanner_title">Yerel tarayıcı</string>
 
@@ -589,6 +589,7 @@ TAKILMIŞ GÖRÜNÜRSE PANİK YAPMAYIN; bazen alım işlemi biraz zaman alabilir
     <string name="go_to_update_link">Manuel Güncelle</string>
     <string name="home_card_update_desc">Detaylar için ayarları kontrol et</string>
     <string name="app_up_to_date">Yazılım Güncel</string>
+    <string name="copy">Kopyala</string>
     <string name="error_network_title">Ağ Hatası</string>
     <string name="error_network_description">Ağ bağlantınızı kotnrol edin ve yeniden deneyin.</string>
     <string name="error_unsupported_format_title">Desteklenmeyen İçerik</string>
@@ -597,4 +598,5 @@ TAKILMIŞ GÖRÜNÜRSE PANİK YAPMAYIN; bazen alım işlemi biraz zaman alabilir
     <string name="error_behind_live_window_description">Canlı yayında bir sorun var. Lütfen yeniden başlatın.</string>
     <string name="error_playback_failed_title">Oynatma Başarısız</string>
     <string name="error_playback_failed_description">Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin.</string>
+    <string name="translate">Çeviri (BETA(</string>
 </resources>

@@ -17,6 +17,7 @@
     <string name="back">返回</string>
     <string name="next">下一步</string>
 
+    <string name="previous">之前</string>
     <string name="home">主页</string>
     <string name="explore">探索</string>
     <string name="songs">歌曲</string>
@@ -52,6 +53,7 @@
     <string name="history_empty">您的历史记录将显示在此处</string>
     <string name="stats_empty">您的统计数据将显示在此处</string>
     <string name="stats">统计</string>
+    <string name="show_more">顯示更多</string>
     <string name="mood_and_genres">心情与流派</string>
     <string name="account">账户</string>
     <string name="quick_picks">快速精选</string>
@@ -64,6 +66,7 @@
     <string name="not_internet">无网络连接</string>
     <string name="internet_required">您似乎没有网络连接。请检查您的网络。</string>
 
+    <string name="featured_for_you">為您精選</string>
     <string name="today">今天</string>
     <string name="yesterday">昨天</string>
     <string name="this_week">本周</string>
@@ -500,6 +503,7 @@
     <string name="edit_photo">编辑照片</string>
     <string name="cancel">取消</string>
 
+    <string name="vpn_info_message">使用 VPN 可能會影響您的連線品質。如果您遇到網路問題，請中斷 VPN 連線或使用代理。您可以在 「設定 >> 內容 >> 代理」 中進行設定。</string>
     <string name="sync_local_songs_toast">本地歌曲同步成功</string>
     <string name="local_scanner_title">本地扫描器</string>
 
@@ -565,4 +569,24 @@
     <string name="where_should_the_liked_songs">喜欢的歌曲应该导入到哪里？</string>
     <string name="new_playlist_named">一个名为“喜欢的歌曲”的新播放列表</string>
     <string name="default_liked_songs">在默认的“喜欢的歌曲”中</string>
+    <string name="show_less">顯示更少</string>
+    <string name="send_to_developer">傳送至開發人員</string>
+    <string name="close">關閉</string>
+    <string name="update_error_details">顯示錯誤詳細資訊</string>
+    <string name="download_failed">下載失敗</string>
+    <string name="show_error">顯示錯誤</string>
+    <string name="go_to_update_link">Manuel 更新</string>
+    <string name="home_card_update_desc">檢查設定頁面的詳細資訊</string>
+    <string name="app_up_to_date">軟體更新</string>
+    <string name="translate">翻譯 (BETA)</string>
+    <string name="copy">複製</string>
+    <string name="error_network_title">網路錯誤</string>
+    <string name="error_network_description">檢查您的網際網路連線，然後再試一次。</string>
+    <string name="error_unsupported_format_title">不支援的內容</string>
+    <string name="error_unsupported_format_description">您的裝置不支援此歌曲格式。</string>
+    <string name="error_behind_live_window_title">現場廣播錯誤</string>
+    <string name="error_behind_live_window_description">即時串流出現問題。請重新啟動。</string>
+    <string name="error_playback_failed_title">播放失敗</string>
+    <string name="error_playback_failed_description">發生未知錯誤。請再試一次。</string>
+    <string name="recovering_playback">再試一次...</string>
 </resources>

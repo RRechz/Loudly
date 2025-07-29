@@ -17,6 +17,7 @@
     <string name="back">Kembali</string>
     <string name="next">Berikutnya</string>
 
+    <string name="previous">Sebelumnya</string>
     <string name="home">Beranda</string>
     <string name="explore">Jelajahi</string>
     <string name="songs">Lagu</string>
@@ -52,6 +53,7 @@
     <string name="history_empty">Histori Anda akan muncul di sini</string>
     <string name="stats_empty">Statistik Anda akan muncul di sini</string>
     <string name="stats">Statistik</string>
+    <string name="show_more">Tampilkan Lebih Banyak</string>
     <string name="mood_and_genres">Suasana Hati dan Genre</string>
     <string name="account">Akun</string>
     <string name="quick_picks">Pilihan cepat</string>
@@ -64,6 +66,7 @@
     <string name="not_internet">Tidak Ada Koneksi Internet</string>
     <string name="internet_required">Sepertinya Anda tidak memiliki koneksi internet. Silakan periksa jaringan Anda.</string>
 
+    <string name="featured_for_you">Rekomendasi untuk Anda</string>
     <string name="today">Hari ini</string>
     <string name="yesterday">Kemarin</string>
     <string name="this_week">Minggu ini</string>
@@ -500,6 +503,7 @@
     <string name="edit_photo">Edit Foto</string>
     <string name="cancel">Batal</string>
 
+    <string name="vpn_info_message">Penggunaan VPN dapat memengaruhi kualitas koneksi Anda. Jika Anda mengalami masalah jaringan, putuskan koneksi VPN Anda atau gunakan proxy. Anda dapat mengonfigurasinya di “Pengaturan >> Konten >> Proxy.”</string>
     <string name="sync_local_songs_toast">Sinkronisasi lagu lokal berhasil</string>
     <string name="local_scanner_title">Pemindai lokal</string>
 
@@ -565,4 +569,24 @@ JANGAN PANIK JIKA TERLIHAT MACET; terkadang pengambilan bisa memakan waktu.</str
     <string name="where_should_the_liked_songs">Ke mana lagu yang disukai harus diimpor?</string>
     <string name="new_playlist_named">Playlist baru bernama "Lagu yang Disukai"</string>
     <string name="default_liked_songs">Di "Lagu yang Disukai" default</string>
+    <string name="show_less">Tampilkan Lebih Sedikit</string>
+    <string name="send_to_developer">Kirim ke Pengembang</string>
+    <string name="close">Tutup</string>
+    <string name="update_error_details">Tampilkan Rincian Kesalahan</string>
+    <string name="download_failed">Unduhan Gagal</string>
+    <string name="show_error">Tampilkan Kesalahan</string>
+    <string name="go_to_update_link">Pembaruan Manual</string>
+    <string name="home_card_update_desc">Periksa halaman pengaturan untuk detailnya.</string>
+    <string name="app_up_to_date">Perangkat Lunak Terbaru</string>
+    <string name="translate">Terjemahkan (BETA)</string>
+    <string name="copy">Salin</string>
+    <string name="error_network_title">Kesalahan Jaringan</string>
+    <string name="error_network_description">Periksa koneksi internet Anda dan coba lagi.</string>
+    <string name="error_unsupported_format_title">Konten yang tidak didukung</string>
+    <string name="error_unsupported_format_description">Format lagu ini tidak didukung di perangkat Anda.</string>
+    <string name="error_behind_live_window_title">Kesalahan Siaran Langsung</string>
+    <string name="error_behind_live_window_description">Ada masalah dengan siaran langsung. Silakan restart.</string>
+    <string name="error_playback_failed_title">Pemutaran Gagal</string>
+    <string name="error_playback_failed_description">Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.</string>
+    <string name="recovering_playback">Coba lagi…</string>
 </resources>

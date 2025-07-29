@@ -17,6 +17,7 @@
     <string name="back">Назад</string>
     <string name="next">Напред</string>
 
+    <string name="previous">Преди това</string>
     <string name="home">Начало</string>
     <string name="explore">Изследване</string>
     <string name="songs">Песни</string>
@@ -53,6 +54,7 @@
     <string name="history_empty">Вашата история ще се появи тук</string>
     <string name="stats_empty">Вашата статистика ще се появи тук</string>
     <string name="stats">Статистика</string>
+    <string name="show_more">Покажи още</string>
     <string name="mood_and_genres">Настроения и жанрове</string>
     <string name="account">Акаунт</string>
     <string name="quick_picks">Бързи избори</string>
@@ -65,6 +67,7 @@
     <string name="not_internet">Няма интернет връзка</string>
     <string name="internet_required">Изглежда, че нямате интернет връзка. Моля, проверете вашата мрежа.</string>
 
+    <string name="featured_for_you">Представено за вас</string>
     <string name="today">Днес</string>
     <string name="yesterday">Вчера</string>
     <string name="this_week">Тази седмица</string>
@@ -510,6 +513,7 @@
     <string name="edit_photo">Редактиране на снимка</string>
     <string name="cancel">Отказ</string>
 
+    <string name="vpn_info_message">Използването на VPN може да повлияе на качеството на връзката ви. Ако имате проблеми с мрежата, прекъснете VPN връзката си или използвайте прокси. Можете да конфигурирате това в „Настройки >> Съдържание >> Прокси“.</string>
     <string name="sync_local_songs_toast">Локалните песни са синхронизирани успешно</string>
     <string name="local_scanner_title">Локален скенер</string>
 
@@ -575,4 +579,24 @@
     <string name="where_should_the_liked_songs">Къде трябва да се импортират харесаните песни?</string>
     <string name="new_playlist_named">Нов плейлист с име "Харесани песни"</string>
     <string name="default_liked_songs">В плейлиста по подразбиране "Харесани песни"</string>
+    <string name="show_less">Покажи по-малко</string>
+    <string name="send_to_developer">Изпрати на разработчика</string>
+    <string name="close">Затвори</string>
+    <string name="update_error_details">Покажи подробности за грешката</string>
+    <string name="download_failed">Изтеглянето се провали</string>
+    <string name="show_error">Покажи грешка</string>
+    <string name="go_to_update_link">Актуализация на Мануел</string>
+    <string name="home_card_update_desc">Проверете страницата с настройките за подробности.</string>
+    <string name="app_up_to_date">Софтуерът е актуален</string>
+    <string name="translate">Преведи (БЕТА)</string>
+    <string name="copy">Копиране</string>
+    <string name="error_network_title">Мрежова грешка</string>
+    <string name="error_network_description">Проверете интернет връзката си и опитайте отново.</string>
+    <string name="error_unsupported_format_title">Неподдържано съдържание</string>
+    <string name="error_unsupported_format_description">Този формат на песента не се поддържа от вашето устройство.</string>
+    <string name="error_behind_live_window_title">Грешка при прякото излъчване</string>
+    <string name="error_behind_live_window_description">Има проблем с прякото предаване. Моля, рестартирайте.</string>
+    <string name="error_playback_failed_title">Възпроизвеждането се провали</string>
+    <string name="error_playback_failed_description">Възникна неизвестна грешка. Моля, опитайте отново.</string>
+    <string name="recovering_playback">Опитвам отново...</string>
 </resources>

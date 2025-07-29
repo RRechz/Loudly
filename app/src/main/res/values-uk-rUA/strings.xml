@@ -9,6 +9,7 @@
     <string name="next">Далі</string>
 
     <!-- Bottom navigation -->
+    <string name="previous">Попередній</string>
     <string name="home">Головна</string>
     <string name="explore">Навігатор</string>
     <string name="songs">Музика</string>

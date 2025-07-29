@@ -17,6 +17,7 @@
     <string name="back">رجوع</string>
     <string name="next">التالي</string>
 
+    <string name="previous">السابق</string>
     <string name="home">الرئيسية</string>
     <string name="explore">استكشاف</string>
     <string name="songs">الأغاني</string>
@@ -57,6 +58,7 @@
     <string name="history_empty">سيظهر سجلك هنا</string>
     <string name="stats_empty">ستظهر إحصائياتك هنا</string>
     <string name="stats">الإحصائيات</string>
+    <string name="show_more">عرض المزيد</string>
     <string name="mood_and_genres">الحالات المزاجية والأنواع</string>
     <string name="account">الحساب</string>
     <string name="quick_picks">اختيارات سريعة</string>
@@ -69,6 +71,7 @@
     <string name="not_internet">لا يوجد اتصال بالإنترنت</string>
     <string name="internet_required">يبدو أنه لا يوجد لديك اتصال بالإنترنت. يرجى التحقق من شبكتك.</string>
 
+    <string name="featured_for_you">مختارات لك</string>
     <string name="today">اليوم</string>
     <string name="yesterday">أمس</string>
     <string name="this_week">هذا الأسبوع</string>
@@ -550,6 +553,7 @@
     <string name="edit_photo">تعديل الصورة</string>
     <string name="cancel">إلغاء</string>
 
+    <string name="vpn_info_message">قد يؤثر استخدام VPN على جودة اتصالك. إذا كنت تواجه مشاكل في الشبكة، فافصل اتصال VPN أو استخدم وكيل. يمكنك تكوين هذا في ”الإعدادات >> المحتوى >> الوكيل“.</string>
     <string name="sync_local_songs_toast">تمت مزامنة الأغاني المحلية بنجاح</string>
     <string name="local_scanner_title">الماسح المحلي</string>
 
@@ -615,4 +619,24 @@
     <string name="where_should_the_liked_songs">أين يجب استيراد الأغاني المعجب بها؟</string>
     <string name="new_playlist_named">قائمة تشغيل جديدة باسم "الأغاني المعجب بها"</string>
     <string name="default_liked_songs">في "الأغاني المعجب بها" الافتراضية</string>
+    <string name="show_less">إظهار أقل</string>
+    <string name="send_to_developer">إرسال إلى المطور</string>
+    <string name="close">إغلاق</string>
+    <string name="update_error_details">عرض تفاصيل الخطأ</string>
+    <string name="download_failed">فشل التنزيل</string>
+    <string name="show_error">عرض الخطأ</string>
+    <string name="go_to_update_link">تحديث مانويل</string>
+    <string name="home_card_update_desc">تحقق من صفحة الإعدادات للحصول على التفاصيل</string>
+    <string name="app_up_to_date">البرامج محدثة</string>
+    <string name="translate">ترجمة (BETA)</string>
+    <string name="copy">نسخ</string>
+    <string name="error_network_title">خطأ في الشبكة</string>
+    <string name="error_network_description">تحقق من اتصالك بالإنترنت وحاول مرة أخرى.</string>
+    <string name="error_unsupported_format_title">محتوى غير مدعوم</string>
+    <string name="error_unsupported_format_description">هذا التنسيق من الأغاني غير مدعوم على جهازك.</string>
+    <string name="error_behind_live_window_title">خطأ في البث المباشر</string>
+    <string name="error_behind_live_window_description">هناك مشكلة في البث المباشر. يرجى إعادة التشغيل.</string>
+    <string name="error_playback_failed_title">فشل التشغيل</string>
+    <string name="error_playback_failed_description">حدث خطأ غير معروف. يرجى المحاولة مرة أخرى.</string>
+    <string name="recovering_playback">أحاول مرة أخرى...</string>
 </resources>

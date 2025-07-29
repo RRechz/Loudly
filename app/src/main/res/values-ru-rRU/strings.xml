@@ -10,6 +10,7 @@
     <string name="next">Далее</string>
 
     <!-- Bottom navigation -->
+    <string name="previous">Предыдущий</string>
     <string name="home">Главная</string>
     <string name="explore">Навигатор</string>
     <string name="songs">Музыка</string>
