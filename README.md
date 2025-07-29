@@ -22,34 +22,21 @@
 * *Android Auto support
 * Discord Rich Presence support
 
+> *Here's what you need to do for Android Auto;
+> 1. Go to Android Auto's settings and tap multiple times on the version in the bottom to enable developer settings
+> 2. In the three dots menu at the top-right of the screen, click "Developer settings"
+> 3. Enable "Unknown sources"
+
 ## Will Be Added Soon!
 * Loudly AI: Music Asistant
 
 ## Screenshots
 <p float="left">
-  <img src="https://github.com/RRechz/Loudly/blob/master/image/loudly_screenshots_1.jpg" width="200" />
-  <img src="https://github.com/RRechz/Loudly/blob/master/image/loudly_screenshots_2.jpg" width="200" />
-  <img src="https://github.com/RRechz/Loudly/blob/master/image/loudly_screenshots_3.jpg" width="200" />
+  <img src="https://github.com/RRechz/Loudly/blob/master/image/loudly_light_mode.png"/>
 </p>
 <p float="left">
-  <img src="https://github.com/RRechz/Loudly/blob/master/image/loudly_screenshots_4.jpg" width="200" />
-  <img src="https://github.com/RRechz/Loudly/blob/master/image/loudly_screenshots_5.jpg" width="200" />
-  <img src="https://github.com/RRechz/Loudly/blob/master/image/loudly_screenshots_6.jpg" width="200" />
+  <img src="https://github.com/RRechz/Loudly/blob/master/image/loudly_dark_mode.png"/>
 </p>
-<p float="left">
-  <img src="https://github.com/RRechz/Loudly/blob/master/image/loudly_screenshots_7.jpg" width="200" />
-  <img src="https://github.com/RRechz/Loudly/blob/master/image/loudly_screenshots_8.jpg" width="200" />
-  <img src="https://github.com/RRechz/Loudly/blob/master/image/loudly_screenshots_9.jpg" width="200" />
-</p>
-<p float="left">
-  <img src="https://github.com/RRechz/Loudly/blob/master/image/loudly_screenshots_10.jpg" width="200" />
-  <img src="https://github.com/RRechz/Loudly/blob/master/image/loudly_screenshots_11.jpg" width="200" />
-</p>
-
-> *Here's what you need to do for Android Auto;
-> 1. Go to Android Auto's settings and tap multiple times on the version in the bottom to enable developer settings
-> 2. In the three dots menu at the top-right of the screen, click "Developer settings"
-> 3. Enable "Unknown sources"
 
 ## Donate
 
