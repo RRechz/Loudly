@@ -1000,10 +1000,10 @@ class MainActivity : ComponentActivity() {
                                     shape = RoundedCornerShape(24.dp),
                                     colors = CardDefaults.cardColors(
                                         containerColor = MaterialTheme.colorScheme.surface.copy(
-                                            alpha = 0.85f
+                                            alpha = 0.8f
                                         )
                                     ),
-                                    border = BorderStroke(1.dp, Color.White.copy(alpha = 2.50f))
+                                    border = BorderStroke(1.dp, Color.White.copy(alpha = 1.50f))
                                 ) { /* This card is only a visual background and has no content. */ }
                             }
                             // <---
