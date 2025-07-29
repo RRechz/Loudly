@@ -5,11 +5,9 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,8 +24,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -104,261 +100,241 @@ fun MiniPlayer(
         defaultValue = PlayerStyle.UI_2_0
     )
 
-    val isDarkTheme = isSystemInDarkTheme()
-    val cardBackgroundColor = if (isDarkTheme) {
-        MaterialTheme.colorScheme.surface.copy(alpha = 1.2f)
-    } else {
-        MaterialTheme.colorScheme.surface.copy(alpha = 1.0f)
-    }
-    val cardBorderColor = if (isDarkTheme) {
-        Color.White.copy(alpha = 0.2f)
-    } else {
-        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f)
-    }
-    val onCardColor = MaterialTheme.colorScheme.onSurface
-
     Box(
         modifier = modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
-            .padding(start = 8.dp, end = 8.dp, top = 6.dp, bottom = 12.dp)
+            .padding(horizontal = 16.dp)
     ) {
-        Card(
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = cardBackgroundColor
-            ),
-            border = BorderStroke(1.dp, cardBorderColor)
-        ) {
-            if (playerStyle == PlayerStyle.UI_2_0) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(64.dp)
-                        .pointerInput(Unit) {
-                            detectHorizontalDragGestures(
-                                onDragCancel = { offsetX = 0f },
-                                onHorizontalDrag = { _, dragAmount ->
-                                    val adjustedDragAmount = if (layoutDirection == LayoutDirection.Rtl) -dragAmount else dragAmount
-                                    offsetX += adjustedDragAmount
-                                },
-                                onDragEnd = {
-                                    val threshold = 0.15f * currentView.width
-                                    when {
-                                        offsetX > threshold && canSkipPrevious -> playerConnection.player.seekToPreviousMediaItem()
-                                        offsetX < -threshold && canSkipNext -> playerConnection.player.seekToNext()
-                                    }
-                                    offsetX = 0f
+        if (playerStyle == PlayerStyle.UI_2_0) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .pointerInput(Unit) {
+                        detectHorizontalDragGestures(
+                            onDragCancel = { offsetX = 0f },
+                            onHorizontalDrag = { _, dragAmount ->
+                                val adjustedDragAmount = if (layoutDirection == LayoutDirection.Rtl) -dragAmount else dragAmount
+                                offsetX += adjustedDragAmount
+                            },
+                            onDragEnd = {
+                                val threshold = 0.15f * currentView.width
+                                when {
+                                    offsetX > threshold && canSkipPrevious -> playerConnection.player.seekToPreviousMediaItem()
+                                    offsetX < -threshold && canSkipNext -> playerConnection.player.seekToNext()
                                 }
-                            )
-                        }
+                                offsetX = 0f
+                            }
+                        )
+                    }
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .offset { IntOffset(offsetX.roundToInt(), 0) }
+                        .padding(start = 8.dp, end = 4.dp)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                    mediaMetadata?.let {
+                        Box(modifier = Modifier.size(48.dp)) {
+                            if (it.isLocal) {
+                                AsyncLocalImage(
+                                    image = { imageCache.getLocalThumbnail(it.localPath, false) },
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))
+                                )
+                            } else {
+                                AsyncImage(
+                                    model = it.thumbnailUrl,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))
+                                )
+                            }
+                            val bitrate = currentFormat?.bitrate
+                            if (bitrate != null) {
+                                val isHq = bitrate > HQ_BITRATE
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(2.dp)
+                                ) {
+                                    QualityIndicator(isHq = isHq)
+                                }
+                            }
+                        }
+                    }
+                    Column(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .offset { IntOffset(offsetX.roundToInt(), 0) }
-                            .padding(start = 8.dp, end = 4.dp)
+                            .weight(1f)
+                            .padding(horizontal = 12.dp)
                     ) {
                         mediaMetadata?.let {
-                            Box(modifier = Modifier.size(48.dp)) {
-                                if (it.isLocal) {
-                                    AsyncLocalImage(
-                                        image = { imageCache.getLocalThumbnail(it.localPath, false) },
-                                        contentDescription = null,
-                                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))
-                                    )
-                                } else {
-                                    AsyncImage(
-                                        model = it.thumbnailUrl,
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))
-                                    )
-                                }
-                                val bitrate = currentFormat?.bitrate
-                                if (bitrate != null) {
-                                    val isHq = bitrate > HQ_BITRATE
-                                    Box(
-                                        modifier = Modifier
-                                            .align(Alignment.BottomEnd)
-                                            .padding(2.dp)
-                                    ) {
-                                        QualityIndicator(isHq = isHq)
-                                    }
-                                }
-                            }
-                        }
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 12.dp)
-                        ) {
-                            mediaMetadata?.let {
-                                Text(
-                                    text = it.title,
-                                    color = onCardColor,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.basicMarquee(),
-                                )
-                                Text(
-                                    text = it.artists.joinToString { artist -> artist.name },
-                                    color = onCardColor.copy(alpha = 0.7f),
-                                    fontSize = 12.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.basicMarquee(),
-                                )
-                            }
-                        }
-                        IconButton(onClick = playerConnection.player::togglePlayPause) {
-                            Icon(
-                                painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
-                                contentDescription = "Play/Pause",
-                                tint = onCardColor,
-                                modifier = Modifier.size(32.dp)
+                            Text(
+                                text = it.title,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.basicMarquee(),
                             )
-                        }
-                        IconButton(enabled = canSkipNext, onClick = { playerConnection.player.seekToNext() }) {
-                            Icon(
-                                painter = painterResource(R.drawable.skip_next),
-                                contentDescription = "Next",
-                                tint = onCardColor,
-                                modifier = Modifier.size(32.dp)
+                            Text(
+                                text = it.artists.joinToString { artist -> artist.name },
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                fontSize = 12.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.basicMarquee(),
                             )
                         }
                     }
-                    LinearProgressIndicator(
-                        progress = { (position.toFloat() / duration).coerceIn(0f, 1f) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(2.dp)
-                            .align(Alignment.BottomCenter),
-                        color = onCardColor,
-                        trackColor = Color.Transparent
-                    )
+                    IconButton(onClick = playerConnection.player::togglePlayPause) {
+                        Icon(
+                            painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
+                            contentDescription = "Play/Pause",
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                    IconButton(enabled = canSkipNext, onClick = { playerConnection.player.seekToNext() }) {
+                        Icon(
+                            painter = painterResource(R.drawable.skip_next),
+                            contentDescription = "Next",
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
                 }
-            } else if (miniPlayerStyle == MiniPlayerStyle.NEW) {
-                Box(
+                LinearProgressIndicator(
+                    progress = { (position.toFloat() / duration).coerceIn(0f, 1f) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(MiniPlayerHeight)
-                        .pointerInput(Unit) {
-                            detectHorizontalDragGestures(
-                                onDragCancel = { offsetX = 0f },
-                                onHorizontalDrag = { _, dragAmount ->
-                                    val adjustedDragAmount = if (layoutDirection == LayoutDirection.Rtl) -dragAmount else dragAmount
-                                    offsetX += adjustedDragAmount
-                                },
-                                onDragEnd = {
-                                    val threshold = 0.15f * currentView.width
-                                    when {
-                                        offsetX > threshold && canSkipPrevious -> playerConnection.player.seekToPreviousMediaItem()
-                                        offsetX < -threshold && canSkipNext -> playerConnection.player.seekToNext()
-                                    }
-                                    offsetX = 0f
+                        .height(2.dp)
+                        .align(Alignment.BottomCenter),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    trackColor = Color.Transparent
+                )
+            }
+        } else if (miniPlayerStyle == MiniPlayerStyle.NEW) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(MiniPlayerHeight)
+                    .pointerInput(Unit) {
+                        detectHorizontalDragGestures(
+                            onDragCancel = { offsetX = 0f },
+                            onHorizontalDrag = { _, dragAmount ->
+                                val adjustedDragAmount = if (layoutDirection == LayoutDirection.Rtl) -dragAmount else dragAmount
+                                offsetX += adjustedDragAmount
+                            },
+                            onDragEnd = {
+                                val threshold = 0.15f * currentView.width
+                                when {
+                                    offsetX > threshold && canSkipPrevious -> playerConnection.player.seekToPreviousMediaItem()
+                                    offsetX < -threshold && canSkipNext -> playerConnection.player.seekToNext()
                                 }
-                            )
-                        }
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .offset { IntOffset(offsetX.roundToInt(), 0) }
-                            .padding(end = 12.dp)
-                    ) {
-                        Box(Modifier.weight(1f)) {
-                            mediaMetadata?.let {
-                                MiniMediaInfo(
-                                    mediaMetadata = it,
-                                    error = error,
-                                    modifier = Modifier.padding(horizontal = 6.dp)
-                                )
+                                offsetX = 0f
                             }
-                        }
-                        IconButton(onClick = { playerConnection.toggleLike() }) {
-                            Icon(
-                                painter = if (currentSong?.song?.liked == true) painterResource(R.drawable.favorite) else painterResource(R.drawable.favorite_border),
-                                tint = if (currentSong?.song?.liked == true) MaterialTheme.colorScheme.error else onCardColor,
-                                contentDescription = null
-                            )
-                        }
-                        IconButton(onClick = playerConnection.player::togglePlayPause) {
-                            Icon(
-                                painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
-                                contentDescription = null,
-                                tint = onCardColor
+                        )
+                    }
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .offset { IntOffset(offsetX.roundToInt(), 0) }
+                        .padding(end = 12.dp)
+                ) {
+                    Box(Modifier.weight(1f)) {
+                        mediaMetadata?.let {
+                            MiniMediaInfo(
+                                mediaMetadata = it,
+                                error = error,
+                                modifier = Modifier.padding(horizontal = 6.dp)
                             )
                         }
                     }
-                    LinearProgressIndicator(
-                        progress = { (position.toFloat() / duration).coerceIn(0f, 1f) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(2.dp)
-                            .align(Alignment.BottomCenter),
-                        color = onCardColor,
-                        trackColor = Color.Transparent
-                    )
+                    IconButton(onClick = { playerConnection.toggleLike() }) {
+                        Icon(
+                            painter = if (currentSong?.song?.liked == true) painterResource(R.drawable.favorite) else painterResource(R.drawable.favorite_border),
+                            tint = if (currentSong?.song?.liked == true) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+                            contentDescription = null
+                        )
+                    }
+                    IconButton(onClick = playerConnection.player::togglePlayPause) {
+                        Icon(
+                            painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
-            } else {
-                Box(
+                LinearProgressIndicator(
+                    progress = { (position.toFloat() / duration).coerceIn(0f, 1f) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(MiniPlayerHeight)
+                        .height(2.dp)
+                        .align(Alignment.BottomCenter),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    trackColor = Color.Transparent
+                )
+            }
+        } else {
+            // Old Style
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(MiniPlayerHeight)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(end = 6.dp),
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = modifier
-                            .fillMaxSize()
-                            .padding(end = 6.dp),
-                    ) {
-                        Box(Modifier.weight(1f)) {
-                            mediaMetadata?.let {
-                                MiniMediaInfo(
-                                    mediaMetadata = it,
-                                    error = error,
-                                    modifier = Modifier.padding(horizontal = 6.dp)
-                                )
-                            }
-                        }
-                        IconButton(enabled = canSkipPrevious, onClick = playerConnection::seekToPrevious) {
-                            Icon(
-                                painter = painterResource(R.drawable.skip_previous),
-                                contentDescription = null,
-                                tint = onCardColor,
-                                modifier = Modifier.size(26.dp)
-                            )
-                        }
-                        IconButton(onClick = playerConnection.player::togglePlayPause) {
-                            Icon(
-                                painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
-                                contentDescription = null,
-                                tint = onCardColor
-                            )
-                        }
-                        IconButton(enabled = canSkipNext, onClick = { playerConnection.player.seekToNext() }) {
-                            Icon(
-                                painter = painterResource(R.drawable.skip_next),
-                                contentDescription = null,
-                                tint = onCardColor,
-                                modifier = Modifier.size(26.dp)
+                    Box(Modifier.weight(1f)) {
+                        mediaMetadata?.let {
+                            MiniMediaInfo(
+                                mediaMetadata = it,
+                                error = error,
+                                modifier = Modifier.padding(horizontal = 6.dp)
                             )
                         }
                     }
-                    LinearProgressIndicator(
-                        progress = { (position.toFloat() / duration).coerceIn(0f, 1f) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(2.dp)
-                            .align(Alignment.BottomCenter),
-                        color = onCardColor,
-                        trackColor = Color.Transparent
-                    )
+                    IconButton(enabled = canSkipPrevious, onClick = playerConnection::seekToPrevious) {
+                        Icon(
+                            painter = painterResource(R.drawable.skip_previous),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(26.dp)
+                        )
+                    }
+                    IconButton(onClick = playerConnection.player::togglePlayPause) {
+                        Icon(
+                            painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    IconButton(enabled = canSkipNext, onClick = { playerConnection.player.seekToNext() }) {
+                        Icon(
+                            painter = painterResource(R.drawable.skip_next),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(26.dp)
+                        )
+                    }
                 }
+                LinearProgressIndicator(
+                    progress = { (position.toFloat() / duration).coerceIn(0f, 1f) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp)
+                        .align(Alignment.BottomCenter),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    trackColor = Color.Transparent
+                )
             }
         }
     }
@@ -372,8 +348,6 @@ fun MiniMediaInfo(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit,
 ) {
-    val onCardColor = MaterialTheme.colorScheme.onSurface
-
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -434,7 +408,7 @@ fun MiniMediaInfo(
             ) { title ->
                 Text(
                     text = title,
-                    color = onCardColor,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
@@ -449,7 +423,7 @@ fun MiniMediaInfo(
             ) { artists ->
                 Text(
                     text = artists,
-                    color = onCardColor.copy(alpha = 0.7f),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -471,7 +445,7 @@ private fun QualityIndicator(isHq: Boolean) {
             .padding(horizontal = 4.dp, vertical = 2.dp)
     ) {
         Text(
-            text = if (isHq) "HQ" else "SQ",
+            text = if (isHq) "HD" else "SD", // Sound | HD = High Quality, SD = Standard Quality
             color = Color.White,
             fontSize = 8.sp,
             fontWeight = FontWeight.Bold
