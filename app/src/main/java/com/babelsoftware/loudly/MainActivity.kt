@@ -22,6 +22,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -36,8 +37,8 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,13 +49,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -67,6 +70,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -79,6 +83,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -87,7 +92,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.window.Dialog
@@ -119,7 +123,6 @@ import com.babelsoftware.loudly.constants.DynamicThemeKey
 import com.babelsoftware.loudly.constants.FirstSetupPassed
 import com.babelsoftware.loudly.constants.LibraryFilter
 import com.babelsoftware.loudly.constants.MiniPlayerHeight
-import com.babelsoftware.loudly.constants.NavigationBarAnimationSpec
 import com.babelsoftware.loudly.constants.NavigationBarHeight
 import com.babelsoftware.loudly.constants.PauseSearchHistoryKey
 import com.babelsoftware.loudly.constants.PlayerStyle
@@ -457,19 +460,51 @@ class MainActivity : ComponentActivity() {
                         navBackStackEntry?.destination?.route == null ||
                                 navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route } && !active
                     }
-                    val navigationBarHeight by animateDpAsState(
-                        targetValue = if (shouldShowNavigationBar) NavigationBarHeight else 0.dp,
-                        animationSpec = NavigationBarAnimationSpec,
-                        label = ""
-                    )
-
+                    // ==================== KEYS & ADDICTIONS ====================
                     val miniPlayerMargin = if (playerStyle == PlayerStyle.UI_2_0) 8.dp else 0.dp
-
+                    val collapsedBound = bottomInset + (if (shouldShowNavigationBar) NavigationBarHeight else 0.dp) + MiniPlayerHeight + miniPlayerMargin
+                    val maxHeightInDp = with(density) { constraints.maxHeight.toDp() }
                     val playerBottomSheetState = rememberBottomSheetState(
                         dismissedBound = 0.dp,
-                        collapsedBound = bottomInset + (if (shouldShowNavigationBar) NavigationBarHeight else 0.dp) + MiniPlayerHeight + miniPlayerMargin,
-                        expandedBound = maxHeight,
+                        collapsedBound = collapsedBound,
+                        expandedBound = maxHeightInDp,
                     )
+
+                    LaunchedEffect(shouldShowNavigationBar, playerBottomSheetState.isDismissed) {
+                        if (!playerBottomSheetState.isDismissed) {
+                            playerBottomSheetState.collapseSoft()
+                        }
+                    }
+
+                    val currentSong by playerConnection?.service?.currentMediaMetadata?.collectAsState(initial = null)
+                        ?: remember { mutableStateOf(null) }
+
+                    val isMiniPlayerVisible by remember(currentSong, playerBottomSheetState.isDismissed) {
+                        derivedStateOf { currentSong != null && !playerBottomSheetState.isDismissed }
+                    }
+
+                    val bottomIslandHeight by animateDpAsState(
+                        targetValue = when {
+                            isMiniPlayerVisible && shouldShowNavigationBar -> NavigationBarHeight + MiniPlayerHeight + 16.dp
+                            !isMiniPlayerVisible && shouldShowNavigationBar -> NavigationBarHeight + 8.dp
+                            isMiniPlayerVisible && !shouldShowNavigationBar -> MiniPlayerHeight + 16.dp
+                            else -> 0.dp
+                        },
+                        animationSpec = tween(durationMillis = 400),
+                        label = "BottomIslandHeight"
+                    )
+
+                    LaunchedEffect(currentSong) {
+                        if (currentSong == null) {
+                            if (!playerBottomSheetState.isDismissed) {
+                                playerBottomSheetState.dismiss()
+                            }
+                        } else {
+                            if (playerBottomSheetState.isDismissed) {
+                                playerBottomSheetState.collapseSoft()
+                            }
+                        }
+                    }
 
                     val playerAwareWindowInsets = remember(bottomInset, shouldShowNavigationBar, playerBottomSheetState.isDismissed, miniPlayerMargin) {
                         var bottom = bottomInset
@@ -495,8 +530,7 @@ class MainActivity : ComponentActivity() {
                                     (playerBottomSheetState.isCollapsed || playerBottomSheetState.isDismissed)
                         }
                     )
-
-                    var showOptionsDropdown by remember { mutableStateOf(false) }
+                    // ========================================================================
 
                     val (firstSetupPassed) = rememberPreference(FirstSetupPassed, defaultValue = false)
 
@@ -688,12 +722,17 @@ class MainActivity : ComponentActivity() {
                                         }
                                     )
                             ) {
-                                navigationBuilder(navController, topAppBarScrollBehavior, updateAvailable)
+                                navigationBuilder(
+                                    navController,
+                                    topAppBarScrollBehavior,
+                                    updateAvailable
+                                )
                             }
                         } else {
                             NavHost(
                                 navController = navController,
-                                startDestination = when (tabOpenedFromShortcut ?: defaultOpenTabOld) {
+                                startDestination = when (tabOpenedFromShortcut
+                                    ?: defaultOpenTabOld) {
                                     NavigationTabOld.HOME -> Screens.Home
                                     NavigationTabOld.EXPLORE -> Screens.Explore
                                     NavigationTabOld.SONGS -> Screens.Songs
@@ -746,7 +785,11 @@ class MainActivity : ComponentActivity() {
                                         }
                                     )
                             ) {
-                                navigationBuilder(navController, topAppBarScrollBehavior, updateAvailable)
+                                navigationBuilder(
+                                    navController,
+                                    topAppBarScrollBehavior,
+                                    updateAvailable
+                                )
                             }
                         }
 
@@ -943,136 +986,183 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
-                        Box() {
+
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            // ---> Island NavBar Background
+                            if (bottomIslandHeight > 0.dp) {
+                                Card(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .padding(bottom = bottomInset)
+                                        .padding(horizontal = 12.dp)
+                                        .fillMaxWidth()
+                                        .height(bottomIslandHeight),
+                                    shape = RoundedCornerShape(24.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.surface.copy(
+                                            alpha = 0.85f
+                                        )
+                                    ),
+                                    border = BorderStroke(1.dp, Color.White.copy(alpha = 2.50f))
+                                ) { /* This card is only a visual background and has no content. */ }
+                            }
+                            // <---
                             if (firstSetupPassed) {
                                 BottomSheetPlayer(
                                     state = playerBottomSheetState,
                                     navController = navController
                                 )
                             }
-                        }
+                            val isPlayerExpanded =
+                                playerBottomSheetState.progress > 0.9f
 
-                        NavigationBar(
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .offset {
-                                    if (navigationBarHeight == 0.dp) {
-                                        IntOffset(
-                                            x = 0,
-                                            y = (bottomInset + NavigationBarHeight).roundToPx(),
-                                        )
-                                    } else {
-                                        val slideOffset =
-                                            (bottomInset + NavigationBarHeight) * playerBottomSheetState.progress.coerceIn(
-                                                0f,
-                                                1f
-                                            )
-                                        val hideOffset =
-                                            (bottomInset + NavigationBarHeight) * (1 - navigationBarHeight / NavigationBarHeight)
-                                        IntOffset(
-                                            x = 0,
-                                            y = (slideOffset + hideOffset).roundToPx(),
-                                        )
-                                    }
-                                }
-                        ) {
-                            val homeScreens = navigationItems.take(2)
-                            val libraryScreen = navigationItems.drop(2)
-
-                            homeScreens.forEach { screen ->
-                                val isSelected = navBackStackEntry?.destination?.hierarchy?.any { it.route == screen.route } == true
-                                NavigationBarItem(
-                                    selected = isSelected,
-                                    onClick = {
-                                        if (isSelected) {
-                                            navController.currentBackStackEntry?.savedStateHandle?.set("scrollToTop", true)
-                                            coroutineScope.launch { searchBarScrollBehavior.state.resetHeightOffset() }
-                                        } else {
-                                            navController.navigate(screen.route) {
-                                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
-                                        }
-                                    },
-                                    icon = { Icon(painter = painterResource(id = if (isSelected) screen.iconIdActive else screen.iconIdInactive), contentDescription = null) },
-                                    label = {
-                                        if (slimNav) {
-                                            Text(text = stringResource(screen.titleId), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                        }
-                                    }
-                                )
-                            }
-
-                            // Arama butonu
-                            NavigationBarItem(
-                                selected = active,
-                                onClick = {
-                                    onActiveChange(true)
-                                    coroutineScope.launch {
-                                        delay(100)
-                                        searchBarFocusRequester.requestFocus()
-                                    }
-                                },
-                                icon = { Icon(painter = painterResource(id = R.drawable.search), contentDescription = stringResource(R.string.search)) },
-                                label = {
-                                    if (slimNav) {
-                                        Text(text = stringResource(R.string.search), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                    }
-                                }
-                            )
-
-                            libraryScreen.forEach { screen ->
-                                val isSelected = navBackStackEntry?.destination?.hierarchy?.any { it.route == screen.route } == true
-                                NavigationBarItem(
-                                    selected = isSelected,
-                                    onClick = {
-                                        if (isSelected) {
-                                            navController.currentBackStackEntry?.savedStateHandle?.set("scrollToTop", true)
-                                            coroutineScope.launch { searchBarScrollBehavior.state.resetHeightOffset() }
-                                        } else {
-                                            navController.navigate(screen.route) {
-                                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
-                                        }
-                                    },
-                                    icon = { Icon(painter = painterResource(id = if (isSelected) screen.iconIdActive else screen.iconIdInactive), contentDescription = null) },
-                                    label = {
-                                        if (slimNav) {
-                                            Text(text = stringResource(screen.titleId), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                        }
-                                    }
-                                )
-                            }
-                        }
-
-                        BottomSheetMenu(
-                            state = LocalMenuState.current,
-                            modifier = Modifier.align(Alignment.BottomCenter)
-                        )
-
-                        sharedSong?.let { song ->
-                            playerConnection?.let { _ ->
-                                Dialog(
-                                    onDismissRequest = { sharedSong = null },
-                                    properties = DialogProperties(usePlatformDefaultWidth = false)
+                            if (shouldShowNavigationBar && !isPlayerExpanded) {
+                                Row(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .padding(bottom = bottomInset)
+                                        .height(NavigationBarHeight)
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 12.dp),
+                                    horizontalArrangement = Arrangement.SpaceAround,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Surface(
-                                        modifier = Modifier.padding(24.dp),
-                                        shape = RoundedCornerShape(16.dp),
-                                        color = AlertDialogDefaults.containerColor,
-                                        tonalElevation = AlertDialogDefaults.TonalElevation
-                                    ) {
-                                        Column(
-                                            horizontalAlignment = Alignment.CenterHorizontally
-                                        ) {
-                                            YouTubeSongMenu(
-                                                song = song,
-                                                navController = navController,
-                                                onDismiss = { sharedSong = null }
+                                    val homeScreens = navigationItems.take(2)
+                                    val libraryScreen = navigationItems.drop(2)
+
+                                    homeScreens.forEach { screen ->
+                                        val isSelected =
+                                            navBackStackEntry?.destination?.hierarchy?.any { it.route == screen.route } == true
+                                        NavigationBarItem(
+                                            selected = isSelected,
+                                            onClick = {
+                                                if (isSelected) {
+                                                    navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                        "scrollToTop",
+                                                        true
+                                                    )
+                                                    coroutineScope.launch { searchBarScrollBehavior.state.resetHeightOffset() }
+                                                } else {
+                                                    navController.navigate(screen.route) {
+                                                        popUpTo(navController.graph.startDestinationId) {
+                                                            saveState = true
+                                                        }
+                                                        launchSingleTop = true
+                                                        restoreState = true
+                                                    }
+                                                }
+                                            },
+                                            icon = {
+                                                Icon(
+                                                    painter = painterResource(id = if (isSelected) screen.iconIdActive else screen.iconIdInactive),
+                                                    contentDescription = null
+                                                )
+                                            },
+                                            label = {
+                                                if (slimNav) {
+                                                    Text(
+                                                        text = stringResource(screen.titleId),
+                                                        maxLines = 1,
+                                                        overflow = TextOverflow.Ellipsis
+                                                    )
+                                                }
+                                            },
+                                            colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
+                                        )
+                                    }
+                                    NavigationBarItem(
+                                        selected = active,
+                                        onClick = {
+                                            onActiveChange(true)
+                                            coroutineScope.launch {
+                                                delay(100)
+                                                searchBarFocusRequester.requestFocus()
+                                            }
+                                        },
+                                        icon = {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.search),
+                                                contentDescription = stringResource(R.string.search)
                                             )
+                                        },
+                                        label = {
+                                            if (slimNav) {
+                                                Text(
+                                                    text = stringResource(R.string.search),
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                            }
+                                        },
+                                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
+                                    )
+                                    libraryScreen.forEach { screen ->
+                                        val isSelected =
+                                            navBackStackEntry?.destination?.hierarchy?.any { it.route == screen.route } == true
+                                        NavigationBarItem(
+                                            selected = isSelected,
+                                            onClick = {
+                                                if (isSelected) {
+                                                    navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                        "scrollToTop",
+                                                        true
+                                                    )
+                                                    coroutineScope.launch { searchBarScrollBehavior.state.resetHeightOffset() }
+                                                } else {
+                                                    navController.navigate(screen.route) {
+                                                        popUpTo(navController.graph.startDestinationId) {
+                                                            saveState = true
+                                                        }
+                                                        launchSingleTop = true
+                                                        restoreState = true
+                                                    }
+                                                }
+                                            },
+                                            icon = {
+                                                Icon(
+                                                    painter = painterResource(id = if (isSelected) screen.iconIdActive else screen.iconIdInactive),
+                                                    contentDescription = null
+                                                )
+                                            },
+                                            label = {
+                                                if (slimNav) {
+                                                    Text(
+                                                        text = stringResource(screen.titleId),
+                                                        maxLines = 1,
+                                                        overflow = TextOverflow.Ellipsis
+                                                    )
+                                                }
+                                            },
+                                            colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
+                                        )
+                                    }
+                                }
+                            }
+                            BottomSheetMenu(
+                                state = LocalMenuState.current,
+                                modifier = Modifier.align(Alignment.BottomCenter)
+                            )
+                            sharedSong?.let { song ->
+                                playerConnection?.let { _ ->
+                                    Dialog(
+                                        onDismissRequest = { sharedSong = null },
+                                        properties = DialogProperties(usePlatformDefaultWidth = false)
+                                    ) {
+                                        Surface(
+                                            modifier = Modifier.padding(24.dp),
+                                            shape = RoundedCornerShape(16.dp),
+                                            color = AlertDialogDefaults.containerColor,
+                                            tonalElevation = AlertDialogDefaults.TonalElevation
+                                        ) {
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally
+                                            ) {
+                                                YouTubeSongMenu(
+                                                    song = song,
+                                                    navController = navController,
+                                                    onDismiss = { sharedSong = null }
+                                                )
+                                            }
                                         }
                                     }
                                 }
