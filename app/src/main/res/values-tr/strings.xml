@@ -17,6 +17,7 @@
     <string name="back">Geri</string>
     <string name="next">İleri</string>
 
+    <string name="previous">Önce ki</string>
     <string name="home">Ana Sayfa</string>
     <string name="explore">Keşfet</string>
     <string name="songs">Şarkılar</string>
@@ -53,6 +54,7 @@
     <string name="history_empty">Geçmişiniz burada görünecek</string>
     <string name="stats_empty">İstatistikleriniz burada görünecek</string>
     <string name="stats">İstatistikler</string>
+    <string name="show_more">Daha Fazla</string>
     <string name="mood_and_genres">Modlar ve Türler</string>
     <string name="account">Hesap</string>
     <string name="quick_picks">Hızlı seçimler</string>
@@ -65,6 +67,7 @@
     <string name="not_internet">İnternet Bağlantısı Yok</string>
     <string name="internet_required">Görünüşe göre internet bağlantınız yok. Lütfen ağınızı kontrol edin.</string>
 
+    <string name="featured_for_you">Sizin için öne çıkanlar</string>
     <string name="today">Bugün</string>
     <string name="yesterday">Dün</string>
     <string name="this_week">Bu hafta</string>
@@ -510,6 +513,8 @@
     <string name="edit_photo">Fotoğrafı Düzenle</string>
     <string name="cancel">İptal</string>
 
+    <string name="recovering_playback">Yeniden Deneniyor...</string>
+    <string name="vpn_info_message">Using a VPN may affect your connection quality. If you are experiencing network problems, disconnect your VPN connection or use a proxy. You can configure this in “Settings >> Content >> Proxy.”</string>
     <string name="sync_local_songs_toast">Yerel şarkılar başarıyla senkronize edildi</string>
     <string name="local_scanner_title">Yerel tarayıcı</string>
 
@@ -575,4 +580,21 @@ TAKILMIŞ GÖRÜNÜRSE PANİK YAPMAYIN; bazen alım işlemi biraz zaman alabilir
     <string name="where_should_the_liked_songs">Beğenilen şarkılar nereye aktarılmalı?</string>
     <string name="new_playlist_named">"Beğenilen Şarkılar" adında yeni bir çalma listesi</string>
     <string name="default_liked_songs">Varsayılan "Beğenilen Şarkılar"a</string>
+    <string name="show_less">Daha Az</string>
+    <string name="send_to_developer">Geliştiriciye İlet</string>
+    <string name="close">Kapat</string>
+    <string name="update_error_details">Hata Detaylarını Göster</string>
+    <string name="download_failed">İndirme Başarısız</string>
+    <string name="show_error">Hatayı Göster</string>
+    <string name="go_to_update_link">Manuel Güncelle</string>
+    <string name="home_card_update_desc">Detaylar için ayarları kontrol et</string>
+    <string name="app_up_to_date">Yazılım Güncel</string>
+    <string name="error_network_title">Ağ Hatası</string>
+    <string name="error_network_description">Ağ bağlantınızı kotnrol edin ve yeniden deneyin.</string>
+    <string name="error_unsupported_format_title">Desteklenmeyen İçerik</string>
+    <string name="error_unsupported_format_description">Bu şarkı formatı cihazınızda desteklenmemektedir.</string>
+    <string name="error_behind_live_window_title">Canlı Yayın Hatası</string>
+    <string name="error_behind_live_window_description">Canlı yayında bir sorun var. Lütfen yeniden başlatın.</string>
+    <string name="error_playback_failed_title">Oynatma Başarısız</string>
+    <string name="error_playback_failed_description">Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin.</string>
 </resources>
