@@ -1,5 +1,7 @@
 package com.babelsoftware.loudly.ui.screens
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
@@ -55,7 +57,6 @@ import com.babelsoftware.loudly.ui.menu.ArtistMenu
 import com.babelsoftware.loudly.ui.menu.SongMenu
 import com.babelsoftware.loudly.viewmodels.StatsViewModel
 
-// Fikir 1: Dinamik ve Derinlikli Arka Plan
 @Composable
 fun AnimatedGradientBackground(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "background_transition")
@@ -69,7 +70,8 @@ fun AnimatedGradientBackground(modifier: Modifier = Modifier) {
         initialValue = -0.5f,
         targetValue = 0.5f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 8000),
+            animation = tween(durationMillis = 8000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
         ),
         label = "offset_animation"
     )
@@ -84,12 +86,11 @@ fun AnimatedGradientBackground(modifier: Modifier = Modifier) {
     }
 }
 
-// Fikir 2: Veri Görselleştirmesi için Yeni Liste Öğesi
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SongStatsListItem(
-    song: com.babelsoftware.loudly.db.entities.Song,
-    playCountRatio: Float, // 0.0f ile 1.0f arasında bir değer
+    song: Song,
+    playCountRatio: Float,
     isActive: Boolean,
     onPlayClick: () -> Unit,
     onMenuClick: () -> Unit
@@ -114,7 +115,6 @@ fun SongStatsListItem(
                 onLongClick = onMenuClick
             )
     ) {
-        // Popülerlik barı (arka planda)
         Box(
             modifier = Modifier
                 .fillMaxWidth(animatedRatio)
@@ -124,8 +124,6 @@ fun SongStatsListItem(
                     shape = RoundedCornerShape(12.dp)
                 )
         )
-
-        // Şarkı içeriği (ön planda)
         Row(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -158,7 +156,6 @@ fun SongStatsListItem(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
             }
-            // Diğer kontroller (menü butonu vb.)
             IconButton(onClick = onMenuClick) {
                 Icon(
                     painter = painterResource(R.drawable.more_vert),
@@ -187,19 +184,15 @@ fun StatsScreen(
     val detailedMostPlayedSongs by viewModel.detailedMostPlayedSongs.collectAsState()
     val mostPlayedArtists by viewModel.mostPlayedArtists.collectAsState()
     val mostPlayedAlbums by viewModel.mostPlayedAlbums.collectAsState()
-
-    // Kartların genişletilme durumunu tutacak state'ler
     var songsCardExpanded by rememberSaveable { mutableStateOf(false) }
     var artistsCardExpanded by rememberSaveable { mutableStateOf(false) }
     var albumsCardExpanded by rememberSaveable { mutableStateOf(false) }
-
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
-    // Fikir 1: Paralaks efekti için kaydırma offset'ini hesapla
     val parallaxOffset by remember {
         derivedStateOf {
-            listState.firstVisibleItemScrollOffset * 0.4f // Hızı ayarlamak için çarpanı değiştir
+            listState.firstVisibleItemScrollOffset * 0.38f
         }
     }
 
@@ -211,7 +204,6 @@ fun StatsScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         AnimatedGradientBackground(
             modifier = Modifier.graphicsLayer {
-                // Arka planı, kaydırmanın ters yönünde daha yavaş hareket ettir
                 translationY = -parallaxOffset
             }
         )
@@ -234,7 +226,7 @@ fun StatsScreen(
                     )
                 )
             },
-            containerColor = Color.Transparent // Scaffold'u şeffaf yap
+            containerColor = Color.Transparent
         ) { innerPadding ->
             LazyColumn(
                 state = listState,
@@ -294,15 +286,9 @@ fun StatsScreen(
                                         modifier = Modifier.padding(horizontal = 16.dp)
                                     )
                                     Spacer(Modifier.height(4.dp))
-
-                                    // Liste öğeleri
                                     itemsToShow.forEach { songWithCount ->
-                                        // DÜZELTME: Oran `toFloat()` eklenerek güvenli hale getirildi.
                                         val ratio = songWithCount.playCount.toFloat() / maxPlayCount
-
-                                        // DÜZELTME: @Composable hatasını gidermek için çağrı bu kapsamda yapılıyor
                                         SongStatsListItem(
-                                            // DÜZELTME: `song` yerine `songWithCount.song` kullanılıyor.
                                             song = songWithCount.song,
                                             playCountRatio = ratio,
                                             isActive = songWithCount.song.id == mediaMetadata?.id,
@@ -329,7 +315,6 @@ fun StatsScreen(
                                             }
                                         )
                                     }
-                                    // "Daha Fazla Göster" / "Daha Az Göster" butonu
                                     if (detailedMostPlayedSongs.size > summaryMostPlayedSongs.size) {
                                         TextButton(
                                             onClick = { songsCardExpanded = !songsCardExpanded },
@@ -362,7 +347,6 @@ fun StatsScreen(
                                     )
                                     LazyRow(
                                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                                        // Fikir 3: Görsel odağı artırmak için boşluğu artır
                                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                                     ) {
                                         items(
@@ -408,7 +392,6 @@ fun StatsScreen(
                                     )
                                     LazyRow(
                                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                                        // Fikir 3: Görsel odağı artırmak için boşluğu artır
                                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                                     ) {
                                         items(
