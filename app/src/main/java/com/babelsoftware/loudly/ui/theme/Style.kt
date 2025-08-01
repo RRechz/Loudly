@@ -16,9 +16,9 @@ fun FrostedCard(
     content: @Composable () -> Unit
 ) {
     val cardColors = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.60f)
     )
-    val cardBorder = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f))
+    val cardBorder = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.20f))
 
     if (onClick != null) {
         Card(
