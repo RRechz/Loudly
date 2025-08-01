@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -85,6 +86,7 @@ import com.babelsoftware.loudly.viewmodels.HistoryViewModel
 import com.babelsoftware.innertube.utils.parseCookieString
 import com.babelsoftware.loudly.R
 import com.babelsoftware.loudly.ui.component.IconButton
+import com.babelsoftware.loudly.ui.theme.AppSpacing
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -322,7 +324,8 @@ fun HistoryScreen(
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.surface)
+                                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 1.85f))
+                                    .padding(vertical = AppSpacing.Small)
                             )
                         }
 
