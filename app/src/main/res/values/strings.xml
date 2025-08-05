@@ -72,6 +72,7 @@
     <string name="not_internet">No Internet Сoonnection</string>
     <string name="internet_required">It looks like you have no Internet connection. Please check your network.</string>
     <string name="featured_for_you">Featured for You</string>
+    <string name="recommended_for_you_today">Recommended for you Today</string>
 
     <!-- History -->
     <string name="today">Today</string>
@@ -121,6 +122,7 @@
 
     <!-- Album screen -->
     <string name="other_versions">Other versions</string>
+    <string name="favorite">Favorite</string>
 
     <!-- Playlist -->
     <string name="liked_songs">Liked songs</string>
@@ -545,6 +547,15 @@
     <string name="go_to_update_link">Manuel Update</string>
     <string name="home_card_update_desc">Check the settings page for details</string>
     <string name="app_up_to_date">Software Up To Date</string>
+
+    <string name="app_ui">App UI</string>
+    <string name="app_ui_desc">Select one of 3 different designs</string>
+    <string name="ui_version_selection">UI Version Selection</string>
+    <string name="ui_version_1_0_desc">Old version design of the application. (App, Player, MiniPlayer)</string>
+    <string name="ui_version_1_5_desc">Compact design created with a more modern approach. (App, Player, MiniPlayer)</string>
+    <string name="ui_version_2_0_desc">Most popular design. (App, Player, MiniPlayer)</string>
+    <string name="ui_version_custom_desc">Create your own app UI design. (App, Player, MiniPlayer)</string>
+    <string name="custom_app_ui">Customize UI</string>
 
     <!-- Player UI -->
     <string name="translate">Translate (BETA)</string>

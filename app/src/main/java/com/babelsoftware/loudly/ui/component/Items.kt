@@ -1272,6 +1272,7 @@ fun YouTubeGridItem(
     isActive: Boolean = false,
     isPlaying: Boolean = false,
     fillMaxWidth: Boolean = false,
+    shape: Shape = RoundedCornerShape(ThumbnailCornerRadius)
 ) = GridItem(
     title = {
         Text(
@@ -1281,7 +1282,9 @@ fun YouTubeGridItem(
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             textAlign = if (item is ArtistItem) TextAlign.Center else TextAlign.Start,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(shape)
         )
     },
     subtitle = {

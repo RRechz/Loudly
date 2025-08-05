@@ -13,6 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.babelsoftware.loudly.constants.PlayerStyle
 import com.babelsoftware.loudly.ui.screens.artist.ArtistItemsScreen
 import com.babelsoftware.loudly.ui.screens.artist.ArtistScreen
 import com.babelsoftware.loudly.ui.screens.artist.ArtistSongsScreen
@@ -50,12 +51,14 @@ import com.babelsoftware.loudly.ui.screens.settings.import_from_spotify.ImportFr
 fun NavGraphBuilder.navigationBuilder(
     navController: NavHostController,
     scrollBehavior: TopAppBarScrollBehavior,
-    updateAvailable: Boolean
+    updateAvailable: Boolean,
+    playerStyle: PlayerStyle
 ) {
     composable(Screens.Home.route) {
         HomeScreen(
             navController = navController,
-            updateAvailable = updateAvailable
+            updateAvailable = updateAvailable,
+            playerStyle = playerStyle
         )
     }
     composable(Screens.Explore.route) {

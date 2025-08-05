@@ -448,7 +448,7 @@ class MainActivity : ComponentActivity() {
                         mutableStateOf(intent?.action == ACTION_SEARCH)
                     }
 
-                    val (playerStyle) = rememberEnumPreference(PlayerStyleKey, defaultValue = PlayerStyle.NEW)
+                    val (playerStyle) = rememberEnumPreference(PlayerStyleKey, defaultValue = PlayerStyle.UI_2_0)
 
                     val shouldShowSearchBar = remember(active, navBackStackEntry, inSelectMode?.value) {
                         (active ||
@@ -725,7 +725,8 @@ class MainActivity : ComponentActivity() {
                                 navigationBuilder(
                                     navController,
                                     topAppBarScrollBehavior,
-                                    updateAvailable
+                                    updateAvailable,
+                                    playerStyle
                                 )
                             }
                         } else {
@@ -788,7 +789,8 @@ class MainActivity : ComponentActivity() {
                                 navigationBuilder(
                                     navController,
                                     topAppBarScrollBehavior,
-                                    updateAvailable
+                                    updateAvailable,
+                                    playerStyle
                                 )
                             }
                         }
