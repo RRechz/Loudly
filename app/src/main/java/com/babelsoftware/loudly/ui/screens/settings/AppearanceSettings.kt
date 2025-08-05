@@ -16,7 +16,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -29,10 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.TrendingUp
 import androidx.compose.material.icons.rounded.Cached
@@ -47,10 +43,10 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
@@ -70,7 +66,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
@@ -79,11 +74,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.babelsoftware.innertube.utils.parseCookieString
 import com.babelsoftware.loudly.LocalPlayerAwareWindowInsets
+import com.babelsoftware.loudly.R
 import com.babelsoftware.loudly.constants.AppDesignVariantKey
 import com.babelsoftware.loudly.constants.AppDesignVariantType
 import com.babelsoftware.loudly.constants.AutoPlaylistCachedPlaylistShowKey
@@ -99,6 +94,7 @@ import com.babelsoftware.loudly.constants.DefaultOpenTabOldKey
 import com.babelsoftware.loudly.constants.DynamicThemeKey
 import com.babelsoftware.loudly.constants.GridCellSize
 import com.babelsoftware.loudly.constants.GridCellSizeKey
+import com.babelsoftware.loudly.constants.HeaderImageKey
 import com.babelsoftware.loudly.constants.InnerTubeCookieKey
 import com.babelsoftware.loudly.constants.LibraryFilter
 import com.babelsoftware.loudly.constants.MiniPlayerStyle
@@ -116,6 +112,7 @@ import com.babelsoftware.loudly.constants.SlimNavBarKey
 import com.babelsoftware.loudly.constants.SwipeSongToDismissKey
 import com.babelsoftware.loudly.constants.SwipeThumbnailKey
 import com.babelsoftware.loudly.constants.ThumbnailCornerRadiusV2Key
+import com.babelsoftware.loudly.constants.UiPresetKey
 import com.babelsoftware.loudly.ui.component.CounterDialog
 import com.babelsoftware.loudly.ui.component.DefaultDialog
 import com.babelsoftware.loudly.ui.component.EnumListPreference
@@ -125,17 +122,12 @@ import com.babelsoftware.loudly.ui.component.PlayerSliderTrack
 import com.babelsoftware.loudly.ui.component.PreferenceEntry
 import com.babelsoftware.loudly.ui.component.PreferenceGroupTitle
 import com.babelsoftware.loudly.ui.component.SwitchPreference
-import com.babelsoftware.loudly.ui.utils.backToMain
-import com.babelsoftware.loudly.utils.rememberEnumPreference
-import com.babelsoftware.loudly.utils.rememberPreference
-import com.babelsoftware.innertube.utils.parseCookieString
-import com.babelsoftware.loudly.R
-import com.babelsoftware.loudly.constants.HeaderImageKey
-import com.babelsoftware.loudly.ui.screens.settings.card_design.ActionType
-import com.babelsoftware.loudly.ui.screens.settings.card_design.IconResource
 import com.babelsoftware.loudly.ui.screens.settings.card_design.SettingCategory
 import com.babelsoftware.loudly.ui.screens.settings.card_design.SettingsBox
 import com.babelsoftware.loudly.ui.screens.settings.card_design.shapeManager
+import com.babelsoftware.loudly.ui.utils.backToMain
+import com.babelsoftware.loudly.utils.rememberEnumPreference
+import com.babelsoftware.loudly.utils.rememberPreference
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
@@ -453,6 +445,35 @@ fun AppearanceSettings(
             }
         }
     }
+    val (selectedPreset, onSelectedPresetChange) = rememberPreference(UiPresetKey, "1.5")
+
+    var showUiDialog by remember { mutableStateOf(false) }
+
+    if (showUiDialog) {
+        UiPresetDialog(
+            onDismiss = { showUiDialog = false },
+            onPresetSelected = { version ->
+                onSelectedPresetChange(version)
+                when (version) {
+                    "1.0" -> {
+                        onAppDesignVariantChange(AppDesignVariantType.OLD)
+                        onPlayerStyle(PlayerStyle.OLD)
+                        onMiniPlayerStyle(MiniPlayerStyle.OLD)
+                    }
+                    "1.5" -> {
+                        onAppDesignVariantChange(AppDesignVariantType.NEW)
+                        onPlayerStyle(PlayerStyle.NEW)
+                        onMiniPlayerStyle(MiniPlayerStyle.NEW)
+                    }
+                    "2.0" -> {
+                        onPlayerStyle(PlayerStyle.UI_2_0)
+                        onAppDesignVariantChange(AppDesignVariantType.NEW)
+                    }
+                }
+            },
+            activePreset = selectedPreset
+        )
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -523,19 +544,68 @@ fun AppearanceSettings(
         }
 
         item {
-            SettingsBox(shape = shapeManager()) {
-                EnumListPreference(
-                    title = { Text(stringResource(R.string.app_design_variant)) },
+            SettingsBox(shape = shapeManager(isFirst = true, isLast = selectedPreset != "Custom")) {
+                PreferenceEntry(
+                    title = { Text(stringResource(R.string.app_ui)) },
+                    description = "v$selectedPreset",
                     icon = { Icon(Icons.Rounded.DesignServices, null) },
-                    selectedValue = appDesignVariant,
-                    onValueSelected = onAppDesignVariantChange,
-                    valueText = {
-                        when (it) {
-                            AppDesignVariantType.NEW -> stringResource(R.string.app_design_ui_1_5)
-                            AppDesignVariantType.OLD -> stringResource(R.string.app_design_ui_1_0)
-                        }
-                    }
+                    onClick = { showUiDialog = true }
                 )
+            }
+        }
+
+        item {
+            // This group will ONLY appear when the `selectedPreset` status is “Custom”.
+            AnimatedVisibility(visible = selectedPreset == "Custom") {
+                Column {
+                    PreferenceGroupTitle(title = stringResource(R.string.custom_app_ui))
+
+                    SettingsBox(shape = shapeManager(isFirst = true)) {
+                        EnumListPreference(
+                            title = { Text(stringResource(R.string.app_design_variant)) },
+                            icon = { Icon(Icons.Rounded.DesignServices, null) },
+                            selectedValue = appDesignVariant,
+                            onValueSelected = onAppDesignVariantChange,
+                            valueText = {
+                                when (it) {
+                                    AppDesignVariantType.NEW -> stringResource(R.string.app_design_ui_1_5)
+                                    AppDesignVariantType.OLD -> stringResource(R.string.app_design_ui_1_0)
+                                }
+                            }
+                        )
+                    }
+                    SettingsBox(shape = shapeManager()) {
+                        ListPreference(
+                            title = { Text(stringResource(R.string.player_style)) },
+                            icon = { Icon(painterResource(R.drawable.play), null) },
+                            selectedValue = playerStyle,
+                            values = listOf(PlayerStyle.OLD, PlayerStyle.NEW, PlayerStyle.UI_2_0),
+                            valueText = {
+                                when (it) {
+                                    PlayerStyle.OLD -> stringResource(R.string.player_style_old_ui)
+                                    PlayerStyle.NEW -> stringResource(R.string.player_style_ui_1_0)
+                                    PlayerStyle.UI_2_0 -> stringResource(R.string.player_style_ui_2_0)
+                                }
+                            },
+                            onValueSelected = onPlayerStyle
+                        )
+                    }
+                    SettingsBox(shape = shapeManager(isLast = true)) {
+                        ListPreference(
+                            title = { Text(stringResource(R.string.mini_player_style)) },
+                            icon = { Icon(painterResource(R.drawable.play), null) },
+                            selectedValue = miniPlayerStyle,
+                            values = listOf(MiniPlayerStyle.OLD, MiniPlayerStyle.NEW),
+                            valueText = {
+                                when (it) {
+                                    MiniPlayerStyle.OLD -> stringResource(R.string.player_style_old_ui)
+                                    MiniPlayerStyle.NEW -> stringResource(R.string.player_style_ui_1_0)
+                                }
+                            },
+                            onValueSelected = onMiniPlayerStyle
+                        )
+                    }
+                }
             }
         }
 
@@ -571,59 +641,21 @@ fun AppearanceSettings(
         }
 
         item {
-            SettingsBox(shape = shapeManager(isFirst = true)) {
-                ListPreference(
-                    title = { Text(stringResource(R.string.player_style)) },
-                    icon = { Icon(painterResource(R.drawable.play), null) },
-                    selectedValue = playerStyle,
-                    values = listOf(PlayerStyle.OLD, PlayerStyle.NEW, PlayerStyle.UI_2_0),
-                    valueText = {
-                        when (it) {
-                            PlayerStyle.OLD -> stringResource(R.string.player_style_old_ui)
-                            PlayerStyle.NEW -> stringResource(R.string.player_style_ui_1_0)
-                            PlayerStyle.UI_2_0 -> stringResource(R.string.player_style_ui_2_0)
-                        }
-                    },
-                    onValueSelected = onPlayerStyle
-                )
-            }
-        }
-
-        item {
             AnimatedVisibility(visible = playerStyle != PlayerStyle.UI_2_0) {
-                SettingsBox(shape = shapeManager()) {
-                    PreferenceEntry(
-                        title = { Text(stringResource(R.string.slider_style)) },
-                        description = when (sliderStyle) {
-                            SliderStyle.DEFAULT -> stringResource(R.string.default_)
-                            SliderStyle.SQUIGGLY -> stringResource(R.string.squiggly)
-                            SliderStyle.COMPOSE -> stringResource(R.string.compose)
-                        },
-                        icon = { Icon(painterResource(R.drawable.sliders), null) },
-                        onClick = {
-                            showSliderOptionDialog = true
-                        }
-                    )
-                }
-            }
-        }
-
-        item {
-            AnimatedVisibility(visible = playerStyle != PlayerStyle.UI_2_0) {
-                SettingsBox(shape = shapeManager()) {
-                    ListPreference(
-                        title = { Text(stringResource(R.string.mini_player_style)) },
-                        icon = { Icon(painterResource(R.drawable.play), null) },
-                        selectedValue = miniPlayerStyle,
-                        values = listOf(MiniPlayerStyle.OLD, MiniPlayerStyle.NEW),
-                        valueText = {
-                            when (it) {
-                                MiniPlayerStyle.OLD -> stringResource(R.string.player_style_old_ui)
-                                MiniPlayerStyle.NEW -> stringResource(R.string.player_style_ui_1_0)
-                            }
-                        },
-                        onValueSelected = onMiniPlayerStyle
-                    )
+                Column{
+                    PreferenceGroupTitle(title = stringResource(R.string.player))
+                    SettingsBox(shape = shapeManager(isFirst = true)) {
+                        PreferenceEntry(
+                            title = { Text(stringResource(R.string.slider_style)) },
+                            description = when (sliderStyle) {
+                                SliderStyle.DEFAULT -> stringResource(R.string.default_)
+                                SliderStyle.SQUIGGLY -> stringResource(R.string.squiggly)
+                                SliderStyle.COMPOSE -> stringResource(R.string.compose)
+                            },
+                            icon = { Icon(painterResource(R.drawable.sliders), null) },
+                            onClick = { /* showSliderOptionDialog = true */ }
+                        )
+                    }
                 }
             }
         }
@@ -976,6 +1008,59 @@ private fun HeaderImagePickerDialog(
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.cancel))
+            }
+        }
+    )
+}
+
+@Composable
+private fun UiPresetDialog(
+    onDismiss: () -> Unit,
+    onPresetSelected: (String) -> Unit,
+    activePreset: String
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.ui_version_selection)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                mapOf(
+                    "1.0" to stringResource(R.string.ui_version_1_0_desc),
+                    "1.5" to stringResource(R.string.ui_version_1_5_desc),
+                    "2.0" to stringResource(R.string.ui_version_2_0_desc),
+                    "Custom" to stringResource(R.string.ui_version_custom_desc)
+                ).forEach { (version, description) ->
+                    val isSelected = activePreset == version
+                    Card(
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable {
+                                onPresetSelected(version)
+                                onDismiss()
+                            }
+                            .border(
+                                width = 1.dp,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                    ) {
+                        Column(Modifier.padding(16.dp)) {
+                            Text("App UI v$version", fontWeight = FontWeight.Bold)
+                            Spacer(Modifier.height(4.dp))
+                            Text(description, style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.close))
             }
         }
     )
