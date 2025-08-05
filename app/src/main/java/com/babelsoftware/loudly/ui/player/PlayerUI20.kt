@@ -8,12 +8,7 @@ import android.net.NetworkCapabilities
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -21,11 +16,9 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -69,7 +62,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
@@ -91,15 +83,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -107,7 +96,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -116,7 +104,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -153,13 +140,11 @@ import com.babelsoftware.loudly.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.saket.squiggles.SquigglySlider
 import kotlin.math.absoluteValue
-import kotlin.math.atan2
-import kotlin.math.cos
 import kotlin.math.roundToInt
-import kotlin.math.sin
 
-private const val HQ_BITRATE = 45000
+private const val HQ_BITRATE = 48000
 
 sealed class NetworkInfo {
     data object None : NetworkInfo()
@@ -299,10 +284,6 @@ private fun NetworkStatusChip() {
     }
 }
 
-/**
- * Master Composable for UI 2.0.
- * Manages switching between the player and playlist screens.
- */
 @Composable
 fun PlayerUI20(
     position: Long,
@@ -406,9 +387,6 @@ fun PlayerUI20(
     }
 }
 
-/**
- * Main player screen with circular progress broadcast.
- */
 @Composable
 fun NowPlayingScreen(
     position: Long,
@@ -421,13 +399,9 @@ fun NowPlayingScreen(
     onToggleLyrics: () -> Unit
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
+    val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
     val isPlaying by playerConnection.isPlaying.collectAsState()
     var sliderPosition by remember { mutableStateOf<Long?>(null) }
-    val errorState by playerConnection.errorManagerState.collectAsState()
-    val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
-    val context = LocalContext.current
-    val onSurfaceColor = Color.White
-
     var showDetailsDialog by remember { mutableStateOf(false) }
 
     if (showDetailsDialog) {
@@ -447,62 +421,26 @@ fun NowPlayingScreen(
                     }
                 }
             }
-            .padding(horizontal = 24.dp)
             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Vertical)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onClose) {
-                Icon(painterResource(R.drawable.arrow_back), contentDescription = "Geri", tint = onSurfaceColor)
-            }
+        PlayerTopBar(onClose = onClose)
+        Spacer(modifier = Modifier.height(16.dp))
 
-            AnimatedVisibility(visible = errorState == PlayerErrorManager.State.RECOVERING) {
-                InfoChip(
-                    icon = R.drawable.ic_autorenew,
-                    text = stringResource(R.string.recovering_playback),
-                    color = onSurfaceColor.copy(alpha = 0.8f),
-                    onClick = {}
-                )
-            }
-            AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) {
-                NetworkStatusChip()
-            }
-        }
-
-        Box(
+        PlayerArtwork(
+            mediaMetadata = mediaMetadata,
             modifier = Modifier
                 .weight(1f)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularArcPlayer(
-                position = sliderPosition ?: position,
-                duration = duration,
-                mediaMetadata = playerConnection.mediaMetadata.collectAsState().value,
-                dominantColor = dominantColor,
-                isPlaying = isPlaying,
-                modifier = Modifier
-                    .padding(vertical = 16.dp)
-                    .fillMaxWidth(0.85f),
-                onSeek = { newPosition ->
-                    playerConnection.player.seekTo(newPosition)
-                    sliderPosition = null
-                },
-                onSeekChange = { tempPosition ->
-                    sliderPosition = tempPosition
-                },
-                onSwipe = { direction ->
-                    if (direction > 0) playerConnection.player.seekToPrevious()
-                    else playerConnection.player.seekToNext()
-                }
-            )
+                .padding(horizontal = 32.dp)
+        ) { direction ->
+            if (direction > 0) playerConnection.player.seekToPrevious()
+            else playerConnection.player.seekToNext()
         }
+
+        SongInfo(
+            mediaMetadata = mediaMetadata,
+            modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp)
+        )
 
         ContextualInfoRow(
             navController = navController,
@@ -512,25 +450,142 @@ fun NowPlayingScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        ControlPanel(
+        ControlsCard(
             position = sliderPosition ?: position,
             duration = duration,
             isPlaying = isPlaying,
             dominantColor = dominantColor,
-            shuffleModeEnabled = playerConnection.shuffleModeEnabled.collectAsState().value,
-            repeatMode = playerConnection.repeatMode.collectAsState().value,
-            onPlayPause = {
-                playerConnection.player.togglePlayPause()
+            onSeek = { newPosition ->
+                playerConnection.player.seekTo(newPosition)
+                sliderPosition = null
             },
-            onShuffle = playerConnection.player::toggleShuffleMode,
-            onPrevious = playerConnection.player::seekToPrevious,
-            onNext = playerConnection.player::seekToNext,
-            onRepeat = playerConnection.player::toggleRepeatMode,
             onToggleLyrics = onToggleLyrics,
-            canSkipPrevious = playerConnection.canSkipPrevious.collectAsState().value,
-            canSkipNext = playerConnection.canSkipNext.collectAsState().value,
             navController = navController
         )
+    }
+}
+
+@Composable
+private fun PlayerTopBar(onClose: () -> Unit) {
+    val errorState by LocalPlayerConnection.current!!.errorManagerState.collectAsState()
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = onClose) {
+            Icon(painterResource(R.drawable.arrow_back), contentDescription = "Geri", tint = Color.White)
+        }
+
+        AnimatedVisibility(visible = errorState == PlayerErrorManager.State.RECOVERING) {
+            InfoChip(
+                icon = R.drawable.ic_autorenew,
+                text = stringResource(R.string.recovering_playback),
+                color = Color.White.copy(alpha = 0.8f),
+                onClick = {}
+            )
+        }
+        AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) {
+            NetworkStatusChip()
+        }
+    }
+}
+
+@Composable
+private fun PlayerArtwork(
+    mediaMetadata: MediaMetadata?,
+    modifier: Modifier = Modifier,
+    onSwipe: (direction: Int) -> Unit
+) {
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    val alpha by animateFloatAsState(
+        targetValue = 1f - (offsetX.coerceIn(-300f, 300f).absoluteValue / 300f) * 0.7f,
+        label = "ArtworkAlpha"
+    )
+
+    AnimatedContent(
+        targetState = mediaMetadata,
+        transitionSpec = { fadeIn() togetherWith fadeOut() },
+        label = "Artwork",
+        modifier = modifier
+            .aspectRatio(1f)
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onDragEnd = {
+                        when {
+                            offsetX > 150 -> onSwipe(1)
+                            offsetX < -150 -> onSwipe(-1)
+                        }
+                        offsetX = 0f
+                    },
+                    onHorizontalDrag = { _, dragAmount ->
+                        offsetX += dragAmount
+                    }
+                )
+            }
+            .graphicsLayer {
+                shadowElevation = 16.dp.toPx()
+                shape = RoundedCornerShape(24.dp)
+                clip = true
+            }
+    ) { currentArtworkMetadata ->
+        AsyncImage(
+            model = currentArtworkMetadata?.thumbnailUrl,
+            contentDescription = "Album Thumbnail",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(alpha)
+                .offset(x = (offsetX / 2).dp)
+        )
+    }
+}
+
+@Composable
+private fun SongInfo(mediaMetadata: MediaMetadata?, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        AnimatedContent(
+            targetState = mediaMetadata?.title,
+            transitionSpec = {
+                (slideInVertically { it } + fadeIn()) togetherWith (slideOutVertically { -it } + fadeOut())
+            },
+            label = "Title"
+        ) { title ->
+            Text(
+                text = title ?: "",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.basicMarquee()
+            )
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        AnimatedContent(
+            targetState = mediaMetadata?.artists?.joinToString { it.name },
+            transitionSpec = {
+                (slideInVertically { it } + fadeIn()) togetherWith (slideOutVertically { -it } + fadeOut())
+            },
+            label = "Artist"
+        ) { artist ->
+            Text(
+                text = artist ?: "",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White.copy(alpha = 0.7f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.basicMarquee()
+            )
+        }
     }
 }
 
@@ -551,7 +606,9 @@ fun ContextualInfoRow(
     val isHq = bitrate != null && bitrate > HQ_BITRATE
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -662,36 +719,171 @@ fun ContextualInfoRow(
     }
 }
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ControlPanel(
+private fun ControlsCard(
     position: Long,
     duration: Long,
     isPlaying: Boolean,
     dominantColor: Color?,
-    shuffleModeEnabled: Boolean,
-    repeatMode: Int,
-    onPlayPause: () -> Unit,
-    onShuffle: () -> Unit,
-    onPrevious: () -> Unit,
-    onNext: () -> Unit,
-    onRepeat: () -> Unit,
+    onSeek: (Long) -> Unit,
     onToggleLyrics: () -> Unit,
-    canSkipPrevious: Boolean,
-    canSkipNext: Boolean,
     navController: NavController
 ) {
-    val onSurfaceColor = Color.White
-    val onSurfaceVariantColor = Color.White.copy(alpha = 0.7f)
+    var sliderPosition by remember { mutableStateOf<Float?>(null) }
+
+    Card(
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
+        ),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.25f)),
+        modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .padding(bottom = 16.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(vertical = 16.dp, horizontal = 24.dp)
+        ) {
+            SquigglySlider(
+                value = sliderPosition ?: position.toFloat(),
+                valueRange = 0f..(if (duration > 0) duration.toFloat() else 1f),
+                onValueChange = { sliderPosition = it },
+                onValueChangeFinished = {
+                    sliderPosition?.let { onSeek(it.toLong()) }
+                    sliderPosition = null
+                },
+                squigglesSpec = SquigglySlider.SquigglesSpec(
+                    amplitude = if (isPlaying) 2.dp else 0.dp,
+                    strokeWidth = 3.dp,
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(4.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = makeTimeString(sliderPosition?.toLong() ?: position),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color.White.copy(alpha = 0.7f)
+                )
+                Text(
+                    text = makeTimeString(duration),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color.White.copy(alpha = 0.7f)
+                )
+            }
+            Spacer(Modifier.height(16.dp))
+
+            MainControls(isPlaying = isPlaying, dominantColor = dominantColor)
+            Spacer(Modifier.height(16.dp))
+
+            SecondaryControlsRow(
+                dominantColor = dominantColor,
+                onToggleLyrics = onToggleLyrics,
+                navController = navController
+            )
+        }
+    }
+}
+
+@Composable
+private fun MainControls(isPlaying: Boolean, dominantColor: Color?) {
+    val playerConnection = LocalPlayerConnection.current!!
+    val shuffleModeEnabled by playerConnection.shuffleModeEnabled.collectAsState()
+    val repeatMode by playerConnection.repeatMode.collectAsState()
+    val canSkipPrevious by playerConnection.canSkipPrevious.collectAsState()
+    val canSkipNext by playerConnection.canSkipNext.collectAsState()
     val haptic = LocalHapticFeedback.current
-    val playerConnection = LocalPlayerConnection.current ?: return
     val playbackState by playerConnection.playbackState.collectAsState()
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceAround
+    ) {
+        ResizableIconButton(
+            icon = R.drawable.shuffle,
+            modifier = Modifier.size(28.dp),
+            color = if (shuffleModeEnabled) dominantColor ?: Color.White else Color.White.copy(alpha = 0.7f),
+            onClick = playerConnection.player::toggleShuffleMode
+        )
+
+        ResizableIconButton(
+            icon = R.drawable.skip_previous,
+            enabled = canSkipPrevious,
+            color = Color.White,
+            modifier = Modifier.size(40.dp),
+            onClick = playerConnection.player::seekToPrevious
+        )
+
+        Box(
+            modifier = Modifier
+                .size(72.dp)
+                .clip(CircleShape)
+                .background(Color.White)
+                .clickable {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    if (playbackState == Player.STATE_ENDED) {
+                        playerConnection.player.seekTo(0, 0)
+                        playerConnection.player.playWhenReady = true
+                    } else {
+                        playerConnection.player.togglePlayPause()
+                    }
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            AnimatedContent(
+                targetState = isPlaying,
+                label = "PlayPauseIcon",
+                contentAlignment = Alignment.Center
+            ) { playing ->
+                Icon(
+                    painter = painterResource(if (playing) R.drawable.pause else R.drawable.play),
+                    contentDescription = "Play/Pause",
+                    tint = Color.Black,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+        }
+
+        ResizableIconButton(
+            icon = R.drawable.skip_next,
+            enabled = canSkipNext,
+            color = Color.White,
+            modifier = Modifier.size(40.dp),
+            onClick = playerConnection.player::seekToNext
+        )
+
+        ResizableIconButton(
+            icon = when (repeatMode) {
+                Player.REPEAT_MODE_OFF, Player.REPEAT_MODE_ALL -> R.drawable.repeat
+                Player.REPEAT_MODE_ONE -> R.drawable.repeat_one
+                else -> throw IllegalStateException()
+            },
+            modifier = Modifier.size(28.dp),
+            color = if (repeatMode != Player.REPEAT_MODE_OFF) dominantColor ?: Color.White else Color.White.copy(alpha = 0.7f),
+            onClick = playerConnection.player::toggleRepeatMode
+        )
+    }
+}
+
+@Composable
+private fun SecondaryControlsRow(
+    dominantColor: Color?,
+    onToggleLyrics: () -> Unit,
+    navController: NavController
+) {
+    val playerConnection = LocalPlayerConnection.current ?: return
     val currentSong by playerConnection.currentSong.collectAsState(initial = null)
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
-
-    var showChoosePlaylistDialog by remember { mutableStateOf(false) }
     val database = LocalDatabase.current
     val coroutineScope = rememberCoroutineScope()
+    var showChoosePlaylistDialog by remember { mutableStateOf(false) }
 
     if (mediaMetadata != null) {
         AddToPlaylistDialog(
@@ -701,13 +893,11 @@ fun ControlPanel(
                 database.transaction {
                     insert(mediaMetadata!!)
                 }
-
                 coroutineScope.launch(Dispatchers.IO) {
                     playlist.playlist.browseId?.let {
                         YouTube.addToPlaylist(it, mediaMetadata!!.id)
                     }
                 }
-
                 listOf(mediaMetadata!!.id)
             },
             onDismiss = {
@@ -716,395 +906,65 @@ fun ControlPanel(
         )
     }
 
-    Card(
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
-        ),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.25f)),
-        modifier = Modifier.padding(bottom = 8.dp)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(16.dp)
-        ) {
-            val currentPosition by rememberUpdatedState(newValue = position)
+        val isLiked = currentSong?.song?.liked == true
+        val likeColor by animateColorAsState(
+            targetValue = if (isLiked) dominantColor ?: MaterialTheme.colorScheme.error else Color.White.copy(alpha = 0.7f),
+            label = "LikeColor"
+        )
+        TextButton(onClick = { playerConnection.toggleLike() }) {
+            Icon(
+                painter = if (isLiked) painterResource(R.drawable.favorite) else painterResource(R.drawable.favorite_border),
+                contentDescription = stringResource(R.string.like),
+                tint = likeColor,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(Modifier.width(8.dp))
             Text(
-                text = "${makeTimeString(currentPosition)} / ${makeTimeString(duration)}",
-                color = onSurfaceVariantColor,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                ResizableIconButton(
-                    icon = R.drawable.shuffle,
-                    modifier = Modifier.size(28.dp),
-                    color = if (shuffleModeEnabled) dominantColor ?: onSurfaceColor else onSurfaceVariantColor,
-                    onClick = onShuffle
-                )
-
-                ResizableIconButton(
-                    icon = R.drawable.skip_previous,
-                    enabled = canSkipPrevious,
-                    color = onSurfaceColor,
-                    modifier = Modifier.size(40.dp),
-                    onClick = onPrevious
-                )
-
-                Box(
-                    modifier = Modifier
-                        .size(72.dp)
-                        .clip(CircleShape)
-                        .background(onSurfaceColor)
-                        .clickable {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            if (playbackState == Player.STATE_ENDED) {
-                                playerConnection.player.seekTo(0, 0)
-                                playerConnection.player.playWhenReady = true
-                            } else {
-                                onPlayPause()
-                            }
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    AnimatedContent(
-                        targetState = isPlaying,
-                        label = "PlayPauseIcon",
-                        contentAlignment = Alignment.Center
-                    ) { playing ->
-                        Icon(
-                            painter = painterResource(if (playing) R.drawable.pause else R.drawable.play),
-                            contentDescription = "Play/Pause",
-                            tint = Color.Black,
-                            modifier = Modifier.size(40.dp)
-                        )
-                    }
-                }
-
-                ResizableIconButton(
-                    icon = R.drawable.skip_next,
-                    enabled = canSkipNext,
-                    color = onSurfaceColor,
-                    modifier = Modifier.size(40.dp),
-                    onClick = onNext
-                )
-
-                ResizableIconButton(
-                    icon = when (repeatMode) {
-                        Player.REPEAT_MODE_OFF, Player.REPEAT_MODE_ALL -> R.drawable.repeat
-                        Player.REPEAT_MODE_ONE -> R.drawable.repeat_one
-                        else -> throw IllegalStateException()
-                    },
-                    modifier = Modifier.size(28.dp),
-                    color = if (repeatMode != Player.REPEAT_MODE_OFF) dominantColor ?: onSurfaceColor else onSurfaceVariantColor,
-                    onClick = onRepeat
-                )
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val isLiked = currentSong?.song?.liked == true
-                val likeColor by animateColorAsState(
-                    targetValue = if (isLiked) dominantColor ?: MaterialTheme.colorScheme.error else onSurfaceVariantColor,
-                    label = "LikeColor"
-                )
-                TextButton(onClick = { playerConnection.toggleLike() }) {
-                    Icon(
-                        painter = if (isLiked) painterResource(R.drawable.favorite) else painterResource(R.drawable.favorite_border),
-                        contentDescription = stringResource(R.string.like),
-                        tint = likeColor,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.like),
-                        color = likeColor,
-                        modifier = Modifier
-                            .widthIn(max = 75.dp)
-                            .basicMarquee()
-                    )
-                }
-
-                TextButton(onClick = { showChoosePlaylistDialog = true }) {
-                    Icon(
-                        painter = painterResource(R.drawable.playlist_add),
-                        contentDescription = stringResource(R.string.add_to_playlist),
-                        tint = onSurfaceVariantColor,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.add_to_playlist),
-                        color = onSurfaceVariantColor,
-                        modifier = Modifier
-                            .widthIn(max = 75.dp)
-                            .basicMarquee()
-                    )
-                }
-                TextButton(onClick = onToggleLyrics) {
-                    Icon(
-                        painter = painterResource(R.drawable.lyrics),
-                        contentDescription = stringResource(R.string.lyrics),
-                        tint = onSurfaceVariantColor,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.lyrics),
-                        color = onSurfaceVariantColor,
-                        modifier = Modifier
-                            .widthIn(max = 75.dp)
-                            .basicMarquee()
-                    )
-                }
-            }
-        }
-    }
-}
-
-
-@Composable
-fun CircularArcPlayer(
-    position: Long,
-    duration: Long,
-    mediaMetadata: MediaMetadata?,
-    dominantColor: Color?,
-    isPlaying: Boolean,
-    modifier: Modifier = Modifier,
-    onSeek: (newPosition: Long) -> Unit,
-    onSeekChange: (tempPosition: Long) -> Unit,
-    onSwipe: (direction: Int) -> Unit
-) {
-    Box(
-        modifier = modifier
-            .aspectRatio(1f)
-            .graphicsLayer {
-                shadowElevation = 8.dp.toPx()
-                shape = CircleShape
-                clip = true
-            },
-        contentAlignment = Alignment.Center
-    ) {
-        AudioVisualizer(isPlaying = isPlaying, dominantColor = dominantColor)
-
-        PlayerArtworkAndInfo(
-            mediaMetadata = mediaMetadata,
-            onSwipe = onSwipe
-        )
-
-        CircularProgressBar(
-            progress = if (duration > 0) (position.toFloat() / duration).coerceIn(0f, 1f) else 0f,
-            duration = duration,
-            dominantColor = dominantColor,
-            modifier = Modifier.fillMaxSize(),
-            onSeek = onSeek,
-            onSeekChange = onSeekChange
-        )
-    }
-}
-
-@Composable
-fun PlayerArtworkAndInfo(
-    mediaMetadata: MediaMetadata?,
-    onSwipe: (direction: Int) -> Unit
-) {
-    var offsetX by remember { mutableFloatStateOf(0f) }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                detectHorizontalDragGestures(
-                    onDragEnd = {
-                        when {
-                            offsetX > 150 -> onSwipe(1) // Previous
-                            offsetX < -150 -> onSwipe(-1) // Next
-                        }
-                        offsetX = 0f
-                    },
-                    onHorizontalDrag = { _, dragAmount ->
-                        offsetX += dragAmount
-                    }
-                )
-            },
-        contentAlignment = Alignment.Center
-    ) {
-        val alpha by animateFloatAsState(
-            targetValue = 1f - (offsetX.coerceIn(-300f, 300f).absoluteValue / 300f) * 0.7f,
-            label = "ArtworkAlpha"
-        )
-
-        AnimatedContent(
-            targetState = mediaMetadata,
-            transitionSpec = { fadeIn() togetherWith fadeOut() },
-            label = "Artwork"
-        ) { currentArtworkMetadata ->
-            AsyncImage(
-                model = currentArtworkMetadata?.thumbnailUrl,
-                contentDescription = "Album Thumbnail",
-                contentScale = ContentScale.Crop,
+                text = stringResource(R.string.like),
+                color = likeColor,
                 modifier = Modifier
-                    .matchParentSize()
-                    .padding(24.dp)
-                    .clip(CircleShape)
-                    .alpha(alpha)
-                    .offset(x = (offsetX / 2).dp)
+                    .widthIn(max = 75.dp)
+                    .basicMarquee()
             )
         }
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .padding(24.dp)
-                .clip(CircleShape)
-                .background(Color.Black.copy(alpha = 0.5f))
-        )
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(horizontal = 48.dp)
-                .alpha(alpha)
-        ) {
-            AnimatedContent(
-                targetState = mediaMetadata?.title,
-                transitionSpec = {
-                    (slideInVertically { it } + fadeIn()) togetherWith (slideOutVertically { -it } + fadeOut())
-                },
-                label = "Title"
-            ) { title ->
-                Text(
-                    text = title ?: "",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.basicMarquee()
-                )
-            }
-            Spacer(modifier = Modifier.height(4.dp))
-            AnimatedContent(
-                targetState = mediaMetadata?.artists?.joinToString { it.name },
-                transitionSpec = {
-                    (slideInVertically { it } + fadeIn()) togetherWith (slideOutVertically { -it } + fadeOut())
-                },
-                label = "Artist"
-            ) { artist ->
-                Text(
-                    text = artist ?: "",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White.copy(alpha = 0.7f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.basicMarquee()
-                )
-            }
+
+        TextButton(onClick = { showChoosePlaylistDialog = true }) {
+            Icon(
+                painter = painterResource(R.drawable.playlist_add),
+                contentDescription = stringResource(R.string.add_to_playlist),
+                tint = Color.White.copy(alpha = 0.7f),
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = stringResource(R.string.add_to_playlist),
+                color = Color.White.copy(alpha = 0.7f),
+                modifier = Modifier
+                    .widthIn(max = 75.dp)
+                    .basicMarquee()
+            )
         }
-    }
-}
-
-
-@Composable
-fun CircularProgressBar(
-    progress: Float,
-    duration: Long,
-    dominantColor: Color?,
-    modifier: Modifier = Modifier,
-    strokeWidth: Dp = 4.dp,
-    trackColor: Color = Color.White.copy(alpha = 0.2f),
-    onSeek: (newPosition: Long) -> Unit,
-    onSeekChange: (tempPosition: Long) -> Unit
-) {
-    val animatedProgress by animateFloatAsState(targetValue = progress, label = "ProgressAnimation")
-    val strokeWidthPx = with(LocalDensity.current) { strokeWidth.toPx() }
-    val haptic = LocalHapticFeedback.current
-
-    var dragProgress by remember { mutableStateOf<Float?>(null) }
-
-    val progressColor by animateColorAsState(
-        targetValue = dominantColor ?: Color.White,
-        label = "ProgressColor"
-    )
-
-    Canvas(
-        modifier = modifier
-            .padding(strokeWidth * 2)
-            .pointerInput(duration) {
-                if (duration <= 0) return@pointerInput
-                val center = Offset(size.width / 2f, size.height / 2f)
-                detectDragGestures(
-                    onDragStart = { startOffset ->
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        val touchX = startOffset.x - center.x
-                        val touchY = center.y - startOffset.y
-                        val angle = Math.toDegrees(atan2(touchY.toDouble(), touchX.toDouble())).toFloat()
-                        val adjustedAngle = (360f - angle + 90f) % 360f
-                        val newProgress = adjustedAngle / 360f
-                        dragProgress = newProgress
-                        onSeekChange((newProgress * duration).toLong())
-                    },
-                    onDragEnd = {
-                        dragProgress?.let { onSeek((it * duration).toLong()) }
-                        dragProgress = null
-                    },
-                    onDragCancel = {
-                        dragProgress = null
-                    }
-                ) { change, _ ->
-                    val touchX = change.position.x - center.x
-                    val touchY = center.y - change.position.y
-                    val angle = Math.toDegrees(atan2(touchY.toDouble(), touchX.toDouble())).toFloat()
-                    val adjustedAngle = (360f - angle + 90f) % 360f
-                    val newProgress = adjustedAngle / 360f
-                    dragProgress = newProgress
-                    onSeekChange((newProgress * duration).toLong())
-                    change.consume()
-                }
-            }
-    ) {
-        val diameter = size.minDimension
-        val radius = diameter / 2f
-        val drawCenter = Offset(size.width / 2, size.height / 2)
-
-        val displayProgress = dragProgress ?: animatedProgress
-        val sweepAngle = displayProgress * 360f
-
-        drawArc(
-            color = trackColor,
-            startAngle = -90f,
-            sweepAngle = 360f,
-            useCenter = false,
-            style = Stroke(width = strokeWidthPx)
-        )
-
-        drawArc(
-            color = progressColor,
-            startAngle = -90f,
-            sweepAngle = sweepAngle,
-            useCenter = false,
-            style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
-        )
-
-        val angleInRadians = (sweepAngle - 90) * (Math.PI / 180f).toFloat()
-        val thumbX = drawCenter.x + radius * cos(angleInRadians)
-        val thumbY = drawCenter.y + radius * sin(angleInRadians)
-
-        drawCircle(
-            color = progressColor,
-            radius = strokeWidthPx * 2f,
-            center = Offset(thumbX, thumbY)
-        )
+        TextButton(onClick = onToggleLyrics) {
+            Icon(
+                painter = painterResource(R.drawable.lyrics),
+                contentDescription = stringResource(R.string.lyrics),
+                tint = Color.White.copy(alpha = 0.7f),
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = stringResource(R.string.lyrics),
+                color = Color.White.copy(alpha = 0.7f),
+                modifier = Modifier
+                    .widthIn(max = 75.dp)
+                    .basicMarquee()
+            )
+        }
     }
 }
 
@@ -1153,8 +1013,6 @@ fun PlaylistScreen(
     val currentWindowIndex by playerConnection.currentWindowIndex.collectAsState()
     val lazyListState = rememberLazyListState()
     val queueTitle by playerConnection.queueTitle.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
-
 
     LaunchedEffect(currentWindowIndex) {
         if (currentWindowIndex != -1) {
@@ -1164,7 +1022,9 @@ fun PlaylistScreen(
 
     val backgroundColor = MaterialTheme.colorScheme.surface
 
-    Box(modifier = Modifier.fillMaxSize().background(backgroundColor)) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(backgroundColor)) {
         LazyColumn(
             state = lazyListState,
             modifier = Modifier.fillMaxSize(),
@@ -1177,7 +1037,6 @@ fun PlaylistScreen(
                 LaunchedEffect(dismissState.targetValue) {
                     if (dismissState.targetValue != SwipeToDismissBoxValue.Settled) {
                         when (dismissState.targetValue) {
-                            // ---> Swipe right => Go to artist
                             SwipeToDismissBoxValue.StartToEnd -> {
                                 val artistId = currentItem.metadata?.artists?.firstOrNull { it.id != null }?.id
                                 if (artistId != null) {
@@ -1185,16 +1044,12 @@ fun PlaylistScreen(
                                     bottomSheetState.collapseSoft()
                                 }
                             }
-                            // <---
-
-                            // ---> Swipe left -> Remove from list
                             SwipeToDismissBoxValue.EndToStart -> {
                                 playerConnection.player.removeMediaItem(index)
                             }
-                            // <---
                             else -> {}
                         }
-                        dismissState.reset() // Restore the action bar to its previous state
+                        dismissState.reset()
                     }
                 }
 
@@ -1339,7 +1194,9 @@ fun CurvedHeader(
                 model = currentMediaMetadata.thumbnailUrl,
                 contentDescription = "Albüm Kapağı",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize().alpha(if(isSystemInDarkTheme()) 0.4f else 1f)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(if (isSystemInDarkTheme()) 0.4f else 1f)
             )
         }
         Box(
@@ -1430,48 +1287,12 @@ class CurvedHeaderShape : Shape {
             lineTo(size.width, 0f)
             lineTo(size.width, size.height - 60f)
             quadraticTo(
-                x1 = size.width / 2, y1 = size.height + 60f,
+                x1 = size.width / 2f, y1 = size.height + 60f,
                 x2 = 0f, y2 = size.height - 60f
             )
             close()
         }
         return Outline.Generic(path)
-    }
-}
-
-@Composable
-fun AudioVisualizer(
-    isPlaying: Boolean,
-    dominantColor: Color?
-) {
-    val infiniteTransition = rememberInfiniteTransition(label = "VisualizerTransition")
-
-    val color by animateColorAsState(
-        targetValue = (dominantColor ?: Color.White).copy(alpha = 0.5f),
-        label = "VisualizerColor"
-    )
-
-    val scale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.05f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "VisualizerScale"
-    )
-
-    if (isPlaying) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(color, Color.Transparent),
-                    center = center,
-                    radius = (size.minDimension / 2) * scale
-                ),
-                radius = (size.minDimension / 2) * scale
-            )
-        }
     }
 }
 
@@ -1518,9 +1339,7 @@ fun InfoChip(
     }
 }
 
-/**
- * Composable containing all new control buttons (font, translation, share, etc.) on the song lyrics screen.
- */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LyricsControls(
     onDismiss: () -> Unit
@@ -1551,7 +1370,7 @@ private fun LyricsControls(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text("A-", color = onSurfaceVariantColor, modifier = Modifier.clickable { if (fontSize > 14) fontSize -= 2 })
-            Slider(
+            SquigglySlider(
                 value = fontSize.toFloat(),
                 onValueChange = { fontSize = it.roundToInt() },
                 valueRange = 14f..40f,
@@ -1562,7 +1381,7 @@ private fun LyricsControls(
             Spacer(modifier = Modifier.width(16.dp))
 
             Icon(painterResource(R.drawable.dark_mode), contentDescription = "Dim", tint = onSurfaceVariantColor)
-            Slider(
+            SquigglySlider(
                 value = backgroundDim.toFloat(),
                 onValueChange = { backgroundDim = it.roundToInt() },
                 valueRange = 0f..100f,
@@ -1605,10 +1424,6 @@ private fun LyricsControls(
     }
 }
 
-/**
- * A special Composable that manages and displays song lyrics.
- * Handles loading, not found, and display states with new features.
- */
 @Composable
 private fun LyricsScreen(
     position: Long,
