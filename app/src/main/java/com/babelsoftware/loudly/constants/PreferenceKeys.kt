@@ -31,6 +31,7 @@ val HeaderImageKey = stringPreferencesKey("header_image_key")
 enum class AppDesignVariantType {
     NEW, OLD
 }
+val UiPresetKey = stringPreferencesKey("ui_preset_selection")
 
 enum class SliderStyle {
     DEFAULT, SQUIGGLY, COMPOSE
