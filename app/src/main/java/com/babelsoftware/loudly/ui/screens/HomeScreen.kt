@@ -467,7 +467,8 @@ fun HomeScreen(
                         HomeHeaderUI20(
                             modifier = Modifier.animateItem(),
                             homePage = homePage,
-                            onChipClick = { chip -> viewModel.toggleChip(chip) }
+                            onChipClick = { chip -> viewModel.toggleChip(chip) },
+                            updateAvailable = updateAvailable
                         )
                     }
                 } else {
@@ -1140,20 +1141,14 @@ private fun HomeGreetingCard(
 private fun HomeHeaderUI20(
     modifier: Modifier = Modifier,
     homePage: HomePage?,
-    onChipClick: (HomePage.Chip?) -> Unit
+    onChipClick: (HomePage.Chip?) -> Unit,
+    updateAvailable: Boolean
 ) {
     val accountName by rememberPreference(AccountNameKey, "")
     val innerTubeCookie by rememberPreference(InnerTubeCookieKey, "")
     val isLoggedIn = remember(innerTubeCookie) { "SAPISID" in parseCookieString(innerTubeCookie) }
 
-    var showGreeting by remember { mutableStateOf(true) }
-
-    LaunchedEffect(key1 = Unit) {
-        if (isLoggedIn) {
-            delay(2000)
-            showGreeting = false
-        }
-    }
+    var textState by remember { mutableStateOf("greeting") }
 
     val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
     val greeting = when (currentHour) {
@@ -1161,6 +1156,19 @@ private fun HomeHeaderUI20(
         in 12..17 -> stringResource(R.string.good_afternoon)
         in 18..23 -> stringResource(R.string.good_evening)
         else -> stringResource(R.string.good_night)
+    }
+
+    val finalTitle = if (isLoggedIn) accountName.replace("@", "") else stringResource(R.string.recommended_for_you_today)
+    val updateText = stringResource(R.string.new_version_available)
+
+    LaunchedEffect(key1 = updateAvailable, key2 = isLoggedIn) {
+        textState = "greeting"
+        delay(2000)
+        textState = "finalTitle"
+        if (updateAvailable) {
+            delay(2000)
+            textState = "update"
+        }
     }
 
     val abstractColors = listOf(
@@ -1176,7 +1184,11 @@ private fun HomeHeaderUI20(
 
     Column(modifier = modifier) {
         AnimatedContent(
-            targetState = if (isLoggedIn && !showGreeting) accountName.replace("@", "") else greeting,
+            targetState = when(textState) {
+                "greeting" -> if(isLoggedIn) greeting else finalTitle
+                "update" -> updateText
+                else -> finalTitle
+            },
             transitionSpec = {
                 (slideInVertically { height -> height } + fadeIn())
                     .togetherWith(slideOutVertically { height -> -height } + fadeOut())
@@ -1184,7 +1196,7 @@ private fun HomeHeaderUI20(
             label = "GreetingTitleAnimation"
         ) { titleText ->
             Text(
-                text = if (isLoggedIn) titleText else stringResource(R.string.recommended_for_you_today),
+                text = titleText,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
