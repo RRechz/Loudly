@@ -42,7 +42,6 @@ import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.MusicVideo
 import androidx.compose.material.icons.rounded.NotInterested
 import androidx.compose.material.icons.rounded.OfflinePin
-import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Sync
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -80,7 +79,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.babelsoftware.loudly.R
+import com.babelsoftware.loudly.constants.AppDesignVariantKey
+import com.babelsoftware.loudly.constants.AppDesignVariantType
 import com.babelsoftware.loudly.constants.FirstSetupPassed
+import com.babelsoftware.loudly.constants.MiniPlayerStyle
+import com.babelsoftware.loudly.constants.MiniPlayerStyleKey
 import com.babelsoftware.loudly.constants.PlayerStyle
 import com.babelsoftware.loudly.constants.PlayerStyleKey
 import com.babelsoftware.loudly.utils.rememberEnumPreference
@@ -153,7 +156,7 @@ fun SetupWizard(
                 ) { targetPosition ->
                     when (targetPosition) {
                         0 -> WelcomeStep()
-                        1 -> PlayerStyleStep()
+                        1 -> AppUiStyleStep()
                         2 -> StoryShareFeatureStep()
                         3 -> SettingsHeaderFeatureStep()
                         4 -> PlayerPlaylistFeatureStep()
@@ -171,7 +174,8 @@ fun WelcomeStep() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -218,16 +222,24 @@ fun WelcomeStep() {
 }
 
 @Composable
-fun PlayerStyleStep() {
-    val (playerStyle, onPlayerStyleChange) = rememberEnumPreference(
-        PlayerStyleKey,
-        defaultValue = PlayerStyle.NEW
-    )
+fun AppUiStyleStep() {
+    val (appDesignVariant, onAppDesignVariantChange) = rememberEnumPreference(AppDesignVariantKey, AppDesignVariantType.NEW)
+    val (playerStyle, onPlayerStyleChange) = rememberEnumPreference(PlayerStyleKey, PlayerStyle.UI_2_0)
+    val (miniPlayerStyle, onMiniPlayerStyleChange) = rememberEnumPreference(MiniPlayerStyleKey, MiniPlayerStyle.NEW)
+
+    val selectedPackage = remember(appDesignVariant, playerStyle, miniPlayerStyle) {
+        when {
+            playerStyle == PlayerStyle.UI_2_0 -> PlayerStyle.UI_2_0
+            appDesignVariant == AppDesignVariantType.NEW && playerStyle == PlayerStyle.NEW -> PlayerStyle.NEW
+            else -> PlayerStyle.OLD
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -250,77 +262,168 @@ fun PlayerStyleStep() {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             PlayerStylePreview(
-                title = "UI v2.0",
-                isSelected = playerStyle == PlayerStyle.UI_2_0,
-                onClick = { onPlayerStyleChange(PlayerStyle.UI_2_0) },
+                title = "App UI v2.0",
+                isSelected = selectedPackage == PlayerStyle.UI_2_0,
+                onClick = {
+                    onPlayerStyleChange(PlayerStyle.UI_2_0)
+                    onAppDesignVariantChange(AppDesignVariantType.NEW)
+                },
                 modifier = Modifier.weight(1f)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .border(2.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), CircleShape)
-                        .padding(4.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .border(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), CircleShape)
-                    )
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Box(modifier = Modifier
-                            .fillMaxWidth(0.6f)
-                            .height(8.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)))
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Box(modifier = Modifier
-                            .fillMaxWidth(0.4f)
-                            .height(6.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)))
-                    }
-                }
+                PlayerUIV2Preview()
             }
             PlayerStylePreview(
-                title = "UI v1.0",
-                isSelected = playerStyle != PlayerStyle.UI_2_0,
-                onClick = { onPlayerStyleChange(PlayerStyle.NEW) },
+                title = "App UI v1.5",
+                isSelected = selectedPackage == PlayerStyle.NEW,
+                onClick = {
+                    onPlayerStyleChange(PlayerStyle.NEW)
+                    onAppDesignVariantChange(AppDesignVariantType.NEW)
+                    onMiniPlayerStyleChange(MiniPlayerStyle.NEW)
+                },
                 modifier = Modifier.weight(1f)
             ) {
-                Column(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .border(2.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
-                        .padding(8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                PlayerUIV15Preview()
+            }
+            PlayerStylePreview(
+                title = "App UI v1.0",
+                isSelected = selectedPackage == PlayerStyle.OLD,
+                onClick = {
+                    onPlayerStyleChange(PlayerStyle.OLD)
+                    onAppDesignVariantChange(AppDesignVariantType.OLD)
+                    onMiniPlayerStyleChange(MiniPlayerStyle.OLD)
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                PlayerUIV10Preview()
+            }
+        }
+    }
+}
+
+@Composable
+private fun PlayerUIV2Preview() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(9f / 16f)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.Black)
+            .padding(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .aspectRatio(1f)
+                .align(Alignment.TopCenter)
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
+        )
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(0.95f)
+                .align(Alignment.BottomCenter),
+            shape = RoundedCornerShape(8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
+            )
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(modifier = Modifier.fillMaxWidth(0.9f).height(4.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)))
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.8f),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                            .weight(1f)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(Icons.AutoMirrored.Rounded.NavigateBefore, contentDescription = null, modifier = Modifier.size(20.dp))
-                        Icon(Icons.Rounded.PlayArrow, contentDescription = null, modifier = Modifier.size(28.dp))
-                        Icon(Icons.AutoMirrored.Rounded.NavigateNext, contentDescription = null, modifier = Modifier.size(20.dp))
-                    }
+                    Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)))
+                    Box(modifier = Modifier.size(20.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface))
+                    Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)))
                 }
             }
         }
     }
 }
+
+@Composable
+private fun PlayerUIV15Preview() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(9f / 16f)
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .border(2.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
+            .padding(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .weight(1f, fill = false)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(modifier = Modifier.fillMaxWidth(0.9f).height(4.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)))
+            Row(
+                modifier = Modifier.fillMaxWidth(0.8f),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)))
+                Box(modifier = Modifier.size(20.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface))
+                Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)))
+            }
+        }
+    }
+}
+
+@Composable
+private fun PlayerUIV10Preview() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(9f / 16f)
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp))
+            .border(2.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
+            .padding(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .weight(1f, fill = false)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(4.dp))
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(modifier = Modifier.fillMaxWidth(0.9f).height(4.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)))
+                Box(modifier = Modifier.size(20.dp).clip(RoundedCornerShape(4.dp)).background(MaterialTheme.colorScheme.onSurface))
+                Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)))
+            }
+        }
+    }
+}
+
 
 @Composable
 private fun FeatureGuideStep(
@@ -331,7 +434,8 @@ private fun FeatureGuideStep(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -597,7 +701,7 @@ fun PlayerStylePreview(
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable BoxScope.() -> Unit
 ) {
     val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
     Column(
@@ -609,7 +713,7 @@ fun PlayerStylePreview(
                 .clip(RoundedCornerShape(16.dp))
                 .border(BorderStroke(2.dp, borderColor), RoundedCornerShape(16.dp))
                 .clickable(onClick = onClick)
-                .padding(16.dp)
+                .padding(8.dp)
         ) {
             content()
         }
