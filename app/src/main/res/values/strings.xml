@@ -123,6 +123,7 @@
     <!-- Album screen -->
     <string name="other_versions">Other versions</string>
     <string name="favorite">Favorite</string>
+    <string name="top_songs">Top Songs</string>
 
     <!-- Playlist -->
     <string name="liked_songs">Liked songs</string>
