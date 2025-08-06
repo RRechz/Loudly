@@ -93,6 +93,7 @@ import com.babelsoftware.innertube.models.WatchEndpoint
 import com.babelsoftware.innertube.models.YTItem
 import com.babelsoftware.innertube.pages.HomePage
 import com.babelsoftware.innertube.utils.parseCookieString
+import com.babelsoftware.loudly.BuildConfig
 import com.babelsoftware.loudly.LocalDatabase
 import com.babelsoftware.loudly.LocalPlayerAwareWindowInsets
 import com.babelsoftware.loudly.LocalPlayerConnection
@@ -116,6 +117,7 @@ import com.babelsoftware.loudly.db.entities.Playlist
 import com.babelsoftware.loudly.db.entities.RecentActivityType
 import com.babelsoftware.loudly.db.entities.Song
 import com.babelsoftware.loudly.extensions.togglePlayPause
+import com.babelsoftware.loudly.isNewerVersion
 import com.babelsoftware.loudly.models.toMediaMetadata
 import com.babelsoftware.loudly.playback.queues.YouTubeAlbumRadio
 import com.babelsoftware.loudly.playback.queues.YouTubeQueue
@@ -141,10 +143,13 @@ import com.babelsoftware.loudly.ui.menu.YouTubeArtistMenu
 import com.babelsoftware.loudly.ui.menu.YouTubePlaylistMenu
 import com.babelsoftware.loudly.ui.menu.YouTubeSongMenu
 import com.babelsoftware.loudly.ui.utils.SnapLayoutInfoProvider
+import com.babelsoftware.loudly.utils.getLatestReleaseInfo
 import com.babelsoftware.loudly.utils.isInternetAvailable
 import com.babelsoftware.loudly.utils.rememberPreference
 import com.babelsoftware.loudly.viewmodels.HomeViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import kotlin.math.min
 import kotlin.random.Random
@@ -155,9 +160,19 @@ import kotlin.random.Random
 fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel(),
-    updateAvailable: Boolean,
     playerStyle: PlayerStyle
 ) {
+    // --- YENİ EKLENEN KOD BAŞLANGICI ---
+
+    // 1. Güncelleme durumunu tutacak bir state oluşturuyoruz.
+    var updateAvailable by remember { mutableStateOf(false) }
+
+    // 2. HomeScreen ekrana geldiğinde güncelleme kontrolünü BİR KEZ çalıştırıyoruz.
+    LaunchedEffect(key1 = Unit) {
+        updateAvailable = checkForUpdate()
+    }
+
+    // --- YENİ EKLENEN KOD SONU ---
     val menuState = LocalMenuState.current
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current ?: return
@@ -1041,12 +1056,12 @@ private fun HomeGreetingCard(
         else -> stringResource(R.string.good_night)
     }
 
-    var showGreeting by remember { mutableStateOf(true) }
+    var showUpdateMessage by remember { mutableStateOf(false) }
     LaunchedEffect(updateAvailable) {
-        showGreeting = true
+        showUpdateMessage = false
         if (updateAvailable) {
             delay(3000)
-            showGreeting = false
+            showUpdateMessage = true
         }
     }
 
@@ -1077,18 +1092,20 @@ private fun HomeGreetingCard(
                     )
             )
             AnimatedContent(
-                targetState = showGreeting,
+                targetState = showUpdateMessage,
                 modifier = Modifier.padding(20.dp),
                 transitionSpec = {
                     (slideInVertically { height -> height } + fadeIn())
                         .togetherWith(slideOutVertically { height -> -height } + fadeOut())
                 },
                 label = "GreetingCardAnimation"
-            ) { isGreetingVisible ->
+            ) { shouldShowUpdate ->
                 Column(
-                    verticalArrangement = Arrangement.Bottom
+                    verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = if (shouldShowUpdate) Alignment.CenterHorizontally else Alignment.Start,
+                    modifier = if (shouldShowUpdate) Modifier.fillMaxWidth() else Modifier
                 ) {
-                    if (isGreetingVisible || !updateAvailable) {
+                    if (!shouldShowUpdate) {
                         if (isLoggedIn && accountName.isNotBlank()) {
                             Text(
                                 text = greeting,
@@ -1113,22 +1130,20 @@ private fun HomeGreetingCard(
                             )
                         }
                     } else {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                            Text(
-                                text = stringResource(R.string.new_version_available),
-                                color = Color.White,
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = stringResource(R.string.home_card_update_desc),
-                                color = Color.White.copy(alpha = 0.9f),
-                                style = MaterialTheme.typography.bodyLarge,
-                                textAlign = TextAlign.Center
-                            )
-                        }
+                        Text(
+                            text = stringResource(R.string.new_version_available),
+                            color = Color.White,
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(R.string.home_card_update_desc),
+                            color = Color.White.copy(alpha = 0.9f),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }
@@ -1148,7 +1163,7 @@ private fun HomeHeaderUI20(
     val innerTubeCookie by rememberPreference(InnerTubeCookieKey, "")
     val isLoggedIn = remember(innerTubeCookie) { "SAPISID" in parseCookieString(innerTubeCookie) }
 
-    var textState by remember { mutableStateOf("greeting") }
+    var headerState by remember { mutableStateOf("INITIAL") }
 
     val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
     val greeting = when (currentHour) {
@@ -1158,16 +1173,30 @@ private fun HomeHeaderUI20(
         else -> stringResource(R.string.good_night)
     }
 
-    val finalTitle = if (isLoggedIn) accountName.replace("@", "") else stringResource(R.string.recommended_for_you_today)
-    val updateText = stringResource(R.string.new_version_available)
+    val recommendedForYouText = stringResource(R.string.recommended_for_you_today)
+    val updateAvailableText = stringResource(R.string.new_version_available)
 
-    LaunchedEffect(key1 = updateAvailable, key2 = isLoggedIn) {
-        textState = "greeting"
-        delay(2000)
-        textState = "finalTitle"
+    LaunchedEffect(updateAvailable, isLoggedIn) {
+        val sequence = mutableListOf<String>()
+        sequence.add("INITIAL")
+
+        if (isLoggedIn) {
+            sequence.add("SECONDARY")
+        }
         if (updateAvailable) {
-            delay(2000)
-            textState = "update"
+            sequence.add("UPDATE")
+        }
+        if (sequence.size <= 1) {
+            headerState = "INITIAL"
+            return@LaunchedEffect
+        }
+        for (i in sequence.indices) {
+            headerState = sequence[i]
+
+            // Son adımdan sonra bekleme yapma.
+            if (i < sequence.size - 1) {
+                delay(1500)
+            }
         }
     }
 
@@ -1184,17 +1213,19 @@ private fun HomeHeaderUI20(
 
     Column(modifier = modifier) {
         AnimatedContent(
-            targetState = when(textState) {
-                "greeting" -> if(isLoggedIn) greeting else finalTitle
-                "update" -> updateText
-                else -> finalTitle
-            },
+            targetState = headerState,
             transitionSpec = {
                 (slideInVertically { height -> height } + fadeIn())
                     .togetherWith(slideOutVertically { height -> -height } + fadeOut())
             },
             label = "GreetingTitleAnimation"
-        ) { titleText ->
+        ) { state ->
+            val titleText = when (state) {
+                "INITIAL" -> if (isLoggedIn) greeting else recommendedForYouText
+                "SECONDARY" -> accountName.replace("@", "")
+                "UPDATE" -> updateAvailableText
+                else -> if (isLoggedIn) greeting else recommendedForYouText
+            }
             Text(
                 text = titleText,
                 style = MaterialTheme.typography.titleLarge,
@@ -1227,6 +1258,7 @@ private fun HomeHeaderUI20(
         }
     }
 }
+
 
 @Composable
 private fun AbstractChipButton(
@@ -1267,6 +1299,22 @@ private fun AbstractChipButton(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
+        }
+    }
+}
+
+private suspend fun checkForUpdate(): Boolean {
+    return withContext(Dispatchers.IO) {
+        try {
+            val latestInfo = getLatestReleaseInfo()
+            if (latestInfo != null) {
+                isNewerVersion(latestInfo.tagName, BuildConfig.VERSION_NAME)
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 }
