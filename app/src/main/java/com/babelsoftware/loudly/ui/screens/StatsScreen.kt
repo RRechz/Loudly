@@ -98,11 +98,11 @@ fun SongStatsListItem(
     var targetRatio by remember { mutableStateOf(0f) }
     val animatedRatio by animateFloatAsState(
         targetValue = targetRatio,
-        animationSpec = tween(durationMillis = 800),
+        animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
         label = "ratio_animation"
     )
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(playCountRatio) {
         targetRatio = playCountRatio
     }
 
@@ -269,7 +269,7 @@ fun StatsScreen(
                     if (summaryMostPlayedSongs.isNotEmpty()) {
                         item(key = "mostPlayedSongs") {
                             val itemsToShow = if (songsCardExpanded) detailedMostPlayedSongs else summaryMostPlayedSongs
-                            val maxPlayCount = detailedMostPlayedSongs.firstOrNull()?.playCount?.toFloat() ?: 1f
+                            val maxPlayCount = (detailedMostPlayedSongs.firstOrNull()?.playCount?.toFloat() ?: 1f) * 1.1f
                             Card(
                                 shape = RoundedCornerShape(20.dp),
                                 colors = frostedCardColors,
