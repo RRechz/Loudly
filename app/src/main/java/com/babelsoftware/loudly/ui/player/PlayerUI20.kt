@@ -1022,80 +1022,92 @@ fun PlaylistScreen(
 
     val backgroundColor = MaterialTheme.colorScheme.surface
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(backgroundColor)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backgroundColor)
+            .pointerInput(Unit) {
+                detectVerticalDragGestures { change, dragAmount ->
+                    if (dragAmount > 50) { // Threshold for downward swipe
+                        onClose()
+                        change.consume()
+                    }
+                }
+            }
+    ) {
         LazyColumn(
             state = lazyListState,
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(top = 280.dp, bottom = 16.dp)
         ) {
             itemsIndexed(queueWindows, key = { _, window -> window.mediaItem.mediaId }) { index, window ->
-                val currentItem by rememberUpdatedState(window.mediaItem)
-                val dismissState = rememberSwipeToDismissBoxState()
+                window.mediaItem.metadata?.let { metadata ->
+                    val currentItem by rememberUpdatedState(window.mediaItem)
+                    val dismissState = rememberSwipeToDismissBoxState()
 
-                LaunchedEffect(dismissState.targetValue) {
-                    if (dismissState.targetValue != SwipeToDismissBoxValue.Settled) {
-                        when (dismissState.targetValue) {
-                            SwipeToDismissBoxValue.StartToEnd -> {
-                                val artistId = currentItem.metadata?.artists?.firstOrNull { it.id != null }?.id
-                                if (artistId != null) {
-                                    navController.navigate("artist/$artistId")
-                                    bottomSheetState.collapseSoft()
+                    LaunchedEffect(dismissState.targetValue) {
+                        if (dismissState.targetValue != SwipeToDismissBoxValue.Settled) {
+                            when (dismissState.targetValue) {
+                                SwipeToDismissBoxValue.StartToEnd -> {
+                                    val artistId = currentItem.metadata?.artists?.firstOrNull { it.id != null }?.id
+                                    if (artistId != null) {
+                                        navController.navigate("artist/$artistId")
+                                        bottomSheetState.collapseSoft()
+                                    }
                                 }
+                                SwipeToDismissBoxValue.EndToStart -> {
+                                    playerConnection.player.removeMediaItem(index)
+                                }
+                                else -> {}
                             }
-                            SwipeToDismissBoxValue.EndToStart -> {
-                                playerConnection.player.removeMediaItem(index)
-                            }
-                            else -> {}
+                            dismissState.reset()
                         }
-                        dismissState.reset()
                     }
-                }
 
-                SwipeToDismissBox(
-                    state = dismissState,
-                    backgroundContent = {
-                        val direction = dismissState.dismissDirection
-                        when (direction) {
-                            SwipeToDismissBoxValue.StartToEnd -> {
-                                SwipeBackground(
-                                    dismissValue = direction,
-                                    icon = Icons.Default.Person,
-                                    text = stringResource(R.string.view_artist),
-                                    alignment = Alignment.CenterStart,
-                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                                )
+                    SwipeToDismissBox(
+                        state = dismissState,
+                        backgroundContent = {
+                            val direction = dismissState.dismissDirection
+                            when (direction) {
+                                SwipeToDismissBoxValue.StartToEnd -> {
+                                    SwipeBackground(
+                                        dismissValue = direction,
+                                        icon = Icons.Default.Person,
+                                        text = stringResource(R.string.view_artist),
+                                        alignment = Alignment.CenterStart,
+                                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                                    )
+                                }
+                                SwipeToDismissBoxValue.EndToStart -> {
+                                    SwipeBackground(
+                                        dismissValue = direction,
+                                        icon = Icons.Rounded.PlaylistRemove,
+                                        text = stringResource(R.string.remove_from_queue),
+                                        alignment = Alignment.CenterEnd,
+                                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
+                                    )
+                                }
+                                SwipeToDismissBoxValue.Settled -> {}
                             }
-                            SwipeToDismissBoxValue.EndToStart -> {
-                                SwipeBackground(
-                                    dismissValue = direction,
-                                    icon = Icons.Rounded.PlaylistRemove,
-                                    text = stringResource(R.string.remove_from_queue),
-                                    alignment = Alignment.CenterEnd,
-                                    color = MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
-                                )
-                            }
-                            SwipeToDismissBoxValue.Settled -> {}
-                        }
-                    },
-                    modifier = Modifier.animateItem()
-                ) {
-                    SimplePlaylistItem(
-                        metadata = window.mediaItem.metadata!!,
-                        isActive = index == currentWindowIndex,
-                        activeColor = dominantColor,
-                        onClick = {
-                            if (index == currentWindowIndex) {
-                                playerConnection.player.togglePlayPause()
-                            } else {
-                                playerConnection.player.seekToDefaultPosition(index)
-                                if (!playerConnection.player.playWhenReady) {
-                                    playerConnection.player.playWhenReady = true
+                        },
+                        modifier = Modifier.animateItem()
+                    ) {
+                        SimplePlaylistItem(
+                            metadata = metadata,
+                            isActive = index == currentWindowIndex,
+                            activeColor = dominantColor,
+                            onClick = {
+                                if (index == currentWindowIndex) {
+                                    playerConnection.player.togglePlayPause()
+                                } else {
+                                    playerConnection.player.seekToDefaultPosition(index)
+                                    if (!playerConnection.player.playWhenReady) {
+                                        playerConnection.player.playWhenReady = true
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -1234,8 +1246,9 @@ fun CurvedHeader(
                             appendLine(queueTitle ?: "Playlist")
                             appendLine()
                             queueWindows.forEach { window ->
-                                val metadata = window.mediaItem.metadata!!
-                                appendLine("${metadata.title} - ${metadata.artists.joinToString { it.name }}")
+                                window.mediaItem.metadata?.let { metadata ->
+                                    appendLine("${metadata.title} - ${metadata.artists.joinToString { it.name }}")
+                                }
                             }
                         }
                         val sendIntent: Intent = Intent().apply {
