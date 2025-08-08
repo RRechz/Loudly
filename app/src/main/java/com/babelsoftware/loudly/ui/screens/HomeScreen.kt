@@ -477,26 +477,14 @@ fun HomeScreen(
             // ==================== CONDITIONAL INTERFACE LOGIC ====================
             if (playerStyle == PlayerStyle.UI_2_0) {
                 // ============== HOME UI 2.0 ==============
-                if (selectedChip == null) {
-                    item {
-                        HomeHeaderUI20(
-                            modifier = Modifier.animateItem(),
-                            homePage = homePage,
-                            onChipClick = { chip -> viewModel.toggleChip(chip) },
-                            updateAvailable = updateAvailable
-                        )
-                    }
-                } else {
-                    item {
-                        val currentChips = homePage?.chips
-                        if (!currentChips.isNullOrEmpty() && showContentFilter) {
-                            ChipsRow(
-                                chips = currentChips.mapNotNull { chip -> chip?.let { it to it.title } },
-                                currentValue = selectedChip,
-                                onValueUpdate = { viewModel.toggleChip(it) }
-                            )
-                        }
-                    }
+                item {
+                    HomeHeaderUI20(
+                        modifier = Modifier.animateItem(),
+                        homePage = homePage,
+                        selectedChip = selectedChip,
+                        onChipClick = { chip -> viewModel.toggleChip(chip) },
+                        updateAvailable = updateAvailable
+                    )
                 }
 
                 if (selectedChip == null && showRecentActivity && isLoggedIn && !recentActivity.isNullOrEmpty()) {
@@ -1156,6 +1144,7 @@ private fun HomeGreetingCard(
 private fun HomeHeaderUI20(
     modifier: Modifier = Modifier,
     homePage: HomePage?,
+    selectedChip: HomePage.Chip?,
     onChipClick: (HomePage.Chip?) -> Unit,
     updateAvailable: Boolean
 ) {
@@ -1192,8 +1181,6 @@ private fun HomeHeaderUI20(
         }
         for (i in sequence.indices) {
             headerState = sequence[i]
-
-            // Son adımdan sonra bekleme yapma.
             if (i < sequence.size - 1) {
                 delay(1500)
             }
@@ -1236,21 +1223,49 @@ private fun HomeHeaderUI20(
 
         val currentChips = homePage?.chips
         if (!currentChips.isNullOrEmpty()) {
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(currentChips) { chip ->
-                    chip?.let {
-                        val colorIndex = (it.title.hashCode() % abstractColors.size).coerceAtLeast(0)
+            AnimatedContent(
+                targetState = selectedChip,
+                transitionSpec = {
+                    fadeIn() togetherWith fadeOut()
+                },
+                label = "ChipSelectionAnimation"
+            ) { chipState ->
+                if (chipState == null) {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(currentChips) { chip ->
+                            chip?.let {
+                                val colorIndex = (it.title.hashCode() % abstractColors.size).coerceAtLeast(0)
+                                val startColor = abstractColors[colorIndex]
+                                val endColor = abstractColors[(colorIndex + 1) % abstractColors.size]
+
+                                AbstractChipButton(
+                                    chip = it,
+                                    startColor = startColor,
+                                    endColor = endColor,
+                                    onClick = { onChipClick(it) }
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        val colorIndex = (chipState.title.hashCode() % abstractColors.size).coerceAtLeast(0)
                         val startColor = abstractColors[colorIndex]
                         val endColor = abstractColors[(colorIndex + 1) % abstractColors.size]
 
                         AbstractChipButton(
-                            chip = it,
+                            chip = chipState,
                             startColor = startColor,
                             endColor = endColor,
-                            onClick = { onChipClick(it) }
+                            onClick = { onChipClick(null) }
                         )
                     }
                 }
