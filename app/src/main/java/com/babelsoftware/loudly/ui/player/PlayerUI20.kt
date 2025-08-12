@@ -62,6 +62,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
@@ -121,6 +123,8 @@ import com.babelsoftware.loudly.R
 import com.babelsoftware.loudly.constants.LyricsBackgroundDimKey
 import com.babelsoftware.loudly.constants.LyricFontSizeKey
 import com.babelsoftware.loudly.constants.ShowLyricsKey
+import com.babelsoftware.loudly.constants.SliderStyle
+import com.babelsoftware.loudly.constants.SliderStyleKey
 import com.babelsoftware.loudly.constants.TranslateLyricsKey
 import com.babelsoftware.loudly.extensions.metadata
 import com.babelsoftware.loudly.extensions.togglePlayPause
@@ -131,11 +135,13 @@ import com.babelsoftware.loudly.lyrics.LyricsUtils
 import com.babelsoftware.loudly.models.MediaMetadata
 import com.babelsoftware.loudly.ui.component.BottomSheetState
 import com.babelsoftware.loudly.ui.component.LocalMenuState
+import com.babelsoftware.loudly.ui.component.PlayerSliderTrack
 import com.babelsoftware.loudly.ui.component.ResizableIconButton
 import com.babelsoftware.loudly.ui.menu.AddToPlaylistDialog
 import com.babelsoftware.loudly.ui.menu.PlayerMenu
 import com.babelsoftware.loudly.ui.theme.extractGradientColors
 import com.babelsoftware.loudly.utils.makeTimeString
+import com.babelsoftware.loudly.utils.rememberEnumPreference
 import com.babelsoftware.loudly.utils.rememberPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -731,6 +737,7 @@ private fun ControlsCard(
     navController: NavController
 ) {
     var sliderPosition by remember { mutableStateOf<Float?>(null) }
+    val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.COMPOSE)
 
     Card(
         shape = RoundedCornerShape(28.dp),
@@ -746,20 +753,55 @@ private fun ControlsCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(vertical = 16.dp, horizontal = 24.dp)
         ) {
-            SquigglySlider(
-                value = sliderPosition ?: position.toFloat(),
-                valueRange = 0f..(if (duration > 0) duration.toFloat() else 1f),
-                onValueChange = { sliderPosition = it },
-                onValueChangeFinished = {
-                    sliderPosition?.let { onSeek(it.toLong()) }
-                    sliderPosition = null
-                },
-                squigglesSpec = SquigglySlider.SquigglesSpec(
-                    amplitude = if (isPlaying) 2.dp else 0.dp,
-                    strokeWidth = 3.dp,
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
+            when (sliderStyle) {
+                SliderStyle.DEFAULT -> {
+                    Slider(
+                        value = sliderPosition ?: position.toFloat(),
+                        valueRange = 0f..(if (duration > 0) duration.toFloat() else 1f),
+                        onValueChange = { sliderPosition = it },
+                        onValueChangeFinished = {
+                            sliderPosition?.let { onSeek(it.toLong()) }
+                            sliderPosition = null
+                        },
+                        thumb = { Spacer(modifier = Modifier.size(0.dp)) },
+                        track = { sliderState ->
+                            PlayerSliderTrack(
+                                sliderState = sliderState,
+                                colors = SliderDefaults.colors()
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                SliderStyle.SQUIGGLY -> {
+                    SquigglySlider(
+                        value = sliderPosition ?: position.toFloat(),
+                        valueRange = 0f..(if (duration > 0) duration.toFloat() else 1f),
+                        onValueChange = { sliderPosition = it },
+                        onValueChangeFinished = {
+                            sliderPosition?.let { onSeek(it.toLong()) }
+                            sliderPosition = null
+                        },
+                        squigglesSpec = SquigglySlider.SquigglesSpec(
+                            amplitude = if (isPlaying) 2.dp else 0.dp,
+                            strokeWidth = 3.dp,
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                SliderStyle.COMPOSE -> {
+                    Slider(
+                        value = sliderPosition ?: position.toFloat(),
+                        valueRange = 0f..(if (duration > 0) duration.toFloat() else 1f),
+                        onValueChange = { sliderPosition = it },
+                        onValueChangeFinished = {
+                            sliderPosition?.let { onSeek(it.toLong()) }
+                            sliderPosition = null
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
             Spacer(Modifier.height(4.dp))
 
             Row(
