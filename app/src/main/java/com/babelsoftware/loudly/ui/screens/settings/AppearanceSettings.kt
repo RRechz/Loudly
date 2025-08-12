@@ -179,7 +179,7 @@ fun AppearanceSettings(
     )
     val (sliderStyle, onSliderStyleChange) = rememberEnumPreference(
         SliderStyleKey,
-        defaultValue = SliderStyle.DEFAULT
+        defaultValue = SliderStyle.COMPOSE
     )
     val (defaultOpenTabOld, onDefaultOpenTabOldChange) = rememberEnumPreference(
         DefaultOpenTabOldKey,
@@ -641,22 +641,17 @@ fun AppearanceSettings(
         }
 
         item {
-            AnimatedVisibility(visible = playerStyle != PlayerStyle.UI_2_0) {
-                Column{
-                    PreferenceGroupTitle(title = stringResource(R.string.player))
-                    SettingsBox(shape = shapeManager(isFirst = true)) {
-                        PreferenceEntry(
-                            title = { Text(stringResource(R.string.slider_style)) },
-                            description = when (sliderStyle) {
-                                SliderStyle.DEFAULT -> stringResource(R.string.default_)
-                                SliderStyle.SQUIGGLY -> stringResource(R.string.squiggly)
-                                SliderStyle.COMPOSE -> stringResource(R.string.compose)
-                            },
-                            icon = { Icon(painterResource(R.drawable.sliders), null) },
-                            onClick = { /* showSliderOptionDialog = true */ }
-                        )
-                    }
-                }
+            SettingsBox(shape = shapeManager(isFirst = true)) {
+                PreferenceEntry(
+                    title = { Text(stringResource(R.string.slider_style)) },
+                    description = when (sliderStyle) {
+                        SliderStyle.DEFAULT -> stringResource(R.string.default_)
+                        SliderStyle.SQUIGGLY -> stringResource(R.string.squiggly)
+                        SliderStyle.COMPOSE -> stringResource(R.string.compose)
+                    },
+                    icon = { Icon(painterResource(R.drawable.sliders), null) },
+                    onClick = { showSliderOptionDialog = true }
+                )
             }
         }
 
