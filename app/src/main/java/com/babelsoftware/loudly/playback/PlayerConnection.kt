@@ -204,7 +204,7 @@ class PlayerConnection(
     }
 
     fun togglePlayPause() {
-       instance?.player?.playWhenReady =
+        instance?.player?.playWhenReady =
             !instance?.player?.playWhenReady!!
     }
 
