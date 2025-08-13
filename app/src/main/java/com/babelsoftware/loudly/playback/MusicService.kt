@@ -646,7 +646,7 @@ class MusicService : MediaLibraryService(),
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         super.onMediaItemTransition(mediaItem, reason)
         if (consecutivePlaybackErr > 0) {
-            consecutivePlaybackErr --
+            consecutivePlaybackErr--
         }
 
         if (player.isPlaying && reason == MEDIA_ITEM_TRANSITION_REASON_SEEK) {
@@ -659,10 +659,35 @@ class MusicService : MediaLibraryService(),
             currentQueue.hasNextPage() && player.currentMediaItemIndex < player.mediaItemCount - 1
         ) {
             scope.launch(SilentHandler) {
-                val mediaItems = currentQueue.nextPage().filterExplicit(dataStore.get(
-                    HideExplicitKey, false))
+                val mediaItems = currentQueue.nextPage().filterExplicit(
+                    dataStore.get(
+                        HideExplicitKey, false
+                    )
+                )
                 if (player.playbackState != STATE_IDLE) {
                     player.addMediaItems(mediaItems.drop(1))
+                }
+            }
+        }
+
+        if (player.nextMediaItemIndex != C.INDEX_UNSET) {
+            val nextMediaItem = player.getMediaItemAt(player.nextMediaItemIndex)
+            val nextMediaId = nextMediaItem.mediaId
+
+            if (!songUrlCache.containsKey(nextMediaId)) {
+                scope.launch(Dispatchers.IO) {
+                    YTPlayerUtils.playerResponseForPlayback(
+                        videoId = nextMediaId,
+                        audioQuality = audioQuality,
+                        connectivityManager = connectivityManager,
+                    ).onSuccess { playbackData ->
+                        val streamUrl = playbackData.streamUrl
+                        val expiration = System.currentTimeMillis() + (playbackData.streamExpiresInSeconds * 1000L)
+                        songUrlCache[nextMediaId] = streamUrl to expiration
+                    }.onFailure { throwable ->
+                        // If it fails, quietly ignore it
+                        // Log.w("PreFetch", "Failed to pre-fetch URL for $nextMediaId", throwable)
+                    }
                 }
             }
         }
@@ -771,8 +796,8 @@ class MusicService : MediaLibraryService(),
         }
     }
 
+    private val songUrlCache = HashMap<String, Pair<String, Long>>()
     private fun createDataSourceFactory(): DataSource.Factory {
-        val songUrlCache = HashMap<String, Pair<String, Long>>()
         return ResolvingDataSource.Factory(createCacheDataSource()) { dataSpec ->
             val mediaId = dataSpec.key ?: error("No media id")
 
@@ -781,7 +806,7 @@ class MusicService : MediaLibraryService(),
                 val songPath = runBlocking(Dispatchers.IO) {
                     database.song(mediaId).firstOrNull()?.song?.localPath
                 }
-                Log.d("WTF", "Looking for local file: " + songPath)
+                Log.d("Wait, What!?", "Looking for local file: " + songPath)
 
                 return@Factory dataSpec.withUri(Uri.fromFile(File(songPath)))
             }
