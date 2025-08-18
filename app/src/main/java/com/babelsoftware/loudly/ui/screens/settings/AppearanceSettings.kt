@@ -18,17 +18,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.TrendingUp
 import androidx.compose.material.icons.rounded.Cached
@@ -39,6 +43,7 @@ import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.QueryStats
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,6 +52,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
@@ -54,6 +62,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -119,9 +128,8 @@ import com.babelsoftware.loudly.ui.component.EnumListPreference
 import com.babelsoftware.loudly.ui.component.IconButton
 import com.babelsoftware.loudly.ui.component.ListPreference
 import com.babelsoftware.loudly.ui.component.PlayerSliderTrack
-import com.babelsoftware.loudly.ui.component.PreferenceEntry
-import com.babelsoftware.loudly.ui.component.PreferenceGroupTitle
-import com.babelsoftware.loudly.ui.component.SwitchPreference
+import com.babelsoftware.loudly.ui.screens.settings.card_design.ActionType
+import com.babelsoftware.loudly.ui.screens.settings.card_design.IconResource
 import com.babelsoftware.loudly.ui.screens.settings.card_design.SettingCategory
 import com.babelsoftware.loudly.ui.screens.settings.card_design.SettingsBox
 import com.babelsoftware.loudly.ui.screens.settings.card_design.shapeManager
@@ -237,6 +245,15 @@ fun AppearanceSettings(
 
     var tempImageUri by remember { mutableStateOf<Uri?>(null) }
 
+    var showMiscSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+
+    var showDarkModeDialog by remember { mutableStateOf(false) }
+    var showPlayerBackgroundDialog by remember { mutableStateOf(false) }
+    var showAppDesignDialog by remember { mutableStateOf(false) }
+    var showPlayerStyleDialog by remember { mutableStateOf(false) }
+    var showMiniPlayerStyleDialog by remember { mutableStateOf(false) }
+
     val cropActivityTitle = stringResource(id = R.string.edit_photo)
     val cropButtonTitle = stringResource(id = R.string.save)
     val toolbarColor = MaterialTheme.colorScheme.surface
@@ -290,6 +307,349 @@ fun AppearanceSettings(
                 tempImageUri = Uri.parse(key)
             }
         )
+    }
+
+    // App Design Variant selection dialog
+    if (showAppDesignDialog) {
+        AlertDialog(
+            onDismissRequest = { showAppDesignDialog = false },
+            title = { Text(stringResource(R.string.app_design_variant)) },
+            text = {
+                Column {
+                    val options = mapOf(
+                        AppDesignVariantType.NEW to stringResource(R.string.app_design_ui_1_5),
+                        AppDesignVariantType.OLD to stringResource(R.string.app_design_ui_1_0)
+                    )
+                    options.forEach { (option, description) ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable {
+                                onAppDesignVariantChange(option)
+                                showAppDesignDialog = false
+                            }.padding(vertical = 12.dp, horizontal = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(selected = (appDesignVariant == option), onClick = {
+                                onAppDesignVariantChange(option)
+                                showAppDesignDialog = false
+                            })
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = description)
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showAppDesignDialog = false }) { Text(stringResource(R.string.cancel)) } }
+        )
+    }
+
+    // Player Style Selection Dialog
+    if (showPlayerStyleDialog) {
+        AlertDialog(
+            onDismissRequest = { showPlayerStyleDialog = false },
+            title = { Text(stringResource(R.string.player_style)) },
+            text = {
+                Column {
+                    val options = mapOf(
+                        PlayerStyle.OLD to stringResource(R.string.player_style_old_ui),
+                        PlayerStyle.NEW to stringResource(R.string.player_style_ui_1_0),
+                        PlayerStyle.UI_2_0 to stringResource(R.string.player_style_ui_2_0)
+                    )
+                    options.forEach { (option, description) ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable {
+                                onPlayerStyle(option)
+                                showPlayerStyleDialog = false
+                            }.padding(vertical = 12.dp, horizontal = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(selected = (playerStyle == option), onClick = {
+                                onPlayerStyle(option)
+                                showPlayerStyleDialog = false
+                            })
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = description)
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showPlayerStyleDialog = false }) { Text(stringResource(R.string.cancel)) } }
+        )
+    }
+
+    // Mini Player Style Selection Dialog
+    if (showMiniPlayerStyleDialog) {
+        AlertDialog(
+            onDismissRequest = { showMiniPlayerStyleDialog = false },
+            title = { Text(stringResource(R.string.mini_player_style)) },
+            text = {
+                Column {
+                    val options = mapOf(
+                        MiniPlayerStyle.OLD to stringResource(R.string.player_style_old_ui),
+                        MiniPlayerStyle.NEW to stringResource(R.string.player_style_ui_1_0)
+                    )
+                    options.forEach { (option, description) ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable {
+                                onMiniPlayerStyle(option)
+                                showMiniPlayerStyleDialog = false
+                            }.padding(vertical = 12.dp, horizontal = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(selected = (miniPlayerStyle == option), onClick = {
+                                onMiniPlayerStyle(option)
+                                showMiniPlayerStyleDialog = false
+                            })
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = description)
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showMiniPlayerStyleDialog = false }) { Text(stringResource(R.string.cancel)) } }
+        )
+    }
+
+    // Player Background Selection Dialog
+    if (showPlayerBackgroundDialog) {
+        AlertDialog(
+            onDismissRequest = { showPlayerBackgroundDialog = false },
+            title = { Text(stringResource(R.string.player_background_style)) },
+            text = {
+                Column {
+                    val options = listOf(
+                        PlayerBackgroundStyle.DEFAULT,
+                        PlayerBackgroundStyle.GRADIENT,
+                        PlayerBackgroundStyle.BLURMOV,
+                        PlayerBackgroundStyle.BLUR
+                    )
+                    options.forEach { option ->
+                        val description = when (option) {
+                            PlayerBackgroundStyle.DEFAULT -> stringResource(R.string.follow_theme)
+                            PlayerBackgroundStyle.GRADIENT -> stringResource(R.string.gradient)
+                            PlayerBackgroundStyle.BLURMOV -> stringResource(R.string.blurmv)
+                            PlayerBackgroundStyle.BLUR -> stringResource(R.string.blur)
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable {
+                                    onPlayerBackgroundChange(option)
+                                    showPlayerBackgroundDialog = false
+                                }
+                                .padding(vertical = 12.dp, horizontal = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = (playerBackground == option),
+                                onClick = {
+                                    onPlayerBackgroundChange(option)
+                                    showPlayerBackgroundDialog = false
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = description)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showPlayerBackgroundDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    // Dark Mode Selection Dialog
+    if (showDarkModeDialog) {
+        AlertDialog(
+            onDismissRequest = { showDarkModeDialog = false },
+            title = { Text(stringResource(R.string.dark_theme)) },
+            text = {
+                Column {
+                    val options = listOf(DarkMode.ON, DarkMode.OFF, DarkMode.AUTO)
+                    options.forEach { option ->
+                        val description = when (option) {
+                            DarkMode.ON -> stringResource(R.string.dark_theme_on)
+                            DarkMode.OFF -> stringResource(R.string.dark_theme_off)
+                            DarkMode.AUTO -> stringResource(R.string.dark_theme_follow_system)
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable {
+                                    onDarkModeChange(option)
+                                    showDarkModeDialog = false
+                                }
+                                .padding(vertical = 12.dp, horizontal = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = (darkMode == option),
+                                onClick = {
+                                    onDarkModeChange(option)
+                                    showDarkModeDialog = false
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = description)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showDarkModeDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    if (showMiscSheet) {
+        ModalBottomSheet(onDismissRequest = { showMiscSheet = false }, sheetState = sheetState) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState())
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+            ) {
+                Text(text = stringResource(R.string.misc), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 16.dp))
+
+                SettingsBox(
+                    title = stringResource(R.string.auto_playlists_customization),
+                    icon = IconResource.Drawable(painterResource(R.drawable.playlist_play)),
+                    shape = shapeManager(isFirst = true, isLast = !autoPlaylistsCustomization),
+                    actionType = ActionType.SWITCH,
+                    isChecked = autoPlaylistsCustomization,
+                    onCheckedChange = onAutoPlaylistsCustomizationChange,
+                    onClick = { onAutoPlaylistsCustomizationChange(!autoPlaylistsCustomization) }
+                )
+
+                AnimatedVisibility(autoPlaylistsCustomization) {
+                    Column {
+                        SettingsBox(
+                            title = stringResource(R.string.show_liked_auto_playlist),
+                            icon = IconResource.Vector(Icons.Rounded.Favorite),
+                            shape = shapeManager(),
+                            actionType = ActionType.SWITCH,
+                            isChecked = autoPlaylistLiked,
+                            onCheckedChange = onAutoPlaylistLikedChange,
+                            onClick = { onAutoPlaylistLikedChange(!autoPlaylistLiked) }
+                        )
+                        SettingsBox(
+                            title = stringResource(R.string.show_download_auto_playlist),
+                            icon = IconResource.Vector(Icons.Rounded.CloudDownload),
+                            shape = shapeManager(),
+                            actionType = ActionType.SWITCH,
+                            isChecked = autoPlaylistDownload,
+                            onCheckedChange = onAutoPlaylistDownloadChange,
+                            onClick = { onAutoPlaylistDownloadChange(!autoPlaylistDownload) }
+                        )
+                        SettingsBox(
+                            title = stringResource(R.string.show_top_auto_playlist),
+                            icon = IconResource.Vector(Icons.AutoMirrored.Rounded.TrendingUp),
+                            shape = shapeManager(),
+                            actionType = ActionType.SWITCH,
+                            isChecked = autoPlaylistTopPlaylist,
+                            onCheckedChange = onAutoPlaylistTopPlaylistChange,
+                            onClick = { onAutoPlaylistTopPlaylistChange(!autoPlaylistTopPlaylist) }
+                        )
+                        SettingsBox(
+                            title = stringResource(R.string.show_cached_auto_playlist),
+                            icon = IconResource.Vector(Icons.Rounded.Cached),
+                            shape = shapeManager(),
+                            actionType = ActionType.SWITCH,
+                            isChecked = autoPlaylistCached,
+                            onCheckedChange = onAutoPlaylistCachedChange,
+                            onClick = { onAutoPlaylistCachedChange(!autoPlaylistCached) }
+                        )
+                        SettingsBox(
+                            title = stringResource(R.string.show_local_auto_playlist),
+                            icon = IconResource.Vector(Icons.Rounded.MusicNote),
+                            shape = shapeManager(isLast = true),
+                            actionType = ActionType.SWITCH,
+                            isChecked = autoPlaylistLocal,
+                            onCheckedChange = onAutoPlaylistLocalChange,
+                            onClick = { onAutoPlaylistLocalChange(!autoPlaylistLocal) }
+                        )
+                    }
+                }
+
+                SettingsBox(
+                    title = stringResource(R.string.swipe_song_to_dismiss),
+                    icon = IconResource.Drawable(painterResource(R.drawable.queue_music)),
+                    shape = shapeManager(isFirst = !autoPlaylistsCustomization),
+                    actionType = ActionType.SWITCH,
+                    isChecked = swipeSongToDismiss,
+                    onCheckedChange = onSwipeSongToDismissChange,
+                    onClick = { onSwipeSongToDismissChange(!swipeSongToDismiss) }
+                )
+
+                if (appDesignVariant == AppDesignVariantType.NEW) {
+                    SettingsBox(shape = shapeManager()) {
+                        EnumListPreference(title = { Text(stringResource(R.string.default_open_tab)) }, icon = { Icon(painterResource(R.drawable.tab), null) }, selectedValue = defaultOpenTab, onValueSelected = onDefaultOpenTabChange, valueText = { stringResource(it.stringId) })
+                    }
+                } else {
+                    SettingsBox(shape = shapeManager()) {
+                        EnumListPreference(title = { Text(stringResource(R.string.default_open_tab)) }, icon = { Icon(painterResource(R.drawable.tab), null) }, selectedValue = defaultOpenTabOld, onValueSelected = onDefaultOpenTabOldChange, valueText = { stringResource(it.stringId) })
+                    }
+                }
+
+                SettingsBox(
+                    title = stringResource(R.string.slim_navbar),
+                    icon = IconResource.Drawable(painterResource(R.drawable.nav_bar)),
+                    shape = shapeManager(),
+                    actionType = ActionType.SWITCH,
+                    isChecked = slimNav,
+                    onCheckedChange = onSlimNavChange,
+                    onClick = { onSlimNavChange(!slimNav) }
+                )
+
+                SettingsBox(shape = shapeManager()) {
+                    EnumListPreference(
+                        title = { Text(stringResource(R.string.grid_cell_size)) },
+                        icon = { Icon(painterResource(R.drawable.grid_view), null) },
+                        selectedValue = gridCellSize,
+                        onValueSelected = onGridCellSizeChange,
+                        valueText = {
+                            when (it) {
+                                GridCellSize.SMALL -> stringResource(R.string.small)
+                                GridCellSize.BIG -> stringResource(R.string.big)
+                            }
+                        },
+                    )
+                }
+
+                SettingsBox(shape = shapeManager(isLast = true)) {
+                    ListPreference(
+                        title = { Text(stringResource(R.string.default_lib_chips)) },
+                        icon = { Icon(painterResource(R.drawable.list), null) },
+                        selectedValue = defaultChip,
+                        values = listOf(
+                            LibraryFilter.LIBRARY,
+                            LibraryFilter.PLAYLISTS,
+                            LibraryFilter.SONGS,
+                            LibraryFilter.ALBUMS,
+                            LibraryFilter.ARTISTS,
+                        ),
+                        valueText = {
+                            when (it) {
+                                LibraryFilter.SONGS -> stringResource(R.string.songs)
+                                LibraryFilter.ARTISTS -> stringResource(R.string.artists)
+                                LibraryFilter.ALBUMS -> stringResource(R.string.albums)
+                                LibraryFilter.PLAYLISTS -> stringResource(R.string.playlists)
+                                LibraryFilter.LIBRARY -> stringResource(R.string.filter_library)
+                            }
+                        },
+                        onValueSelected = onDefaultChipChange,
+                    )
+                }
+                Spacer(Modifier.windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Bottom)))
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
     }
 
     Column(
@@ -475,397 +835,225 @@ fun AppearanceSettings(
         )
     }
 
-    LazyColumn(
-        modifier = Modifier
-            .windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))
-    ) {
-        item {
-            Spacer(Modifier.windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Top)))
-        }
-
-        // --- THEME GROUP ---
-        item {
-            SettingCategory(title = stringResource(R.string.theme))
-        }
-
-        item {
-            SettingsBox(shape = shapeManager(isFirst = true)) {
-                SwitchPreference(
-                    title = { Text(stringResource(R.string.enable_dynamic_theme)) },
-                    icon = { Icon(painterResource(R.drawable.palette), null) },
-                    checked = dynamicTheme,
-                    onCheckedChange = onDynamicThemeChange
-                )
-            }
-        }
-
-        item {
-            SettingsBox(shape = shapeManager()) {
-                EnumListPreference(
-                    title = { Text(stringResource(R.string.dark_theme)) },
-                    icon = { Icon(painterResource(R.drawable.dark_mode), null) },
-                    selectedValue = darkMode,
-                    onValueSelected = onDarkModeChange,
-                    valueText = {
-                        when (it) {
-                            DarkMode.ON -> stringResource(R.string.dark_theme_on)
-                            DarkMode.OFF -> stringResource(R.string.dark_theme_off)
-                            DarkMode.AUTO -> stringResource(R.string.dark_theme_follow_system)
-                        }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.appearance)) },
+                navigationIcon = {
+                    IconButton(
+                        onClick = navController::navigateUp,
+                        onLongClick = navController::backToMain
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.arrow_back),
+                            contentDescription = stringResource(R.string.back)
+                        )
                     }
+                },
+                scrollBehavior = scrollBehavior
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Horizontal))
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
+        ) {
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // --- THEME GROUP ---
+            SettingCategory(title = stringResource(R.string.theme))
+            SettingsBox(
+                title = stringResource(R.string.enable_dynamic_theme),
+                icon = IconResource.Drawable(painterResource(R.drawable.palette)),
+                shape = shapeManager(isFirst = true),
+                actionType = ActionType.SWITCH,
+                isChecked = dynamicTheme,
+                onCheckedChange = onDynamicThemeChange,
+                onClick = { onDynamicThemeChange(!dynamicTheme) }
+            )
+            val darkModeDesc = when (darkMode) {
+                DarkMode.ON -> stringResource(R.string.dark_theme_on)
+                DarkMode.OFF -> stringResource(R.string.dark_theme_off)
+                DarkMode.AUTO -> stringResource(R.string.dark_theme_follow_system)
+            }
+            SettingsBox(
+                title = stringResource(R.string.dark_theme),
+                description = darkModeDesc,
+                icon = IconResource.Drawable(painterResource(R.drawable.dark_mode)),
+                shape = shapeManager(),
+                onClick = { showDarkModeDialog = true }
+            )
+            AnimatedVisibility(useDarkTheme) {
+                SettingsBox(
+                    title = stringResource(R.string.pure_black),
+                    icon = IconResource.Drawable(painterResource(R.drawable.contrast)),
+                    shape = shapeManager(isLast = !useDarkTheme),
+                    actionType = ActionType.SWITCH,
+                    isChecked = pureBlack,
+                    onCheckedChange = onPureBlackChange,
+                    onClick = { onPureBlackChange(!pureBlack) }
                 )
             }
-        }
+            SettingsBox(
+                title = stringResource(R.string.header_background),
+                description = stringResource(R.string.header_background_description),
+                icon = IconResource.Vector(Icons.Rounded.Image),
+                shape = shapeManager(isLast = false),
+                onClick = { showHeaderImageDialog = true }
+            )
 
-        item {
-            AnimatedVisibility(useDarkTheme) {
-                SettingsBox(shape = shapeManager()) {
-                    SwitchPreference(
-                        title = { Text(stringResource(R.string.pure_black)) },
-                        icon = { Icon(painterResource(R.drawable.contrast), null) },
-                        checked = pureBlack,
-                        onCheckedChange = { checked ->
-                            onPureBlackChange(checked)
-                        }
+            if (selectedPreset == "Custom") {
+                SettingsBox(
+                    title = stringResource(R.string.app_ui),
+                    description = "v$selectedPreset",
+                    icon = IconResource.Vector(Icons.Rounded.DesignServices),
+                    shape = shapeManager(isFirst = false, isLast = false),
+                    onClick = { showUiDialog = true }
+                )
+                Column {
+                    val appDesignDesc = when (appDesignVariant) {
+                        AppDesignVariantType.NEW -> stringResource(R.string.app_design_ui_1_5)
+                        AppDesignVariantType.OLD -> stringResource(R.string.app_design_ui_1_0)
+                    }
+                    SettingsBox(
+                        title = stringResource(R.string.app_design_variant),
+                        description = appDesignDesc,
+                        icon = IconResource.Vector(Icons.Rounded.DesignServices),
+                        shape = shapeManager(isFirst = false),
+                        onClick = { showAppDesignDialog = true }
+                    )
+
+                    val playerStyleDesc = when (playerStyle) {
+                        PlayerStyle.OLD -> stringResource(R.string.player_style_old_ui)
+                        PlayerStyle.NEW -> stringResource(R.string.player_style_ui_1_0)
+                        PlayerStyle.UI_2_0 -> stringResource(R.string.player_style_ui_2_0)
+                    }
+                    SettingsBox(
+                        title = stringResource(R.string.player_style),
+                        description = playerStyleDesc,
+                        icon = IconResource.Drawable(painterResource(R.drawable.play)),
+                        shape = shapeManager(),
+                        onClick = { showPlayerStyleDialog = true }
+                    )
+
+                    val miniPlayerStyleDesc = when (miniPlayerStyle) {
+                        MiniPlayerStyle.OLD -> stringResource(R.string.player_style_old_ui)
+                        MiniPlayerStyle.NEW -> stringResource(R.string.player_style_ui_1_0)
+                    }
+                    SettingsBox(
+                        title = stringResource(R.string.mini_player_style),
+                        description = miniPlayerStyleDesc,
+                        icon = IconResource.Drawable(painterResource(R.drawable.play)),
+                        shape = shapeManager(isLast = true),
+                        onClick = { showMiniPlayerStyleDialog = true }
                     )
                 }
-            }
-        }
 
-        item {
-            SettingsBox(shape = shapeManager(isBoth = true)) {
-                PreferenceEntry(
-                    title = { Text(stringResource(R.string.header_background)) },
-                    description = stringResource(R.string.header_background_description),
-                    icon = { Icon(Icons.Rounded.Image, null) },
-                    onClick = { showHeaderImageDialog = true }
-                )
-            }
-        }
-
-        item {
-            SettingsBox(shape = shapeManager(isFirst = true, isLast = selectedPreset != "Custom")) {
-                PreferenceEntry(
-                    title = { Text(stringResource(R.string.app_ui)) },
+            } else {
+                SettingsBox(
+                    title = stringResource(R.string.app_ui),
                     description = "v$selectedPreset",
-                    icon = { Icon(Icons.Rounded.DesignServices, null) },
+                    icon = IconResource.Vector(Icons.Rounded.DesignServices),
+                    shape = shapeManager(isFirst = false, isLast = true),
                     onClick = { showUiDialog = true }
                 )
             }
-        }
 
-        item {
-            // This group will ONLY appear when the `selectedPreset` status is “Custom”.
-            AnimatedVisibility(visible = selectedPreset == "Custom") {
-                Column {
-                    PreferenceGroupTitle(title = stringResource(R.string.custom_app_ui))
-
-                    SettingsBox(shape = shapeManager(isFirst = true)) {
-                        EnumListPreference(
-                            title = { Text(stringResource(R.string.app_design_variant)) },
-                            icon = { Icon(Icons.Rounded.DesignServices, null) },
-                            selectedValue = appDesignVariant,
-                            onValueSelected = onAppDesignVariantChange,
-                            valueText = {
-                                when (it) {
-                                    AppDesignVariantType.NEW -> stringResource(R.string.app_design_ui_1_5)
-                                    AppDesignVariantType.OLD -> stringResource(R.string.app_design_ui_1_0)
-                                }
-                            }
-                        )
-                    }
-                    SettingsBox(shape = shapeManager()) {
-                        ListPreference(
-                            title = { Text(stringResource(R.string.player_style)) },
-                            icon = { Icon(painterResource(R.drawable.play), null) },
-                            selectedValue = playerStyle,
-                            values = listOf(PlayerStyle.OLD, PlayerStyle.NEW, PlayerStyle.UI_2_0),
-                            valueText = {
-                                when (it) {
-                                    PlayerStyle.OLD -> stringResource(R.string.player_style_old_ui)
-                                    PlayerStyle.NEW -> stringResource(R.string.player_style_ui_1_0)
-                                    PlayerStyle.UI_2_0 -> stringResource(R.string.player_style_ui_2_0)
-                                }
-                            },
-                            onValueSelected = onPlayerStyle
-                        )
-                    }
-                    SettingsBox(shape = shapeManager(isLast = true)) {
-                        ListPreference(
-                            title = { Text(stringResource(R.string.mini_player_style)) },
-                            icon = { Icon(painterResource(R.drawable.play), null) },
-                            selectedValue = miniPlayerStyle,
-                            values = listOf(MiniPlayerStyle.OLD, MiniPlayerStyle.NEW),
-                            valueText = {
-                                when (it) {
-                                    MiniPlayerStyle.OLD -> stringResource(R.string.player_style_old_ui)
-                                    MiniPlayerStyle.NEW -> stringResource(R.string.player_style_ui_1_0)
-                                }
-                            },
-                            onValueSelected = onMiniPlayerStyle
-                        )
-                    }
-                }
-            }
-        }
-
-        // --- HOME GROUP ---
-        item {
+            // --- HOME GROUP ---
             SettingCategory(title = stringResource(R.string.home))
-        }
 
-        item {
-            SettingsBox(shape = shapeManager(isFirst = true, isLast = !isLoggedIn)) {
-                SwitchPreference(
-                    title = { Text(stringResource(R.string.show_content_filter)) },
-                    icon = { Icon(Icons.Rounded.FilterList, null) },
-                    checked = showContentFilter,
-                    onCheckedChange = onShowContentFilterChange
-                )
-            }
             if (isLoggedIn) {
-                SettingsBox(shape = shapeManager(isLast = true)) {
-                    SwitchPreference(
-                        title = { Text(stringResource(R.string.recent_activity)) },
-                        icon = { Icon(Icons.Rounded.QueryStats, null) },
-                        checked = showRecentActivity,
-                        onCheckedChange = onShowRecentActivityChange
-                    )
-                }
-            }
-        }
-
-        // --- PLAYER GROUP ---
-        item {
-            SettingCategory(title = stringResource(R.string.player))
-        }
-
-        item {
-            SettingsBox(shape = shapeManager(isFirst = true)) {
-                PreferenceEntry(
-                    title = { Text(stringResource(R.string.slider_style)) },
-                    description = when (sliderStyle) {
-                        SliderStyle.DEFAULT -> stringResource(R.string.default_)
-                        SliderStyle.SQUIGGLY -> stringResource(R.string.squiggly)
-                        SliderStyle.COMPOSE -> stringResource(R.string.compose)
-                    },
-                    icon = { Icon(painterResource(R.drawable.sliders), null) },
-                    onClick = { showSliderOptionDialog = true }
+                SettingsBox(
+                    title = stringResource(R.string.show_content_filter),
+                    icon = IconResource.Vector(Icons.Rounded.FilterList),
+                    shape = shapeManager(isFirst = true, isLast = false),
+                    actionType = ActionType.SWITCH,
+                    isChecked = showContentFilter,
+                    onCheckedChange = onShowContentFilterChange,
+                    onClick = { onShowContentFilterChange(!showContentFilter) }
                 )
-            }
-        }
-
-        item {
-            SettingsBox(shape = shapeManager()) {
-                EnumListPreference(
-                    title = { Text(stringResource(R.string.player_background_style)) },
-                    icon = { Icon(painterResource(R.drawable.gradient), null) },
-                    selectedValue = playerBackground,
-                    onValueSelected = onPlayerBackgroundChange,
-                    valueText = {
-                        when (it) {
-                            PlayerBackgroundStyle.DEFAULT -> stringResource(R.string.follow_theme)
-                            PlayerBackgroundStyle.GRADIENT -> stringResource(R.string.gradient)
-                            PlayerBackgroundStyle.BLURMOV -> stringResource(R.string.blurmv)
-                            PlayerBackgroundStyle.BLUR -> stringResource(R.string.blur)
-                        }
-                    }
+                SettingsBox(
+                    title = stringResource(R.string.recent_activity),
+                    icon = IconResource.Vector(Icons.Rounded.QueryStats),
+                    shape = shapeManager(isFirst = false, isLast = true),
+                    actionType = ActionType.SWITCH,
+                    isChecked = showRecentActivity,
+                    onCheckedChange = onShowRecentActivityChange,
+                    onClick = { onShowRecentActivityChange(!showRecentActivity) }
                 )
-            }
-        }
-
-        item {
-            SettingsBox(shape = shapeManager()) {
-                SwitchPreference(
-                    title = { Text(stringResource(R.string.enable_swipe_thumbnail)) },
-                    icon = { Icon(painterResource(R.drawable.swipe), null) },
-                    checked = swipeThumbnail,
-                    onCheckedChange = onSwipeThumbnailChange,
-                )
-            }
-        }
-
-        item {
-            SettingsBox(shape = shapeManager(isLast = true)) {
-                PreferenceEntry(
-                    title = { Text(stringResource(R.string.thumbnail_corner_radius)) },
-                    description = "$thumbnailCornerRadius" + "0%",
-                    icon = { Icon(Icons.Rounded.Image, null) },
-                    onClick = { showCornerRadiusDialog = true }
-                )
-            }
-        }
-
-        // --- MISC GROUP ---
-        item {
-            SettingCategory(title = stringResource(R.string.misc))
-        }
-
-        item {
-            SettingsBox(shape = shapeManager(isFirst = true)) {
-                SwitchPreference(
-                    title = { Text(stringResource(R.string.auto_playlists_customization)) },
-                    icon = { Icon(painterResource(R.drawable.playlist_play), null) },
-                    checked = autoPlaylistsCustomization,
-                    onCheckedChange = onAutoPlaylistsCustomizationChange
-                )
-            }
-        }
-
-        item {
-            AnimatedVisibility(autoPlaylistsCustomization) {
-                Column(modifier = Modifier.padding(start = 16.dp)) {
-                    SettingsBox(shape = shapeManager()) {
-                        SwitchPreference(
-                            title = { Text(stringResource(R.string.show_liked_auto_playlist)) },
-                            icon = { Icon(Icons.Rounded.Favorite, null) },
-                            checked = autoPlaylistLiked,
-                            onCheckedChange = onAutoPlaylistLikedChange
-                        )
-                    }
-                    SettingsBox(shape = shapeManager()) {
-                        SwitchPreference(
-                            title = { Text(stringResource(R.string.show_download_auto_playlist)) },
-                            icon = { Icon(Icons.Rounded.CloudDownload, null) },
-                            checked = autoPlaylistDownload,
-                            onCheckedChange = onAutoPlaylistDownloadChange
-                        )
-                    }
-                    SettingsBox(shape = shapeManager()) {
-                        SwitchPreference(
-                            title = { Text(stringResource(R.string.show_top_auto_playlist)) },
-                            icon = { Icon(Icons.AutoMirrored.Rounded.TrendingUp, null) },
-                            checked = autoPlaylistTopPlaylist,
-                            onCheckedChange = onAutoPlaylistTopPlaylistChange
-                        )
-                    }
-                    SettingsBox(shape = shapeManager()) {
-                        SwitchPreference(
-                            title = { Text(stringResource(R.string.show_cached_auto_playlist)) },
-                            icon = { Icon(Icons.Rounded.Cached, null) },
-                            checked = autoPlaylistCached,
-                            onCheckedChange = onAutoPlaylistCachedChange
-                        )
-                    }
-                    SettingsBox(shape = shapeManager()) {
-                        SwitchPreference(
-                            title = { Text(stringResource(R.string.show_local_auto_playlist)) },
-                            icon = { Icon(Icons.Rounded.MusicNote, null) },
-                            checked = autoPlaylistLocal,
-                            onCheckedChange = onAutoPlaylistLocalChange
-                        )
-                    }
-                }
-            }
-        }
-
-        item {
-            SettingsBox(shape = shapeManager()) {
-                SwitchPreference(
-                    title = { Text(stringResource(R.string.swipe_song_to_dismiss)) },
-                    icon = { Icon(painterResource(R.drawable.queue_music), null) },
-                    checked = swipeSongToDismiss,
-                    onCheckedChange = onSwipeSongToDismissChange
-                )
-            }
-        }
-
-        item {
-            if (appDesignVariant == AppDesignVariantType.NEW) {
-                SettingsBox(shape = shapeManager()) {
-                    EnumListPreference(
-                        title = { Text(stringResource(R.string.default_open_tab)) },
-                        icon = { Icon(painterResource(R.drawable.tab), null) },
-                        selectedValue = defaultOpenTab,
-                        onValueSelected = onDefaultOpenTabChange,
-                        valueText = { stringResource(it.stringId) }
-                    )
-                }
             } else {
-                SettingsBox(shape = shapeManager()) {
-                    EnumListPreference(
-                        title = { Text(stringResource(R.string.default_open_tab)) },
-                        icon = { Icon(painterResource(R.drawable.tab), null) },
-                        selectedValue = defaultOpenTabOld,
-                        onValueSelected = onDefaultOpenTabOldChange,
-                        valueText = { stringResource(it.stringId) }
-                    )
-                }
-            }
-        }
-
-        item {
-            SettingsBox(shape = shapeManager()) {
-                SwitchPreference(
-                    title = { Text(stringResource(R.string.slim_navbar)) },
-                    icon = { Icon(painterResource(R.drawable.nav_bar), null) },
-                    checked = slimNav,
-                    onCheckedChange = onSlimNavChange
+                SettingsBox(
+                    title = stringResource(R.string.show_content_filter),
+                    icon = IconResource.Vector(Icons.Rounded.FilterList),
+                    shape = shapeManager(isBoth = true),
+                    actionType = ActionType.SWITCH,
+                    isChecked = showContentFilter,
+                    onCheckedChange = onShowContentFilterChange,
+                    onClick = { onShowContentFilterChange(!showContentFilter) }
                 )
             }
-        }
 
-        item {
-            SettingsBox(shape = shapeManager()) {
-                EnumListPreference(
-                    title = { Text(stringResource(R.string.grid_cell_size)) },
-                    icon = { Icon(painterResource(R.drawable.grid_view), null) },
-                    selectedValue = gridCellSize,
-                    onValueSelected = onGridCellSizeChange,
-                    valueText = {
-                        when (it) {
-                            GridCellSize.SMALL -> stringResource(R.string.small)
-                            GridCellSize.BIG -> stringResource(R.string.big)
-                        }
-                    },
-                )
+            // --- PLAYER GROUP ---
+            SettingCategory(title = stringResource(R.string.player))
+            val sliderStyleDesc = when (sliderStyle) {
+                SliderStyle.DEFAULT -> stringResource(R.string.default_)
+                SliderStyle.SQUIGGLY -> stringResource(R.string.squiggly)
+                SliderStyle.COMPOSE -> stringResource(R.string.compose)
             }
-        }
+            SettingsBox(
+                title = stringResource(R.string.slider_style),
+                description = sliderStyleDesc,
+                icon = IconResource.Drawable(painterResource(R.drawable.sliders)),
+                shape = shapeManager(isFirst = true),
+                onClick = { showSliderOptionDialog = true }
+            )
+            val playerBackgroundDesc = when (playerBackground) {
+                PlayerBackgroundStyle.DEFAULT -> stringResource(R.string.follow_theme)
+                PlayerBackgroundStyle.GRADIENT -> stringResource(R.string.gradient)
+                PlayerBackgroundStyle.BLURMOV -> stringResource(R.string.blurmv)
+                PlayerBackgroundStyle.BLUR -> stringResource(R.string.blur)
+            }
+            SettingsBox(
+                title = stringResource(R.string.player_background_style),
+                description = playerBackgroundDesc,
+                icon = IconResource.Drawable(painterResource(R.drawable.gradient)),
+                shape = shapeManager(),
+                onClick = { showPlayerBackgroundDialog = true }
+            )
+            SettingsBox(
+                title = stringResource(R.string.enable_swipe_thumbnail),
+                icon = IconResource.Drawable(painterResource(R.drawable.swipe)),
+                shape = shapeManager(),
+                actionType = ActionType.SWITCH,
+                isChecked = swipeThumbnail,
+                onCheckedChange = onSwipeThumbnailChange,
+                onClick = { onSwipeThumbnailChange(!swipeThumbnail) }
+            )
+            SettingsBox(
+                title = stringResource(R.string.thumbnail_corner_radius),
+                description = "$thumbnailCornerRadius" + "0%",
+                icon = IconResource.Vector(Icons.Rounded.Image),
+                shape = shapeManager(isLast = true),
+                onClick = { showCornerRadiusDialog = true }
+            )
 
-        item {
-            SettingsBox(shape = shapeManager(isLast = true)) {
-                ListPreference(
-                    title = { Text(stringResource(R.string.default_lib_chips)) },
-                    icon = { Icon(painterResource(R.drawable.list), null) },
-                    selectedValue = defaultChip,
-                    values = listOf(
-                        LibraryFilter.LIBRARY,
-                        LibraryFilter.PLAYLISTS,
-                        LibraryFilter.SONGS,
-                        LibraryFilter.ALBUMS,
-                        LibraryFilter.ARTISTS,
-                    ),
-                    valueText = {
-                        when (it) {
-                            LibraryFilter.SONGS -> stringResource(R.string.songs)
-                            LibraryFilter.ARTISTS -> stringResource(R.string.artists)
-                            LibraryFilter.ALBUMS -> stringResource(R.string.albums)
-                            LibraryFilter.PLAYLISTS -> stringResource(R.string.playlists)
-                            LibraryFilter.LIBRARY -> stringResource(R.string.filter_library)
-                        }
-                    },
-                    onValueSelected = onDefaultChipChange,
-                )
-            }
+            // --- MISC GROUP ---
+            SettingCategory(title = stringResource(R.string.misc))
+            SettingsBox(
+                title = stringResource(R.string.other_settings),
+                description = stringResource(R.string.other_settings_description),
+                icon = IconResource.Vector(Icons.Rounded.Tune),
+                shape = shapeManager(isBoth = true),
+                onClick = { showMiscSheet = true }
+            )
+            Spacer(Modifier.windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Bottom)))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
-
-
-    TopAppBar(
-        title = { Text(stringResource(R.string.appearance)) },
-        navigationIcon = {
-            IconButton(
-                onClick = navController::navigateUp,
-                onLongClick = navController::backToMain
-            ) {
-                Icon(
-                    painterResource(R.drawable.arrow_back),
-                    contentDescription = null
-                )
-            }
-        },
-        scrollBehavior = scrollBehavior
-    )
 }
 
 @Composable
