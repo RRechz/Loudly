@@ -568,6 +568,8 @@
     <string name="audio_quality_high_desc">Set to High Bitrate quality</string>
     <string name="audio_quality_low_desc">Maintains ideal speed for uninterrupted music experience</string>
 
+    <string name="could_not_import">Could not import</string>
+
     <!-- Player UI -->
     <string name="translate">Translate (BETA)</string>
     <string name="copy">Copy</string>
