@@ -1,12 +1,19 @@
 package com.babelsoftware.loudly.ui.screens.settings
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.VolumeOff
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
@@ -15,17 +22,26 @@ import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.Lyrics
 import androidx.compose.material.icons.rounded.SdCard
 import androidx.compose.material.icons.rounded.Sync
+import androidx.compose.material.icons.rounded.Tune
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,16 +65,16 @@ import com.babelsoftware.loudly.constants.StopMusicOnTaskClearKey
 import com.babelsoftware.loudly.constants.StopPlayingSongWhenMinimumVolumeKey
 import com.babelsoftware.loudly.constants.minPlaybackDurKey
 import com.babelsoftware.loudly.ui.component.CounterDialog
-import com.babelsoftware.loudly.ui.component.EnumListPreference
 import com.babelsoftware.loudly.ui.component.IconButton
-import com.babelsoftware.loudly.ui.component.PreferenceEntry
-import com.babelsoftware.loudly.ui.component.SwitchPreference
+import com.babelsoftware.loudly.ui.screens.settings.card_design.ActionType
+import com.babelsoftware.loudly.ui.screens.settings.card_design.IconResource
 import com.babelsoftware.loudly.ui.screens.settings.card_design.SettingCategory
 import com.babelsoftware.loudly.ui.screens.settings.card_design.SettingsBox
 import com.babelsoftware.loudly.ui.screens.settings.card_design.shapeManager
 import com.babelsoftware.loudly.ui.utils.backToMain
 import com.babelsoftware.loudly.utils.rememberEnumPreference
 import com.babelsoftware.loudly.utils.rememberPreference
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,9 +96,14 @@ fun PlayerSettings(
     val (addingPlayedSongsToYtmHistory, onAddingPlayedSongsToYtmHistoryChange) = rememberPreference(AddingPlayedSongsToYTMHistoryKey, defaultValue = true)
     val innerTubeCookie by rememberPreference(InnerTubeCookieKey, "")
     val isLoggedIn = remember(innerTubeCookie) { "SAPISID" in parseCookieString(innerTubeCookie) }
+    var showMinPlaybackDurDialog by remember { mutableStateOf(false) }
+    var showAudioQualityDialog by remember { mutableStateOf(false) }
+    val miscSheetState = rememberModalBottomSheetState()
+    var showMiscSheet by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
-    var showMinPlaybackDur by remember { mutableStateOf(false) }
-    if (showMinPlaybackDur) {
+
+    if (showMinPlaybackDurDialog) {
         CounterDialog(
             title = stringResource(R.string.minimum_playback_duration),
             description = stringResource(R.string.minimum_playback_duration_info),
@@ -91,15 +112,27 @@ fun PlayerSettings(
             lowerBound = 0,
             resetValue = 30,
             unitDisplay = "%",
-            onDismiss = { showMinPlaybackDur = false },
+            onDismiss = { showMinPlaybackDurDialog = false },
             onConfirm = {
-                showMinPlaybackDur = false
                 onMinPlaybackDurChange(it)
+                showMinPlaybackDurDialog = false
             },
-            onCancel = { showMinPlaybackDur = false },
+            onCancel = { showMinPlaybackDurDialog = false },
             onReset = { onMinPlaybackDurChange(30) },
         )
     }
+
+    if (showAudioQualityDialog) {
+        AudioQualitySelectionDialog(
+            selectedValue = audioQuality,
+            onValueSelected = {
+                onAudioQualityChange(it)
+                showAudioQualityDialog = false
+            },
+            onDismissRequest = { showAudioQualityDialog = false }
+        )
+    }
+
 
     Scaffold(
         topBar = {
@@ -117,171 +150,219 @@ fun PlayerSettings(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))
-                .padding(horizontal = 16.dp),
-            contentPadding = PaddingValues(vertical = 16.dp)
-        ) {
-            item { SettingCategory(title = stringResource(R.string.player)) }
-            item {
-                SettingsBox(shape = shapeManager(isFirst = true)) {
-                    EnumListPreference(
-                        title = { Text(stringResource(R.string.audio_quality)) },
-                        icon = { Icon(painterResource(R.drawable.graphic_eq), null) },
-                        selectedValue = audioQuality,
-                        onValueSelected = onAudioQualityChange,
-                        valueText = {
-                            when (it) {
-                                AudioQuality.AUTO -> stringResource(R.string.audio_quality_auto)
-                                AudioQuality.MAX -> stringResource(R.string.audio_quality_max)
-                                AudioQuality.HIGH -> stringResource(R.string.audio_quality_high)
-                                AudioQuality.LOW -> stringResource(R.string.audio_quality_low)
-                            }
-                        }
-                    )
-                }
-            }
-            item {
-                SettingsBox(shape = shapeManager()) {
-                    PreferenceEntry(
-                        title = { Text(stringResource(R.string.lyrics_settings_title)) },
-                        icon = { Icon(Icons.Rounded.Lyrics, null) },
-                        onClick = { navController.navigate("settings/player/lyrics") }
-                    )
-                }
-            }
-            item {
-                SettingsBox(shape = shapeManager()) {
-                    PreferenceEntry(
-                        title = { Text(stringResource(R.string.local_player_settings_title)) },
-                        icon = { Icon(Icons.Rounded.SdCard, null) },
-                        onClick = { navController.navigate("player/local") }
-                    )
-                }
-            }
-            item {
-                SettingsBox(shape = shapeManager()) {
-                    PreferenceEntry(
-                        title = { Text(stringResource(R.string.minimum_playback_duration)) },
-                        description = "$minPlaybackDur %",
-                        icon = { Icon(Icons.Rounded.Sync, null) },
-                        onClick = { showMinPlaybackDur = true }
-                    )
-                }
-            }
-            item {
-                SettingsBox(shape = shapeManager()) {
-                    SwitchPreference(
-                        title = { Text(stringResource(R.string.skip_silence)) },
-                        icon = { Icon(painterResource(R.drawable.fast_forward), null) },
-                        checked = skipSilence,
-                        onCheckedChange = onSkipSilenceChange
-                    )
-                }
-            }
-            item {
-                if (isLoggedIn) {
-                    SettingsBox(shape = shapeManager()) {
-                        SwitchPreference(
-                            title = { Text(stringResource(R.string.adding_played_songs_to_ytm_history)) },
-                            icon = { Icon(painterResource(R.drawable.history), null) },
-                            checked = addingPlayedSongsToYtmHistory,
-                            onCheckedChange = onAddingPlayedSongsToYtmHistoryChange
-                        )
-                    }
-                }
-            }
-            item {
-                SettingsBox(shape = shapeManager()) {
-                    SwitchPreference(
-                        title = { Text(stringResource(R.string.audio_normalization)) },
-                        icon = { Icon(Icons.AutoMirrored.Rounded.VolumeUp, null) },
-                        checked = audioNormalization,
-                        onCheckedChange = onAudioNormalizationChange
-                    )
-                }
-            }
-            item {
-                SettingsBox(shape = shapeManager()) {
-                    SwitchPreference(
-                        title = { Text(stringResource(R.string.play_song_when_bluetooth_device_connected)) },
-                        icon = { Icon(Icons.Rounded.BluetoothConnected, null) },
-                        checked = autoPlaySongWhenBluetoothDeviceConnected,
-                        onCheckedChange = onAutoPlaySongWhenBluetoothDeviceConnectedChange,
-                    )
-                }
-            }
-            item {
-                SettingsBox(shape = shapeManager(isLast = true)) {
-                    SwitchPreference(
-                        title = { Text(stringResource(R.string.stop_playing_when_song_sound_minimum_volume)) },
-                        icon = { Icon(Icons.AutoMirrored.Rounded.VolumeOff, null) },
-                        checked = stopPlayingSongWhenMinimumVolume,
-                        onCheckedChange = onStopPlayingSongWhenMinimumVolumeChange
-                    )
-                }
-            }
 
-            item { SettingCategory(title = stringResource(R.string.queue)) }
-            item {
-                SettingsBox(shape = shapeManager(isFirst = true)) {
-                    SwitchPreference(
-                        title = { Text(stringResource(R.string.persistent_queue)) },
-                        description = stringResource(R.string.persistent_queue_desc),
-                        icon = { Icon(painterResource(R.drawable.queue_music), null) },
-                        checked = persistentQueue,
-                        onCheckedChange = onPersistentQueueChange
-                    )
-                }
-            }
-            item {
-                SettingsBox(shape = shapeManager()) {
-                    SwitchPreference(
-                        title = { Text(stringResource(R.string.auto_load_more)) },
-                        description = stringResource(R.string.auto_load_more_desc),
-                        icon = { Icon(painterResource(R.drawable.playlist_add), null) },
-                        checked = autoLoadMore,
-                        onCheckedChange = onAutoLoadMoreChange
-                    )
-                }
-            }
-            item {
-                SettingsBox(shape = shapeManager(isLast = true)) {
-                    SwitchPreference(
-                        title = { Text(stringResource(R.string.auto_skip_next_on_error)) },
-                        description = stringResource(R.string.auto_skip_next_on_error_desc),
-                        icon = { Icon(painterResource(R.drawable.skip_next), null) },
-                        checked = autoSkipNextOnError,
-                        onCheckedChange = onAutoSkipNextOnErrorChange
-                    )
-                }
-            }
-
-            item { SettingCategory(title = stringResource(R.string.misc)) }
-            item {
-                SettingsBox(shape = shapeManager(isFirst = true)) {
-                    SwitchPreference(
-                        title = { Text(stringResource(R.string.audio_offload)) },
+        if (showMiscSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showMiscSheet = false },
+                sheetState = miscSheetState,
+                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+            ) {
+                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).padding(bottom = 24.dp)) {
+                    SettingCategory(title = stringResource(R.string.misc))
+                    SettingsBox(
+                        title = stringResource(R.string.audio_offload),
                         description = stringResource(R.string.audio_offload_description),
-                        icon = { Icon(Icons.Rounded.Bolt, null) },
-                        checked = audioOffload,
-                        onCheckedChange = onAudioOffloadChange
+                        icon = IconResource.Vector(Icons.Rounded.Bolt),
+                        actionType = ActionType.SWITCH,
+                        isChecked = audioOffload,
+                        onCheckedChange = onAudioOffloadChange,
+                        shape = shapeManager(isFirst = true)
                     )
-                }
-            }
-            item {
-                SettingsBox(shape = shapeManager(isLast = true)) {
-                    SwitchPreference(
-                        title = { Text(stringResource(R.string.stop_music_on_task_clear)) },
-                        icon = { Icon(painterResource(R.drawable.clear_all), null) },
-                        checked = stopMusicOnTaskClear,
-                        onCheckedChange = onStopMusicOnTaskClearChange
+                    Spacer(modifier = Modifier.padding(top=2.dp))
+                    SettingsBox(
+                        title = stringResource(R.string.stop_music_on_task_clear),
+                        icon = IconResource.Drawable(painterResource(R.drawable.clear_all)),
+                        actionType = ActionType.SWITCH,
+                        isChecked = stopMusicOnTaskClear,
+                        onCheckedChange = onStopMusicOnTaskClearChange,
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     )
                 }
             }
         }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .windowInsetsPadding(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 16.dp)
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                SettingCategory(title = stringResource(R.string.player))
+                SettingsBox(
+                    title = stringResource(R.string.audio_quality),
+                    description = when (audioQuality) {
+                        AudioQuality.AUTO -> stringResource(R.string.audio_quality_auto)
+                        AudioQuality.MAX -> stringResource(R.string.audio_quality_max)
+                        AudioQuality.HIGH -> stringResource(R.string.audio_quality_high)
+                        AudioQuality.LOW -> stringResource(R.string.audio_quality_low)
+                    },
+                    icon = IconResource.Drawable(painterResource(R.drawable.graphic_eq)),
+                    shape = shapeManager(isFirst = true),
+                    onClick = { showAudioQualityDialog = true }
+                )
+                SettingsBox(
+                    title = stringResource(R.string.lyrics_settings_title),
+                    icon = IconResource.Vector(Icons.Rounded.Lyrics),
+                    shape = shapeManager(),
+                    onClick = { navController.navigate("settings/player/lyrics") }
+                )
+                SettingsBox(
+                    title = stringResource(R.string.local_player_settings_title),
+                    icon = IconResource.Vector(Icons.Rounded.SdCard),
+                    shape = shapeManager(),
+                    onClick = { navController.navigate("player/local") }
+                )
+                SettingsBox(
+                    title = stringResource(R.string.minimum_playback_duration),
+                    description = "$minPlaybackDur %",
+                    icon = IconResource.Vector(Icons.Rounded.Sync),
+                    shape = shapeManager(),
+                    onClick = { showMinPlaybackDurDialog = true }
+                )
+                SettingsBox(
+                    title = stringResource(R.string.skip_silence),
+                    icon = IconResource.Drawable(painterResource(R.drawable.fast_forward)),
+                    actionType = ActionType.SWITCH,
+                    isChecked = skipSilence,
+                    onCheckedChange = onSkipSilenceChange,
+                    shape = shapeManager()
+                )
+                if (isLoggedIn) {
+                    SettingsBox(
+                        title = stringResource(R.string.adding_played_songs_to_ytm_history),
+                        icon = IconResource.Drawable(painterResource(R.drawable.history)),
+                        actionType = ActionType.SWITCH,
+                        isChecked = addingPlayedSongsToYtmHistory,
+                        onCheckedChange = onAddingPlayedSongsToYtmHistoryChange,
+                        shape = shapeManager()
+                    )
+                }
+                SettingsBox(
+                    title = stringResource(R.string.audio_normalization),
+                    icon = IconResource.Vector(Icons.AutoMirrored.Rounded.VolumeUp),
+                    actionType = ActionType.SWITCH,
+                    isChecked = audioNormalization,
+                    onCheckedChange = onAudioNormalizationChange,
+                    shape = shapeManager()
+                )
+                SettingsBox(
+                    title = stringResource(R.string.play_song_when_bluetooth_device_connected),
+                    icon = IconResource.Vector(Icons.Rounded.BluetoothConnected),
+                    actionType = ActionType.SWITCH,
+                    isChecked = autoPlaySongWhenBluetoothDeviceConnected,
+                    onCheckedChange = onAutoPlaySongWhenBluetoothDeviceConnectedChange,
+                    shape = shapeManager()
+                )
+                SettingsBox(
+                    title = stringResource(R.string.stop_playing_when_song_sound_minimum_volume),
+                    icon = IconResource.Vector(Icons.AutoMirrored.Rounded.VolumeOff),
+                    actionType = ActionType.SWITCH,
+                    isChecked = stopPlayingSongWhenMinimumVolume,
+                    onCheckedChange = onStopPlayingSongWhenMinimumVolumeChange,
+                    shape = shapeManager(isLast = true)
+                )
+
+                SettingCategory(title = stringResource(R.string.queue))
+                SettingsBox(
+                    title = stringResource(R.string.persistent_queue),
+                    description = stringResource(R.string.persistent_queue_desc),
+                    icon = IconResource.Drawable(painterResource(R.drawable.queue_music)),
+                    actionType = ActionType.SWITCH,
+                    isChecked = persistentQueue,
+                    onCheckedChange = onPersistentQueueChange,
+                    shape = shapeManager(isFirst = true)
+                )
+                SettingsBox(
+                    title = stringResource(R.string.auto_load_more),
+                    description = stringResource(R.string.auto_load_more_desc),
+                    icon = IconResource.Drawable(painterResource(R.drawable.playlist_add)),
+                    actionType = ActionType.SWITCH,
+                    isChecked = autoLoadMore,
+                    onCheckedChange = onAutoLoadMoreChange,
+                    shape = shapeManager()
+                )
+                SettingsBox(
+                    title = stringResource(R.string.auto_skip_next_on_error),
+                    description = stringResource(R.string.auto_skip_next_on_error_desc),
+                    icon = IconResource.Drawable(painterResource(R.drawable.skip_next)),
+                    actionType = ActionType.SWITCH,
+                    isChecked = autoSkipNextOnError,
+                    onCheckedChange = onAutoSkipNextOnErrorChange,
+                    shape = shapeManager(isLast = true)
+                )
+
+                SettingCategory(title = stringResource(R.string.advanced))
+                SettingsBox(
+                    title = stringResource(R.string.other_settings),
+                    description = stringResource(R.string.other_settings_description),
+                    icon = IconResource.Vector(Icons.Rounded.Tune),
+                    shape = shapeManager(isBoth = true),
+                    onClick = {
+                        scope.launch {
+                            showMiscSheet = true
+                        }
+                    }
+                )
+            }
+        }
     }
+}
+
+@Composable
+private fun AudioQualitySelectionDialog(
+    selectedValue: AudioQuality,
+    onValueSelected: (AudioQuality) -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = { Text(stringResource(R.string.audio_quality)) },
+        text = {
+            Column {
+                AudioQuality.values().forEach { quality ->
+                    val isSelected = selectedValue == quality
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onValueSelected(quality) }
+                            .padding(vertical = 8.dp)
+                    ) {
+                        RadioButton(selected = isSelected, onClick = { onValueSelected(quality) })
+                        Spacer(Modifier.width(16.dp))
+                        Column {
+                            Text(
+                                text = when (quality) {
+                                    AudioQuality.AUTO -> stringResource(R.string.audio_quality_auto)
+                                    AudioQuality.MAX -> stringResource(R.string.audio_quality_max)
+                                    AudioQuality.HIGH -> stringResource(R.string.audio_quality_high)
+                                    AudioQuality.LOW -> stringResource(R.string.audio_quality_low)
+                                },
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = when (quality) {
+                                    AudioQuality.AUTO -> stringResource(R.string.audio_quality_auto_desc)
+                                    AudioQuality.MAX -> stringResource(R.string.audio_quality_max_desc)
+                                    AudioQuality.HIGH -> stringResource(R.string.audio_quality_high_desc)
+                                    AudioQuality.LOW -> stringResource(R.string.audio_quality_low_desc)
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
 }
