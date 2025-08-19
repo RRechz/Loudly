@@ -381,6 +381,7 @@
 
     <string name="content">Content</string>
     <string name="login">Login</string>
+    <string name="login_description">Sign in to your YT Music playlists and more</string>
     <string name="token_hidden">Tap to show token</string>
     <string name="token_shown">Tap again to copy or edit</string>
     <string name="token_adv_login_description">This is an ADVANCED login method. As an alternative to the web portal, you may directly enter or update your login token here. For example, this can speed up logging in on multiple devices. Please note that any invalid token formats the app fails to parse will not be accepted</string>
@@ -389,6 +390,7 @@
     <string name="title_discord">Discord</string>
     <string name="like_autodownload">Automatically download your liked songs</string>
     <string name="ytm_sync">Automatically sync with your YouTube Music account</string>
+    <string name="ytm_sync_description">Sync your playlists and more with your account</string>
     <string name="wifi_only">Wifi only</string>
     <string name="not_logged_in">Not logged in</string>
     <string name="content_language">Default content language</string>
@@ -496,7 +498,7 @@
     <string name="app_version">App version</string>
     <string name="checking_for_update">Checking for updates...</string>
     <string name="update_card_version_ready_to_download">version %1$s available for download.</string>
-    <string name="update_card_downloading">Downloading... %1$s</string>
+    <string name="update_card_downloading">Downloading...</string>
     <string name="install">Upgrade</string>
     <string name="try_again">Try Again</string>
     <string name="download_now">Download Now</string>
@@ -557,6 +559,9 @@
     <string name="ui_version_2_0_desc">Most popular design. (App, Player, MiniPlayer)</string>
     <string name="ui_version_custom_desc">Create your own app UI design. (App, Player, MiniPlayer)</string>
     <string name="custom_app_ui">Customize UI</string>
+
+    <string name="other_settings">Other settings</string>
+    <string name="other_settings_description">Click for other various settings</string>
 
     <!-- Player UI -->
     <string name="translate">Translate (BETA)</string>
