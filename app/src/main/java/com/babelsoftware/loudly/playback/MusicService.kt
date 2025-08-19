@@ -38,6 +38,7 @@ import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.datasource.okhttp.OkHttpDataSource
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
@@ -53,7 +54,11 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionToken
+import com.babelsoftware.innertube.YouTube
+import com.babelsoftware.innertube.models.SongItem
+import com.babelsoftware.innertube.models.WatchEndpoint
 import com.babelsoftware.loudly.MainActivity
+import com.babelsoftware.loudly.R
 import com.babelsoftware.loudly.constants.AddingPlayedSongsToYTMHistoryKey
 import com.babelsoftware.loudly.constants.AudioNormalizationKey
 import com.babelsoftware.loudly.constants.AudioOffload
@@ -61,7 +66,6 @@ import com.babelsoftware.loudly.constants.AudioQuality
 import com.babelsoftware.loudly.constants.AudioQualityKey
 import com.babelsoftware.loudly.constants.AutoLoadMoreKey
 import com.babelsoftware.loudly.constants.AutoPlaySongWhenBluetoothDeviceConnectedKey
-import com.babelsoftware.loudly.constants.AutoSkipNextOnErrorKey
 import com.babelsoftware.loudly.constants.DiscordTokenKey
 import com.babelsoftware.loudly.constants.EnableDiscordRPCKey
 import com.babelsoftware.loudly.constants.HideExplicitKey
@@ -77,7 +81,6 @@ import com.babelsoftware.loudly.constants.StopPlayingSongWhenMinimumVolumeKey
 import com.babelsoftware.loudly.constants.minPlaybackDurKey
 import com.babelsoftware.loudly.db.MusicDatabase
 import com.babelsoftware.loudly.db.entities.Event
-import com.babelsoftware.loudly.db.entities.FormatEntity
 import com.babelsoftware.loudly.db.entities.LyricsEntity
 import com.babelsoftware.loudly.db.entities.RelatedSongMap
 import com.babelsoftware.loudly.di.DownloadCache
@@ -100,26 +103,22 @@ import com.babelsoftware.loudly.playback.queues.ListQueue
 import com.babelsoftware.loudly.playback.queues.Queue
 import com.babelsoftware.loudly.playback.queues.YouTubeQueue
 import com.babelsoftware.loudly.playback.queues.filterExplicit
-import com.google.common.util.concurrent.MoreExecutors
-import com.babelsoftware.innertube.YouTube
-import com.babelsoftware.innertube.models.SongItem
-import com.babelsoftware.innertube.models.WatchEndpoint
-import com.babelsoftware.loudly.R
+import com.babelsoftware.loudly.reportException
+import com.babelsoftware.loudly.ui.player.PlayerErrorManager
 import com.babelsoftware.loudly.utils.CoilBitmapLoader
 import com.babelsoftware.loudly.utils.DiscordRPC
 import com.babelsoftware.loudly.utils.YTPlayerUtils
 import com.babelsoftware.loudly.utils.dataStore
 import com.babelsoftware.loudly.utils.enumPreference
 import com.babelsoftware.loudly.utils.get
-import com.babelsoftware.loudly.utils.isInternetAvailable
-import com.babelsoftware.loudly.reportException
-import com.babelsoftware.loudly.ui.player.PlayerErrorManager
+import com.google.common.util.concurrent.MoreExecutors
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -139,20 +138,23 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import java.io.File
+import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
-import java.net.ConnectException
 import java.net.HttpURLConnection
-import java.net.SocketTimeoutException
 import java.net.URL
-import java.net.UnknownHostException
 import java.time.LocalDateTime
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.time.Duration.Companion.seconds
 
-
+sealed class UrlStatus {
+    object Loading : UrlStatus() // Indicates that the URL is being fetched
+    data class Ready(val url: String, val expiration: Long) : UrlStatus() // URL ready
+    data class Failed(val error: Throwable) : UrlStatus() // An error occurred while retrieving the URL
+}
 @Suppress("DEPRECATION")
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @AndroidEntryPoint
@@ -280,7 +282,18 @@ class MusicService : MediaLibraryService(),
                 reportException(e)
             }
         }
+
+        val loadControl = DefaultLoadControl.Builder()
+            .setBufferDurationsMs(
+                10_000, // Keep data in memory for at least 10 seconds
+                30_000, // Accumulate up to a maximum of 30 seconds
+                2_500,
+                5_000
+            )
+            .build()
+
         player = ExoPlayer.Builder(this)
+            .setLoadControl(loadControl)
             .setMediaSourceFactory(DefaultMediaSourceFactory(createDataSourceFactory()))
             .setRenderersFactory(createRenderersFactory())
             .setHandleAudioBecomingNoisy(true)
@@ -326,7 +339,8 @@ class MusicService : MediaLibraryService(),
         val controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
         controllerFuture.addListener({ controllerFuture.get() }, MoreExecutors.directExecutor())
 
-        connectivityManager = getSystemService()!!
+        connectivityManager = getSystemService<ConnectivityManager>()
+            ?: throw IllegalStateException("ConnectivityManager not found")
 
         combine(playerVolume, normalizeFactor) { playerVolume, normalizeFactor ->
             playerVolume * normalizeFactor
@@ -672,23 +686,8 @@ class MusicService : MediaLibraryService(),
 
         if (player.nextMediaItemIndex != C.INDEX_UNSET) {
             val nextMediaItem = player.getMediaItemAt(player.nextMediaItemIndex)
-            val nextMediaId = nextMediaItem.mediaId
-
-            if (!songUrlCache.containsKey(nextMediaId)) {
-                scope.launch(Dispatchers.IO) {
-                    YTPlayerUtils.playerResponseForPlayback(
-                        videoId = nextMediaId,
-                        audioQuality = audioQuality,
-                        connectivityManager = connectivityManager,
-                    ).onSuccess { playbackData ->
-                        val streamUrl = playbackData.streamUrl
-                        val expiration = System.currentTimeMillis() + (playbackData.streamExpiresInSeconds * 1000L)
-                        songUrlCache[nextMediaId] = streamUrl to expiration
-                    }.onFailure { throwable ->
-                        // If it fails, quietly ignore it
-                        // Log.w("PreFetch", "Failed to pre-fetch URL for $nextMediaId", throwable)
-                    }
-                }
+            scope.launch(Dispatchers.IO) {
+                getOrFetchSongUrl(nextMediaItem.mediaId)
             }
         }
     }
@@ -796,93 +795,71 @@ class MusicService : MediaLibraryService(),
         }
     }
 
-    private val songUrlCache = HashMap<String, Pair<String, Long>>()
+    private suspend fun getOrFetchSongUrl(mediaId: String): String? {
+        when (val status = songUrlCache[mediaId]) {
+            is UrlStatus.Ready -> {
+                if (status.expiration > System.currentTimeMillis()) {
+                    return status.url
+                }
+                songUrlCache.remove(mediaId)
+            }
+            is UrlStatus.Loading -> {
+                return null
+            }
+            is UrlStatus.Failed -> {
+                songUrlCache.remove(mediaId)
+            }
+            null -> {}
+        }
+        songUrlCache[mediaId] = UrlStatus.Loading
+
+        YTPlayerUtils.playerResponseForPlayback(
+            videoId = mediaId,
+            audioQuality = audioQuality,
+            connectivityManager = connectivityManager,
+        ).onSuccess { playbackData ->
+            val streamUrl = playbackData.streamUrl
+            val expiration = System.currentTimeMillis() + (playbackData.streamExpiresInSeconds * 1000L)
+            songUrlCache[mediaId] = UrlStatus.Ready(streamUrl, expiration)
+            return streamUrl
+        }.onFailure { throwable ->
+            songUrlCache[mediaId] = UrlStatus.Failed(throwable)
+            return null
+        }
+        return null
+    }
+
+    private val songUrlCache = ConcurrentHashMap<String, UrlStatus>()
     private fun createDataSourceFactory(): DataSource.Factory {
         return ResolvingDataSource.Factory(createCacheDataSource()) { dataSpec ->
-            val mediaId = dataSpec.key ?: error("No media id")
-
-            // find a better way to detect local files later...
+            val mediaId = dataSpec.key ?: throw IOException("Media ID is null")
             if (mediaId.startsWith("1000")) {
                 val songPath = runBlocking(Dispatchers.IO) {
                     database.song(mediaId).firstOrNull()?.song?.localPath
                 }
-                Log.d("Wait, What!?", "Looking for local file: " + songPath)
-
-                return@Factory dataSpec.withUri(Uri.fromFile(File(songPath)))
+                songPath?.let {
+                    Log.d("DataSourceFactory", "Local file being served: $it")
+                    return@Factory dataSpec.withUri(Uri.fromFile(File(it)))
+                }
+                throw IOException("Local song path not found: $mediaId")
             }
-
             if (downloadCache.isCached(mediaId, dataSpec.position, if (dataSpec.length >= 0) dataSpec.length else 1) ||
                 playerCache.isCached(mediaId, dataSpec.position, CHUNK_LENGTH)
             ) {
                 scope.launch(Dispatchers.IO) { recoverSong(mediaId) }
                 return@Factory dataSpec
             }
-
-            // ---> Verify URL in cache
-            songUrlCache[mediaId]?.takeIf { it.second > System.currentTimeMillis() }?.let { cached ->
-                return@let runBlocking(Dispatchers.IO) {
-                    if (validateStreamUrl(cached.first)) {
-                        recoverSong(mediaId)
-                        dataSpec.withUri(cached.first.toUri())
-                    } else {
-                        songUrlCache.remove(mediaId)
-                        null
-                    }
+            val status = songUrlCache[mediaId]
+            if (status is UrlStatus.Ready && status.expiration > System.currentTimeMillis()) {
+                scope.launch(Dispatchers.IO) { recoverSong(mediaId) }
+                return@Factory dataSpec.withUri(status.url.toUri()).subrange(dataSpec.uriPositionOffset, CHUNK_LENGTH)
+            } else {
+                if (status !is UrlStatus.Loading) {
+                    scope.launch(Dispatchers.IO) { getOrFetchSongUrl(mediaId) }
                 }
-            } // <---
 
-            val playbackData = runBlocking(Dispatchers.IO) {
-                YTPlayerUtils.playerResponseForPlayback(
-                    mediaId,
-                    audioQuality = audioQuality,
-                    connectivityManager = connectivityManager,
-                )
-            }.getOrElse { throwable ->
-                when (throwable) {
-                    is PlaybackException -> throw throwable
-                    is ConnectException, is UnknownHostException -> {
-                        throw PlaybackException(getString(R.string.error_no_internet), throwable, PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED)
-                    }
-
-                    is SocketTimeoutException -> {
-                        throw PlaybackException(getString(R.string.error_timeout), throwable, PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT)
-                    }
-
-                    else -> throw PlaybackException(getString(R.string.error_unknown), throwable, PlaybackException.ERROR_CODE_REMOTE_ERROR)
-                }
+                throw IOException("Stream URL for $mediaId not ready yet. Retrying...")
             }
-
-            // ---> Verify the newly acquired URL
-            val isValidUrl = runBlocking(Dispatchers.IO) {
-                validateStreamUrl(playbackData.streamUrl)
-            }
-
-            if (!isValidUrl) {
-                throw PlaybackException("Invalid stream URL", null, PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS)
-            } // <---
-
-            val format = playbackData.format
-
-            database.query {
-                upsert(
-                    FormatEntity(
-                        id = mediaId,
-                        itag = format.itag,
-                        mimeType = format.mimeType.split(";")[0],
-                        codecs = format.mimeType.split("codecs=")[1].removeSurrounding("\""),
-                        bitrate = format.bitrate,
-                        sampleRate = format.audioSampleRate,
-                        contentLength = format.contentLength!!,
-                        loudnessDb = playbackData.audioConfig?.loudnessDb,
-                        playbackUrl = playbackData.playbackTracking?.videostatsPlaybackUrl?.baseUrl
-                    )
-                )
-            }
-            scope.launch(Dispatchers.IO) { recoverSong(mediaId, playbackData) }
-            val streamUrl = playbackData.streamUrl
-
-            songUrlCache[mediaId] = streamUrl to System.currentTimeMillis() + (playbackData.streamExpiresInSeconds * 1000L)
-            dataSpec.withUri(streamUrl.toUri()).subrange(dataSpec.uriPositionOffset, CHUNK_LENGTH)
         }
     }
 
@@ -962,6 +939,7 @@ class MusicService : MediaLibraryService(),
     }
 
     override fun onDestroy() {
+        scope.cancel()
         volumeReceiver?.let { unregisterReceiver(it) }
         volumeReceiver = null
         if (dataStore.get(PersistentQueueKey, true)) {

@@ -460,27 +460,27 @@ fun SongListItem(
             badges = badges,
             thumbnailContent = {
                 if (song.song.isLocal) {
-                        song.song.let {
-                            AsyncLocalImage(
-                                image = { imageCache.getLocalThumbnail(it.localPath, false) },
-                                contentDescription = null,
-                                contentScale = contentScale,
-                                modifier = Modifier.Companion
-                                    .size(ListThumbnailSize)
-                                    .clip(RoundedCornerShape(ThumbnailCornerRadius))
-                            )
-                            PlayingIndicatorBox(
-                                isActive = isActive,
-                                playWhenReady = isPlaying,
-                                color = Color.White,
-                                modifier = Modifier.Companion
-                                    .size(ListThumbnailSize)
-                                    .background(
-                                        color = Color.Black.copy(alpha = ActiveBoxAlpha),
-                                        shape = RoundedCornerShape(ThumbnailCornerRadius)
-                                    )
-                            )
-                        }
+                    song.song.let {
+                        AsyncLocalImage(
+                            image = { imageCache.getLocalThumbnail(it.localPath, false) },
+                            contentDescription = null,
+                            contentScale = contentScale,
+                            modifier = Modifier.Companion
+                                .size(ListThumbnailSize)
+                                .clip(RoundedCornerShape(ThumbnailCornerRadius))
+                        )
+                        PlayingIndicatorBox(
+                            isActive = isActive,
+                            playWhenReady = isPlaying,
+                            color = Color.White,
+                            modifier = Modifier.Companion
+                                .size(ListThumbnailSize)
+                                .background(
+                                    color = Color.Black.copy(alpha = ActiveBoxAlpha),
+                                    shape = RoundedCornerShape(ThumbnailCornerRadius)
+                                )
+                        )
+                    }
                 } else {
                     ItemThumbnail(
                         thumbnailUrl = song.song.thumbnailUrl,
@@ -530,11 +530,11 @@ fun SongFolderItem(
     subtitle = subtitle,
     thumbnailContent = {
         Icon(
-    Icons.Rounded.FolderCopy,
-    contentDescription = null,
-    modifier = modifier.size(48.dp)
-)
-},
+            Icons.Rounded.FolderCopy,
+            contentDescription = null,
+            modifier = modifier.size(48.dp)
+        )
+    },
     trailingContent = {
         IconButton(
             onClick = {
@@ -947,7 +947,7 @@ fun MediaMetadataListItem(
     isPlaying: Boolean = false,
     trailingContent: @Composable RowScope.() -> Unit = {},
     contentScale: ContentScale = ContentScale.Fit,
-    ) = ListItem(
+) = ListItem(
     title = mediaMetadata.title,
     subtitle = joinByBullet(
         mediaMetadata.artists.joinToString { it.name },
