@@ -26,6 +26,9 @@ object LocalLyricsProvider : LyricsProvider {
         artist: String,
         duration: Int,
     ): Result<String> = runCatching {
+        if (title.isBlank()) {
+            throw IllegalArgumentException("Local lyrics path cannot be empty.")
+        }
         // ex .../music/song.ogg -> .../music/song.lrc
         String(Files.readAllBytes(
             Paths.get(title.substringBeforeLast('.') + ".lrc"))

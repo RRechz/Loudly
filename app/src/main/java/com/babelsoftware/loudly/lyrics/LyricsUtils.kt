@@ -2,6 +2,7 @@
 
 package com.babelsoftware.loudly.lyrics
 
+import com.babelsoftware.loudly.reportException
 import com.babelsoftware.loudly.ui.component.animateScrollDuration
 import kotlin.math.pow
 
@@ -36,60 +37,65 @@ object LyricsUtils {
      * We completely ignore all ID3 tags from the header as MediaStore is our source of truth.
      */
     fun parseLyrics(lyrics: String, trim: Boolean, multilineEnable: Boolean): List<LyricsEntry> {
-        val list = mutableListOf<LyricsEntry>()
-        var foundNonNull = false
-        var lyricsText: StringBuilder? = StringBuilder()
-        lyrics.lines().forEach { line ->
-            timeMarksRegex.findAll(line).let { sequence ->
-                if (sequence.count() == 0) {
-                    return@let
-                }
-                var lyricLine: String
-                sequence.forEach { match ->
-                    val firstSync = match.groupValues.subList(1, match.groupValues.size)
-                        .joinToString("")
-                    val ts = parseTime(firstSync)
-                    if (!foundNonNull && ts > 0) {
-                        foundNonNull = true
-                        lyricsText = null
+        try {
+            val list = mutableListOf<LyricsEntry>()
+            var foundNonNull = false
+            var lyricsText: StringBuilder? = StringBuilder()
+            lyrics.lines().forEach { line ->
+                timeMarksRegex.findAll(line).let { sequence ->
+                    if (sequence.count() == 0) {
+                        return@let
                     }
-                    if (multilineEnable) {
-                        val startIndex = lyrics.indexOf(line) + firstSync.length + 1
-                        var endIndex = lyrics.length
-                        var nextSync = ""
-                        if (timeMarksRegex.find(lyrics, startIndex)?.value != null) {
-                            nextSync = timeMarksRegex.find(lyrics, startIndex)?.value!!
-                            endIndex = lyrics.indexOf(nextSync) - 1
+                    var lyricLine: String
+                    sequence.forEach { match ->
+                        val firstSync = match.groupValues.subList(1, match.groupValues.size)
+                            .joinToString("")
+                        val ts = parseTime(firstSync)
+                        if (!foundNonNull && ts > 0) {
+                            foundNonNull = true
+                            lyricsText = null
                         }
-                        lyricLine = if (nextSync == "[$firstSync]") {
-                            line.substring(sequence.last().range.last + 1)
-                                .let { if (trim) it.trim() else it }
+                        if (multilineEnable) {
+                            val startIndex = lyrics.indexOf(line) + firstSync.length + 1
+                            var endIndex = lyrics.length
+                            var nextSync = ""
+                            if (timeMarksRegex.find(lyrics, startIndex)?.value != null) {
+                                nextSync = timeMarksRegex.find(lyrics, startIndex)?.value!!
+                                endIndex = lyrics.indexOf(nextSync) - 1
+                            }
+                            lyricLine = if (nextSync == "[$firstSync]") {
+                                line.substring(sequence.last().range.last + 1)
+                                    .let { if (trim) it.trim() else it }
+                            } else {
+                                lyrics.substring(startIndex + 1, endIndex)
+                                    .let { if (trim) it.trim() else it }
+                            }
                         } else {
-                            lyrics.substring(startIndex + 1, endIndex)
+                            lyricLine = line.substring(sequence.last().range.last + 1)
                                 .let { if (trim) it.trim() else it }
                         }
-                    } else {
-                        lyricLine = line.substring(sequence.last().range.last + 1)
-                            .let { if (trim) it.trim() else it }
+                        lyricsText?.append(lyricLine + "\n")
+                        list.add(LyricsEntry(time = ts, text = lyricLine))
                     }
-                    lyricsText?.append(lyricLine + "\n")
-                    list.add(LyricsEntry(ts, lyricLine))
                 }
             }
+            list.sortBy { it.time }
+            var previousTs = -1L
+            list.forEach {
+                it.isTranslation = (it.time == previousTs)
+                previousTs = it.time
+            }
+            if (list.isEmpty() && lyrics.isNotEmpty()) {
+                list.add(LyricsEntry(time = 1, text = lyrics, isTranslation = false))
+            } else if (!foundNonNull) {
+                list.clear()
+                list.add(LyricsEntry(time = 1, text = lyricsText!!.toString(), isTranslation = false))
+            }
+            return list
+        } catch (e: Exception) {
+            reportException(e)
+            return listOf(LyricsEntry(time = 1, text = lyrics, isTranslation = false))
         }
-        list.sortBy { it.time }
-        var previousTs = -1L
-        list.forEach {
-            it.isTranslation = (it.time == previousTs)
-            previousTs = it.time
-        }
-        if (list.isEmpty() && lyrics.isNotEmpty()) {
-            list.add(LyricsEntry(1, lyrics, false))
-        } else if (!foundNonNull) {
-            list.clear()
-            list.add(LyricsEntry(1, lyricsText!!.toString(), false))
-        }
-        return list
     }
     /**
      * Parse a timestamp in string format (ex: [mm:ss.ms]) into a Long value
@@ -114,17 +120,5 @@ object LyricsUtils {
             }
         }
         return lines.lastIndex
-    }
-    fun parseLyrics(lyrics: String): List<LyricsEntry> =
-        lyrics.lines()
-            .flatMap { line ->
-                parseLine(line).orEmpty()
-            }.sorted()
-
-    private fun parseLine(line: String): List<LyricsEntry>? {
-        if (line.isEmpty()) {
-            return null
-        }
-        return TODO("Provide the return value")
     }
 }

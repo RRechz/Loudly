@@ -45,6 +45,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -60,14 +61,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -110,6 +114,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.navigation.NavController
@@ -120,18 +125,18 @@ import com.babelsoftware.innertube.YouTube
 import com.babelsoftware.loudly.LocalDatabase
 import com.babelsoftware.loudly.LocalPlayerConnection
 import com.babelsoftware.loudly.R
-import com.babelsoftware.loudly.constants.LyricsBackgroundDimKey
 import com.babelsoftware.loudly.constants.LyricFontSizeKey
+import com.babelsoftware.loudly.constants.LyricsBackgroundDimKey
 import com.babelsoftware.loudly.constants.ShowLyricsKey
 import com.babelsoftware.loudly.constants.SliderStyle
 import com.babelsoftware.loudly.constants.SliderStyleKey
-import com.babelsoftware.loudly.constants.TranslateLyricsKey
 import com.babelsoftware.loudly.extensions.metadata
 import com.babelsoftware.loudly.extensions.togglePlayPause
 import com.babelsoftware.loudly.extensions.toggleRepeatMode
 import com.babelsoftware.loudly.extensions.toggleShuffleMode
-import com.babelsoftware.loudly.lyrics.LyricsEntry
+import com.babelsoftware.loudly.lyrics.LyricsUiState
 import com.babelsoftware.loudly.lyrics.LyricsUtils
+import com.babelsoftware.loudly.lyrics.LyricsViewModel
 import com.babelsoftware.loudly.models.MediaMetadata
 import com.babelsoftware.loudly.ui.component.BottomSheetState
 import com.babelsoftware.loudly.ui.component.LocalMenuState
@@ -147,6 +152,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.saket.squiggles.SquigglySlider
+import java.util.Locale
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -296,7 +302,8 @@ fun PlayerUI20(
     duration: Long,
     navController: NavController,
     bottomSheetState: BottomSheetState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    lyricsViewModel: LyricsViewModel = hiltViewModel()
 ) {
     var showPlaylist by remember { mutableStateOf(false) }
     var showLyrics by rememberPreference(ShowLyricsKey, defaultValue = false)
@@ -387,6 +394,7 @@ fun PlayerUI20(
         ) {
             LyricsScreen(
                 position = position,
+                viewModel = lyricsViewModel,
                 onDismiss = { showLyrics = false }
             )
         }
@@ -1397,7 +1405,8 @@ fun InfoChip(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LyricsControls(
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    viewModel: LyricsViewModel
 ) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
@@ -1406,8 +1415,9 @@ private fun LyricsControls(
 
     var fontSize by rememberPreference(LyricFontSizeKey, 22)
     var backgroundDim by rememberPreference(LyricsBackgroundDimKey, 0)
-    var translate by rememberPreference(TranslateLyricsKey, false)
-
+    var showLanguageSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
     val onSurfaceColor = Color.White
     val onSurfaceVariantColor = Color.White.copy(alpha = 0.7f)
 
@@ -1420,7 +1430,9 @@ private fun LyricsControls(
         modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -1447,11 +1459,11 @@ private fun LyricsControls(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            IconButton(onClick = { translate = !translate }) {
+            IconButton(onClick = { showLanguageSheet = true }) {
                 Icon(
                     painter = painterResource(R.drawable.translate),
                     contentDescription = stringResource(R.string.translate),
-                    tint = if (translate) MaterialTheme.colorScheme.primary else onSurfaceVariantColor
+                    tint = onSurfaceVariantColor
                 )
             }
             IconButton(onClick = {
@@ -1477,36 +1489,63 @@ private fun LyricsControls(
             }
         }
     }
+    if (showLanguageSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showLanguageSheet = false },
+            sheetState = sheetState
+        ) {
+            LanguageSelectionSheet(
+                languages = viewModel.targetLanguages,
+                onLanguageSelected = { languageCode ->
+                    viewModel.translateLyrics(languageCode)
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            showLanguageSheet = false
+                        }
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun LanguageSelectionSheet(
+    languages: List<String>,
+    onLanguageSelected: (String) -> Unit
+) {
+    LazyColumn {
+        items(languages) { languageCode ->
+            ListItem(
+                headlineContent = {
+                    Text(text = Locale(languageCode).displayLanguage)
+                },
+                modifier = Modifier.clickable { onLanguageSelected(languageCode) }
+            )
+        }
+    }
 }
 
 @Composable
 private fun LyricsScreen(
     position: Long,
+    viewModel: LyricsViewModel,
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit
 ) {
+    val lyricsUiState by viewModel.lyricsState.collectAsState()
     val playerConnection = LocalPlayerConnection.current ?: return
-    val lyricsEntity by playerConnection.currentLyrics.collectAsState()
-    val isTranslating by playerConnection.translating.collectAsState()
-    val onSurfaceColor = Color.White
+    val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
 
-    val fontSize by rememberPreference(LyricFontSizeKey, 22)
-    val backgroundDim by rememberPreference(LyricsBackgroundDimKey, 0)
-
-    val parsedLyrics: List<LyricsEntry> = remember(lyricsEntity) {
-        LyricsUtils.parseLyrics(lyricsEntity?.lyrics ?: "", trim = true, multilineEnable = false)
-    }
-
-    val currentLineIndex by remember(parsedLyrics, position) {
-        derivedStateOf {
-            if (parsedLyrics.isNotEmpty()) {
-                LyricsUtils.findCurrentLineIndex(parsedLyrics, position)
-            } else {
-                -1
-            }
+    LaunchedEffect(mediaMetadata?.id) {
+        mediaMetadata?.let {
+            viewModel.loadLyricsFor(it)
         }
     }
 
+    val fontSize by rememberPreference(LyricFontSizeKey, 22)
+    val backgroundDim by rememberPreference(LyricsBackgroundDimKey, 0)
+    val onSurfaceColor = Color.White
     val dimColor = if (isSystemInDarkTheme()) Color.Black else MaterialTheme.colorScheme.surface
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -1528,69 +1567,70 @@ private fun LyricsScreen(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                when {
-                    lyricsEntity == null || isTranslating -> {
+                when (val state = lyricsUiState) {
+                    is LyricsUiState.Loading -> {
                         CircularProgressIndicator(color = onSurfaceColor)
                     }
-                    parsedLyrics.isEmpty() -> {
+                    is LyricsUiState.Error -> {
                         Text(
-                            text = "No lyrics were found for this song.",
+                            text = state.message,
                             color = onSurfaceColor.copy(alpha = 0.7f),
                             style = MaterialTheme.typography.headlineSmall,
                             textAlign = TextAlign.Center
                         )
                     }
-                    else -> {
-                        val listState = rememberLazyListState()
-
-                        LaunchedEffect(currentLineIndex) {
-                            if (currentLineIndex != -1 && currentLineIndex < listState.layoutInfo.totalItemsCount) {
-                                listState.animateScrollToItem(index = currentLineIndex, scrollOffset = -250)
-                            }
-                        }
-
-                        LazyColumn(
-                            state = listState,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            item { Spacer(modifier = Modifier.height(200.dp)) }
-
-                            itemsIndexed(parsedLyrics) { index, line ->
-                                if (line.isTranslation) return@itemsIndexed
-
-                                val isActive = index == currentLineIndex
-
-                                val color by animateColorAsState(
-                                    targetValue = if (isActive) onSurfaceColor else onSurfaceColor.copy(alpha = 0.6f),
-                                    label = "LyricColor"
-                                )
-                                val dynamicFontSize by animateFloatAsState(
-                                    targetValue = if (isActive) (fontSize + 4).toFloat() else fontSize.toFloat(),
-                                    label = "LyricFontSize"
-                                )
-                                val fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal
-
-                                Text(
-                                    text = line.text,
-                                    color = color,
-                                    fontSize = dynamicFontSize.sp,
-                                    fontWeight = fontWeight,
-                                    textAlign = TextAlign.Center,
-                                    lineHeight = (dynamicFontSize * 1.5).sp,
-                                    modifier = Modifier.clickable {
-                                        playerConnection.player.seekTo(line.time)
-                                    }
-                                )
+                    is LyricsUiState.Success -> {
+                        val parsedLyrics = state.entries
+                        if (parsedLyrics.isEmpty()) {
+                            Text(
+                                text = "No lyrics were found for this song.",
+                                color = onSurfaceColor.copy(alpha = 0.7f),
+                                style = MaterialTheme.typography.headlineSmall,
+                                textAlign = TextAlign.Center
+                            )
+                        } else {
+                            val listState = rememberLazyListState()
+                            val currentLineIndex by remember(parsedLyrics, position) {
+                                derivedStateOf { LyricsUtils.findCurrentLineIndex(parsedLyrics, position) }
                             }
 
-                            item { Spacer(modifier = Modifier.height(200.dp)) }
+                            LaunchedEffect(currentLineIndex) {
+                                if (currentLineIndex != -1 && currentLineIndex < listState.layoutInfo.totalItemsCount) {
+                                    listState.animateScrollToItem(index = currentLineIndex, scrollOffset = -250)
+                                }
+                            }
+
+                            LazyColumn(
+                                state = listState,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                item { Spacer(modifier = Modifier.height(200.dp)) }
+                                itemsIndexed(parsedLyrics) { index, line ->
+                                    if (line.isTranslation) return@itemsIndexed
+                                    val isActive = index == currentLineIndex
+                                    val color by animateColorAsState(targetValue = if (isActive) onSurfaceColor else onSurfaceColor.copy(alpha = 0.6f), label = "")
+                                    val dynamicFontSize by animateFloatAsState(targetValue = if (isActive) (fontSize + 4).toFloat() else fontSize.toFloat(), label = "")
+                                    val fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal
+
+                                    Text(
+                                        text = line.text,
+                                        color = color,
+                                        fontSize = dynamicFontSize.sp,
+                                        fontWeight = fontWeight,
+                                        textAlign = TextAlign.Center,
+                                        lineHeight = (dynamicFontSize * 1.5).sp,
+                                        modifier = Modifier.clickable { playerConnection.player.seekTo(line.time) }
+                                    )
+                                }
+                                item { Spacer(modifier = Modifier.height(200.dp)) }
+                            }
                         }
                     }
                 }
             }
-            LyricsControls(onDismiss = onDismiss)
+            LyricsControls(onDismiss = onDismiss, viewModel = viewModel)
         }
     }
 }

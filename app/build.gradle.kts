@@ -27,7 +27,7 @@ android {
         minSdk = 24
         targetSdk = 36
         versionCode = 1
-        versionName = "1.3"
+        versionName = "1.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -150,8 +150,10 @@ dependencies {
     implementation("com.vanniktech:android-image-cropper:4.6.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.palette:palette-ktx:1.0.0")
-    implementation("io.ktor:ktor-client-cio:3.2.2")
+    implementation("io.ktor:ktor-client-cio:3.2.3")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation("com.google.mlkit:translate:17.0.3")
+    implementation("com.google.mlkit:language-id:17.0.6")
 
     implementation(libs.coil)
 
