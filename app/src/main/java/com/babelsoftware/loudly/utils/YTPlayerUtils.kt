@@ -44,53 +44,55 @@ object YTPlayerUtils {
         connectivityManager: ConnectivityManager,
     ): Result<PlaybackData> = runCatching {
         val signatureTimestamp = NewPipeUtils.getSignatureTimestamp(videoId).getOrNull()
-
         val isLoggedIn = YouTube.cookie != null
 
-        val mainPlayerResponse =
-            YouTube.player(videoId, playlistId, MAIN_CLIENT, signatureTimestamp).getOrThrow()
-
-        val audioConfig = mainPlayerResponse.playerConfig?.audioConfig
-        val videoDetails = mainPlayerResponse.videoDetails
-        val playbackTracking = mainPlayerResponse.playbackTracking
-
+        // Metadata will now be retrieved in a loop.
+        // This way, a single client failure should not halt the entire process
+        var audioConfig: PlayerResponse.PlayerConfig.AudioConfig? = null
+        var videoDetails: PlayerResponse.VideoDetails? = null
+        var playbackTracking: PlayerResponse.PlaybackTracking? = null
         var format: PlayerResponse.StreamingData.Format? = null
         var streamUrl: String? = null
         var streamExpiresInSeconds: Int? = null
-        var streamPlayerResponse: PlayerResponse? = null
 
         val allClients = listOf(MAIN_CLIENT) + STREAM_FALLBACK_CLIENTS
 
         for (client in allClients) {
             if (client.loginRequired && !isLoggedIn && YouTube.cookie == null) continue
 
-            streamPlayerResponse = if (client == MAIN_CLIENT) {
-                mainPlayerResponse
-            } else {
-                YouTube.player(videoId, playlistId, client, signatureTimestamp).getOrNull()
-            }
+            val streamPlayerResponse = YouTube.player(videoId, playlistId, client, signatureTimestamp).getOrNull() // A player request is made for each client, no special circumstances
 
             if (streamPlayerResponse?.playabilityStatus?.status != "OK") continue
+
+            if (videoDetails == null) {
+                audioConfig = streamPlayerResponse.playerConfig?.audioConfig
+                videoDetails = streamPlayerResponse.videoDetails
+                playbackTracking = streamPlayerResponse.playbackTracking
+            }
 
             val audioFormats = streamPlayerResponse.streamingData?.adaptiveFormats?.filter { it.isAudio } ?: continue
             val bestFormat = audioFormats.maxByOrNull {
                 it.bitrate * when (audioQuality) {
-                    AudioQuality.AUTO -> if (connectivityManager.isActiveNetworkMetered) -1 else 1 - 5
+                    AudioQuality.AUTO -> if (connectivityManager.isActiveNetworkMetered) -1 else 1
                     AudioQuality.MAX -> 5
-                    AudioQuality.HIGH -> 1
+                    AudioQuality.HIGH -> 2
                     AudioQuality.LOW -> -1
-                } + (if (it.mimeType.startsWith("audio/webm")) 10240 else 0)
+                } + (if (it.mimeType.startsWith("audio/webm")) 10240 else 0) // A slight priority for WebM/Opus
             } ?: continue
 
-            streamUrl = NewPipeUtils.getStreamUrl(bestFormat, videoId).getOrNull()
-            if (streamUrl == null || !validateStatus(streamUrl)) continue
+            val currentStreamUrl = NewPipeUtils.getStreamUrl(bestFormat, videoId).getOrNull()
 
-            format = bestFormat
-            streamExpiresInSeconds = streamPlayerResponse.streamingData?.expiresInSeconds ?: 3600
-            break
+            // ---> Verify when a valid URL is found
+            if (currentStreamUrl != null && validateStatus(currentStreamUrl)) {
+                streamUrl = currentStreamUrl
+                format = bestFormat
+                streamExpiresInSeconds = streamPlayerResponse.streamingData?.expiresInSeconds ?: 3600
+                break // Working flow found, exiting loop
+            }
+            // <---
         }
 
-        if (streamPlayerResponse == null || streamUrl == null || format == null) {
+        if (streamUrl == null || format == null) {
             throw PlaybackException("Failed to get working stream", null, PlaybackException.ERROR_CODE_IO_UNSPECIFIED)
         }
 
