@@ -72,9 +72,7 @@ class PlayerConnection(
             translating.value = false
         }
     }.stateIn(scope, SharingStarted.Lazily, null)
-    val currentFormat = mediaMetadata.flatMapLatest { mediaMetadata ->
-        database.format(mediaMetadata?.id)
-    }
+    val currentFormat = service.currentPlaybackFormat.stateIn(scope, SharingStarted.Lazily, null)
 
     val queueTitle = MutableStateFlow<String?>(null)
     val queueWindows = MutableStateFlow<List<Timeline.Window>>(emptyList())

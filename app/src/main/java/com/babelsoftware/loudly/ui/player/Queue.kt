@@ -773,20 +773,14 @@ fun DetailsDialog(
 ) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
-
     val playerConnection = LocalPlayerConnection.current ?: return
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
-    val currentFormat by playerConnection.currentFormat.collectAsState(initial = null)
+    val currentFormat by playerConnection.currentFormat.collectAsState()
 
     AlertDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = onDismiss,
-        icon = {
-            Icon(
-                painter = painterResource(R.drawable.info),
-                contentDescription = null
-            )
-        },
+        icon = { Icon(painter = painterResource(R.drawable.info), contentDescription = null) },
         confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text(stringResource(android.R.string.ok))
@@ -802,21 +796,14 @@ fun DetailsDialog(
                     stringResource(R.string.song_title) to mediaMetadata?.title,
                     stringResource(R.string.song_artists) to mediaMetadata?.artists?.joinToString { it.name },
                     stringResource(R.string.media_id) to mediaMetadata?.id,
-                    "I tag" to currentFormat?.itag?.toString(),
                     stringResource(R.string.mime_type) to currentFormat?.mimeType,
-                    stringResource(R.string.codecs) to currentFormat?.codecs,
+                    stringResource(R.string.codecs) to currentFormat?.mimeType?.substringAfter("codecs=\"", "")?.substringBefore("\""),
                     stringResource(R.string.bitrate) to currentFormat?.bitrate?.let { "${it / 1000} Kbps" },
-                    stringResource(R.string.sample_rate) to currentFormat?.sampleRate?.let { "$it Hz" },
-                    stringResource(R.string.loudness) to currentFormat?.loudnessDb?.let { "$it dB" },
+                    stringResource(R.string.sample_rate) to currentFormat?.audioSampleRate?.let { "${"%.1f".format(it / 1000.0)} kHz" },
                     stringResource(R.string.volume) to "${(playerConnection.player.volume * 100).toInt()}%",
-                    stringResource(R.string.file_size) to currentFormat?.contentLength?.let {
-                        Formatter.formatShortFileSize(
-                            context,
-                            it
-                        )
-                    }
+                    stringResource(R.string.file_size) to currentFormat?.contentLength?.let { Formatter.formatShortFileSize(context, it) }
                 ).forEach { (label, text) ->
-                    val displayText = text ?: stringResource(R.string.unknown)
+                    val displayText = if (text.isNullOrBlank()) stringResource(R.string.unknown) else text
                     Text(
                         text = label,
                         style = MaterialTheme.typography.labelMedium
@@ -824,14 +811,10 @@ fun DetailsDialog(
                     Text(
                         text = displayText,
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = {
-                                clipboardManager.setText(AnnotatedString(displayText))
-                                Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
-                            }
-                        )
+                        modifier = Modifier.clickable {
+                            clipboardManager.setText(AnnotatedString(displayText))
+                            Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
+                        }
                     )
                     Spacer(Modifier.height(8.dp))
                 }

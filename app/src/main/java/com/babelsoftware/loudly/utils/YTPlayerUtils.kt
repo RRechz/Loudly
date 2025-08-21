@@ -71,14 +71,44 @@ object YTPlayerUtils {
             }
 
             val audioFormats = streamPlayerResponse.streamingData?.adaptiveFormats?.filter { it.isAudio } ?: continue
-            val bestFormat = audioFormats.maxByOrNull {
-                it.bitrate * when (audioQuality) {
-                    AudioQuality.AUTO -> if (connectivityManager.isActiveNetworkMetered) -1 else 1
-                    AudioQuality.MAX -> 5
-                    AudioQuality.HIGH -> 2
-                    AudioQuality.LOW -> -1
-                } + (if (it.mimeType.startsWith("audio/webm")) 10240 else 0) // A slight priority for WebM/Opus
-            } ?: continue
+            val bestFormat = when (audioQuality) {
+                // Low Quality (LOW) Setting: Bitrate is kept between 45 - 52 Kbps.
+                AudioQuality.LOW -> {
+                    audioFormats
+                        .filter { it.bitrate in 45_000..52_000 }
+                        .maxByOrNull { it.bitrate }
+                }
+
+                // High Quality (HIGH) Setting: Bitrate is kept between 128 - 256 Kbps.
+                AudioQuality.HIGH -> {
+                    audioFormats
+                        .filter { it.bitrate in 128_000..256_000 }
+                        .maxByOrNull { it.bitrate }
+                }
+
+                // Maximum Quality (MAX) Setting: Smart selection up to 512 Kbps.
+                AudioQuality.MAX -> {
+                    audioFormats
+                        .filter { it.bitrate <= 512_000 }
+                        // Select the one with the highest bitrate; if equal, give priority to WEBM/OPUS.
+                        .maxByOrNull { it.bitrate + if (it.mimeType.startsWith("audio/webm")) 1 else 0 }
+                }
+
+                // Automatic Quality (AUTO) Setting: Smart selection based on network conditions.
+                AudioQuality.AUTO -> {
+                    if (connectivityManager.isActiveNetworkMetered) {
+                        // Mobile network: 45 - 128 Kbps range is targeted.
+                        audioFormats
+                            .filter { it.bitrate in 45_000..128_000 }
+                            .maxByOrNull { it.bitrate }
+                    } else {
+                        // Wi-Fi: A range of 45 - 512 kbps is targeted.
+                        audioFormats
+                            .filter { it.bitrate in 45_000..512_000 }
+                            .maxByOrNull { it.bitrate + if (it.mimeType.startsWith("audio/webm")) 1 else 0 }
+                    }
+                }
+            } ?: continue // If no suitable format is found, try the next client
 
             val currentStreamUrl = NewPipeUtils.getStreamUrl(bestFormat, videoId).getOrNull()
 

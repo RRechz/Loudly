@@ -156,7 +156,7 @@ import java.util.Locale
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
-private const val HQ_BITRATE = 48000
+private const val HQ_BITRATE = 52000
 
 sealed class NetworkInfo {
     data object None : NetworkInfo()
@@ -685,7 +685,7 @@ fun ContextualInfoRow(
                             modifier = qualityRowModifier.padding(horizontal = 10.dp, vertical = 6.dp)
                         ) {
                             Icon(
-                                painter = painterResource(if (isHq) R.drawable.high_quality else R.drawable.headphones),
+                                painter = painterResource(if (isHq) R.drawable.high_quality else R.drawable.standart_quality),
                                 contentDescription = "Quality",
                                 tint = Color.White.copy(alpha = 0.7f),
                                 modifier = Modifier.size(16.dp)

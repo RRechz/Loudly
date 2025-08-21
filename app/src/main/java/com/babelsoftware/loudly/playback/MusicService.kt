@@ -13,6 +13,7 @@ import android.media.audiofx.AudioEffect
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Binder
+import android.os.Bundle
 import android.util.Log
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
@@ -57,6 +58,7 @@ import androidx.media3.session.SessionToken
 import com.babelsoftware.innertube.YouTube
 import com.babelsoftware.innertube.models.SongItem
 import com.babelsoftware.innertube.models.WatchEndpoint
+import com.babelsoftware.innertube.models.response.PlayerResponse
 import com.babelsoftware.loudly.MainActivity
 import com.babelsoftware.loudly.R
 import com.babelsoftware.loudly.constants.AddingPlayedSongsToYTMHistoryKey
@@ -152,7 +154,7 @@ import kotlin.time.Duration.Companion.seconds
 
 sealed class UrlStatus {
     object Loading : UrlStatus() // Indicates that the URL is being fetched
-    data class Ready(val url: String, val expiration: Long) : UrlStatus() // URL ready
+    data class Ready(val url: String, val expiration: Long, val format: PlayerResponse.StreamingData.Format) : UrlStatus() // URL ready
     data class Failed(val error: Throwable) : UrlStatus() // An error occurred while retrieving the URL
 }
 @Suppress("DEPRECATION")
@@ -200,6 +202,8 @@ class MusicService : MediaLibraryService(),
     val errorManagerState = MutableStateFlow(PlayerErrorManager.State.IDLE)
 
     lateinit var sleepTimer: SleepTimer
+
+    val currentPlaybackFormat = MutableStateFlow<PlayerResponse.StreamingData.Format?>(null)
 
     @Inject
     @PlayerCache
@@ -776,25 +780,6 @@ class MusicService : MediaLibraryService(),
             .setCacheWriteDataSinkFactory(null)
             .setFlags(FLAG_IGNORE_CACHE_ON_ERROR)
 
-    private suspend fun validateStreamUrl(url: String): Boolean {
-        return try {
-            withContext(Dispatchers.IO) {
-                val connection = URL(url).openConnection() as HttpURLConnection
-                connection.requestMethod = "HEAD"
-                connection.connectTimeout = 5000
-                connection.readTimeout = 5000
-                connection.connect()
-                val responseCode = connection.responseCode
-                val contentLength = connection.contentLength
-                connection.disconnect()
-
-                responseCode == 200 && contentLength > 1024
-            }
-        } catch (e: Exception) {
-            false
-        }
-    }
-
     private suspend fun getOrFetchSongUrl(mediaId: String): String? {
         when (val status = songUrlCache[mediaId]) {
             is UrlStatus.Ready -> {
@@ -820,7 +805,35 @@ class MusicService : MediaLibraryService(),
         ).onSuccess { playbackData ->
             val streamUrl = playbackData.streamUrl
             val expiration = System.currentTimeMillis() + (playbackData.streamExpiresInSeconds * 1000L)
-            songUrlCache[mediaId] = UrlStatus.Ready(streamUrl, expiration)
+            songUrlCache[mediaId] = UrlStatus.Ready(streamUrl, expiration, playbackData.format)
+            currentPlaybackFormat.value = playbackData.format
+
+            withContext(Dispatchers.Main) {
+                val timeline = player.currentTimeline
+                for (i in 0 until timeline.windowCount) {
+                    val window = timeline.getWindow(i, Timeline.Window())
+                    if (window.mediaItem.mediaId == mediaId) {
+                        val currentMediaItem = window.mediaItem
+                        val format = playbackData.format
+                        val extras = Bundle().apply {
+                            putInt("bitrate", format.bitrate)
+                            putString("mimeType", format.mimeType)
+                            format.audioSampleRate?.let { putInt("sampleRate", it) }
+                            playbackData.audioConfig?.loudnessDb?.let { putDouble("loudnessDb", it) }
+                            putLong("contentLength", format.contentLength ?: 0L)
+                        }
+                        val newMetadata = currentMediaItem.mediaMetadata.buildUpon()
+                            .setExtras(extras)
+                            .build()
+                        val newMediaItem = currentMediaItem.buildUpon()
+                            .setMediaMetadata(newMetadata)
+                            .build()
+                        player.replaceMediaItem(i, newMediaItem)
+                        break
+                    }
+                }
+            }
+
             return streamUrl
         }.onFailure { throwable ->
             songUrlCache[mediaId] = UrlStatus.Failed(throwable)
@@ -833,6 +846,10 @@ class MusicService : MediaLibraryService(),
     private fun createDataSourceFactory(): DataSource.Factory {
         return ResolvingDataSource.Factory(createCacheDataSource()) { dataSpec ->
             val mediaId = dataSpec.key ?: throw IOException("Media ID is null")
+            val status = songUrlCache[mediaId]
+            if (status is UrlStatus.Ready) {
+                currentPlaybackFormat.value = status.format
+            }
             if (mediaId.startsWith("1000")) {
                 val songPath = runBlocking(Dispatchers.IO) {
                     database.song(mediaId).firstOrNull()?.song?.localPath
@@ -849,7 +866,7 @@ class MusicService : MediaLibraryService(),
                 scope.launch(Dispatchers.IO) { recoverSong(mediaId) }
                 return@Factory dataSpec
             }
-            val status = songUrlCache[mediaId]
+
             if (status is UrlStatus.Ready && status.expiration > System.currentTimeMillis()) {
                 scope.launch(Dispatchers.IO) { recoverSong(mediaId) }
                 return@Factory dataSpec.withUri(status.url.toUri()).subrange(dataSpec.uriPositionOffset, CHUNK_LENGTH)
@@ -857,7 +874,6 @@ class MusicService : MediaLibraryService(),
                 if (status !is UrlStatus.Loading) {
                     scope.launch(Dispatchers.IO) { getOrFetchSongUrl(mediaId) }
                 }
-
                 throw IOException("Stream URL for $mediaId not ready yet. Retrying...")
             }
         }
