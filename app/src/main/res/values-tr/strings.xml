@@ -68,6 +68,7 @@
     <string name="internet_required">Görünüşe göre internet bağlantınız yok. Lütfen ağınızı kontrol edin.</string>
 
     <string name="featured_for_you">Sizin için öne çıkanlar</string>
+    <string name="recommended_for_you_today">Bugün sizin için önerilenler</string>
     <string name="today">Bugün</string>
     <string name="yesterday">Dün</string>
     <string name="this_week">Bu hafta</string>
@@ -111,6 +112,7 @@
 
     <string name="other_versions">Diğer versiyonlar</string>
 
+    <string name="top_songs">En Popüler Şarkılar</string>
     <string name="liked_songs">Beğenilen şarkılar</string>
     <string name="downloaded_songs">İndirilen şarkılar</string>
     <string name="playlist_is_empty">Çalma listesi boş</string>
@@ -354,6 +356,7 @@
 
     <string name="content">İçerik</string>
     <string name="login">Giriş yap</string>
+    <string name="login_description">YT Music çalma listelerinize ve daha fazlasına giriş yapın</string>
     <string name="token_hidden">Tokeni göstermek için dokunun</string>
     <string name="token_shown">Kopyalamak veya düzenlemek için tekrar dokunun</string>
     <string name="token_adv_login_description">Bu GELİŞMİŞ bir giriş yöntemidir. Web portalına alternatif olarak, giriş tokeninizi doğrudan buraya girebilir veya güncelleyebilirsiniz. Örneğin, bu birden fazla cihazda oturum açmayı hızlandırabilir. Lütfen uygulamanın ayrıştıramadığı geçersiz token formatlarının kabul edilmeyeceğini unutmayın</string>
@@ -362,6 +365,7 @@
     <string name="title_discord">Discord</string>
     <string name="like_autodownload">Beğendiğiniz şarkıları otomatik olarak indirin</string>
     <string name="ytm_sync">YouTube Music hesabınızla otomatik olarak senkronize edin</string>
+    <string name="ytm_sync_description">Çalma listelerinizi ve daha fazlasını hesabınızla senkronize edin</string>
     <string name="wifi_only">Sadece Wi-Fi</string>
     <string name="not_logged_in">Giriş yapılmadı</string>
     <string name="content_language">Varsayılan içerik dili</string>
@@ -598,5 +602,31 @@ TAKILMIŞ GÖRÜNÜRSE PANİK YAPMAYIN; bazen alım işlemi biraz zaman alabilir
     <string name="error_behind_live_window_description">Canlı yayında bir sorun var. Lütfen yeniden başlatın.</string>
     <string name="error_playback_failed_title">Oynatma Başarısız</string>
     <string name="error_playback_failed_description">Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin.</string>
+    <string name="tap_to_change">Değiştirmek için dokun</string>
     <string name="translate">Çeviri (BETA(</string>
+    <string name="favorite">Favori</string>
+    <string name="app_ui">Uygulama Arayüzü</string>
+    <string name="app_ui_desc">3 farklı tasarımdan birini seçin</string>
+    <string name="ui_version_selection">UI Sürüm Seçimi</string>
+    <string name="ui_version_1_0_desc">Uygulamanın eski sürüm tasarımı. (Uygulama, Oynatıcı, Mini Oynatıcı)</string>
+    <string name="ui_version_1_5_desc">Daha modern bir yaklaşımla tasarlanmış kompakt tasarım. (Uygulama, Oynatıcı, Mini Oynatıcı)</string>
+    <string name="ui_version_2_0_desc">En popüler tasarım. (Uygulama, Oynatıcı, Mini Oynatıcı)</string>
+    <string name="ui_version_custom_desc">Kendi uygulama kullanıcı arayüzü tasarımınızı oluşturun. (Uygulama, Oynatıcı, Mini Oynatıcı)</string>
+    <string name="custom_app_ui">Kullanıcı Arayüzünü Özelleştir</string>
+    <string name="other_settings">Diğer Ayarlar</string>
+    <string name="other_settings_description">Diğer çeşitli ayarlar için tıklayın</string>
+    <string name="audio_quality_auto_desc">Kaliteyi 45 ile 512 Kbps arasında otomatik olarak ayarlar.</string>
+    <string name="audio_quality_max_desc">512 Kbps\'ye kadar en yüksek kaliteyi sunar</string>
+    <string name="audio_quality_high_desc">Ortalama internet hızları için kaliteyi 128 ile 256 Kbps arasında ayarlar.</string>
+    <string name="audio_quality_low_desc">Verileri tasarruf etmek için kaliteyi 45 ile 52 Kbps arasında sınırlar (Veri Tasarrufu)</string>
+    <string name="could_not_import">İçe aktarılamadı</string>
+    <string name="text_alignment">Metin Hizalama</string>
+    <string name="text_alignment_description">Kart üzerindeki metnin konumunu ayarlayın</string>
+    <string name="gradient_intensity">Gradyan Yoğunluğu</string>
+    <string name="corner_round">Köşe Yuvarlama</string>
+    <string name="profile_picture">Profil Resmi</string>
+    <string name="profile_card">Profil Kartı</string>
+    <string name="remove_profile_picture">Profil Fotoğrafını Kaldır</string>
+    <string name="show_texts">Metni Göster</string>
+    <string name="show_texts_description">Profil kartında selamlama ve kullanıcı adı metnini göster</string>
 </resources>

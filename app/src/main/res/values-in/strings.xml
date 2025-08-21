@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="welcome_to_loudly">Selamat datang di Loudly</string>
-    <string name="welcome_to_loudly_description">Mari kita mulai personalisasi pengalaman musik Anda.</string>
+    <string name="welcome_to_loudly">Selamat Datang di Loudly</string>
+    <string name="welcome_to_loudly_description">Ayo mulai personalisasi pengalaman musik Anda.</string>
     <string name="yt_music_fingertips">YouTube Music di ujung jari Anda</string>
     <string name="ytm_account_sync">Sinkronisasi akun YT Music</string>
     <string name="ad_free_playback">Pemutaran tanpa IKLAN</string>
@@ -9,15 +10,15 @@
     <string name="android_auto">Mendukung Android Auto</string>
     <string name="discord_support">Mendukung status Discord</string>
     <string name="fos_info">Sepenuhnya sumber terbuka</string>
-    <string name="select_player_ui">Pilih UI Pemutar Anda</string>
-    <string name="select_player_ui_description">Pilih tampilan pemutar dalam aplikasi. Anda dapat mengubah pengaturan ini nanti di "Setelan > Tampilan".</string>
+    <string name="select_player_ui">Pilih Tampilan Pemutar Anda</string>
+    <string name="select_player_ui_description">Pilih tampilan pemutar dalam aplikasi. Anda dapat mengubah pengaturan ini nanti di “Setelan > Tampilan”.</string>
     <string name="setup_complete">Pengaturan Selesai!</string>
     <string name="setup_complete_description">Anda siap untuk menjelajahi Loudly.</string>
     <string name="finish">Selesai</string>
     <string name="back">Kembali</string>
     <string name="next">Berikutnya</string>
-
     <string name="previous">Sebelumnya</string>
+
     <string name="home">Beranda</string>
     <string name="explore">Jelajahi</string>
     <string name="songs">Lagu</string>
@@ -41,6 +42,7 @@
     <string name="past_year">Setahun terakhir</string>
 
     <plurals name="n_selected">
+        <item quantity="one">%d dipilih</item>
         <item quantity="other">%d dipilih</item>
     </plurals>
 
@@ -49,32 +51,34 @@
     <string name="good_evening">Selamat malam</string>
     <string name="good_night">Selamat malam</string>
     <string name="recent_activity">Aktivitas terkini</string>
-    <string name="history">Histori</string>
-    <string name="history_empty">Histori Anda akan muncul di sini</string>
+    <string name="history">Riwayat</string>
+    <string name="history_empty">Riwayat Anda akan muncul di sini</string>
     <string name="stats_empty">Statistik Anda akan muncul di sini</string>
     <string name="stats">Statistik</string>
+    <string name="show_less">Tampilkan Lebih Sedikit</string>
     <string name="show_more">Tampilkan Lebih Banyak</string>
     <string name="mood_and_genres">Suasana Hati dan Genre</string>
     <string name="account">Akun</string>
     <string name="quick_picks">Pilihan cepat</string>
     <string name="quick_picks_empty">Dengarkan lagu untuk menghasilkan pilihan cepat Anda</string>
     <string name="forgotten_favorites">Favorit yang terlupakan</string>
-    <string name="keep_listening">Terus dengarkan</string>
+    <string name="keep_listening">Terus mendengarkan</string>
     <string name="your_youtube_playlists">Playlist YouTube Anda</string>
     <string name="similar_to">Mirip dengan</string>
     <string name="new_release_albums">Album rilis baru</string>
     <string name="not_internet">Tidak Ada Koneksi Internet</string>
-    <string name="internet_required">Sepertinya Anda tidak memiliki koneksi internet. Silakan periksa jaringan Anda.</string>
+    <string name="internet_required">Sepertinya Anda tidak memiliki koneksi Internet. Silakan periksa jaringan Anda.</string>
+    <string name="featured_for_you">Unggulan untuk Anda</string>
+    <string name="recommended_for_you_today">Direkomendasikan untuk Anda Hari Ini</string>
 
-    <string name="featured_for_you">Rekomendasi untuk Anda</string>
     <string name="today">Hari ini</string>
     <string name="yesterday">Kemarin</string>
     <string name="this_week">Minggu ini</string>
     <string name="last_week">Minggu lalu</string>
     <string name="local_history">Lokal</string>
     <string name="remote_history">Jarak Jauh</string>
-    <string name="history_queue_title_local">Histori lokal</string>
-    <string name="history_queue_title_online">Histori jarak jauh</string>
+    <string name="history_queue_title_local">Riwayat lokal</string>
+    <string name="history_queue_title_online">Riwayat online</string>
 
     <string name="most_played_songs">Lagu yang paling sering diputar</string>
     <string name="most_played_artists">Artis yang paling sering diputar</string>
@@ -83,7 +87,7 @@
     <string name="search">Cari</string>
     <string name="search_yt_music">Cari di Loudly</string>
     <string name="search_library">Cari di koleksi…</string>
-    <string name="SearchHistory">Histori Pencarian</string>
+    <string name="SearchHistory">Riwayat Pencarian</string>
     <string name="Sujestions">Saran</string>
     <string name="SearchResutls">Hasil Pencarian</string>
     <string name="filter_library">Koleksi</string>
@@ -101,27 +105,29 @@
     <string name="no_results_found">Tidak ada hasil yang ditemukan</string>
 
     <string name="library_empty">Koleksi akan muncul di sini</string>
-    <string name="library_song_empty">Lagu di koleksi akan muncul di sini</string>
-    <string name="library_artist_empty">Artis di koleksi akan muncul di sini</string>
-    <string name="library_album_empty">Album di koleksi akan muncul di sini</string>
+    <string name="library_song_empty">Lagu koleksi akan muncul di sini</string>
+    <string name="library_artist_empty">Artis koleksi akan muncul di sini</string>
+    <string name="library_album_empty">Album koleksi akan muncul di sini</string>
     <string name="library_playlist_empty">Playlist Anda akan muncul di sini</string>
 
     <string name="from_your_library">Dari koleksi Anda</string>
 
     <string name="other_versions">Versi lain</string>
+    <string name="favorite">Favorit</string>
+    <string name="top_songs">Lagu Teratas</string>
 
     <string name="liked_songs">Lagu yang disukai</string>
     <string name="downloaded_songs">Lagu yang diunduh</string>
     <string name="playlist_is_empty">Playlist ini kosong</string>
-    <string name="remove_download_playlist_confirm">Apakah Anda benar-benar ingin menghapus semua lagu dari playlist \"%s\" dari penyimpanan Lagu yang Diunduh?</string>
+    <string name="remove_download_playlist_confirm">Apakah Anda benar-benar ingin menghapus semua lagu playlist \"%s\" dari penyimpanan Lagu yang Diunduh?</string>
     <string name="delete_playlist_confirm">Apakah Anda benar-benar ingin menghapus playlist \"%s\"?</string>
 
     <string name="off">Nonaktif</string>
 
-    <string name="retry">Coba lagi</string>
+    <string name="retry">Coba Lagi</string>
     <string name="radio">Radio</string>
     <string name="shuffle">Acak</string>
-    <string name="reset">Setel ulang</string>
+    <string name="reset">Setel Ulang</string>
 
     <string name="details">Detail</string>
     <string name="edit">Edit</string>
@@ -140,10 +146,10 @@
     <string name="add_to_playlist">Tambahkan ke playlist</string>
     <string name="view_artist">Lihat artis</string>
     <string name="view_album">Lihat album</string>
-    <string name="refetch">Ambil ulang</string>
+    <string name="refetch">Ambil Ulang</string>
     <string name="share">Bagikan</string>
     <string name="delete">Hapus</string>
-    <string name="remove_from_history">Hapus dari histori</string>
+    <string name="remove_from_history">Hapus dari riwayat</string>
     <string name="remove_from_playlist">Hapus dari playlist</string>
     <string name="remove_from_queue">Hapus dari antrean</string>
     <string name="remove_from_cache">Hapus dari cache</string>
@@ -165,7 +171,7 @@
 
     <string name="media_id">ID Media</string>
     <string name="mime_type">Jenis MIME</string>
-    <string name="codecs">Codec</string>
+    <string name="codecs">Kodek</string>
     <string name="bitrate">Bitrate</string>
     <string name="sample_rate">Sample rate</string>
     <string name="loudness">Kenyaringan</string>
@@ -199,35 +205,42 @@
     <string name="duplicates">Duplikat</string>
     <string name="skip_duplicates">Lewati duplikat</string>
     <string name="add_anyway">Tetap tambahkan</string>
-    <string name="duplicates_description_single">Lagu ini sudah ada di playlist Anda</string>
+    <string name="duplicates_description_single">Lagu tersebut sudah ada di playlist Anda</string>
     <string name="duplicates_description_multiple">%d lagu sudah ada di playlist Anda</string>
     <string name="allows_for_sync_witch_youtube">Catatan: Ini memungkinkan sinkronisasi dengan YouTube Music</string>
 
     <plurals name="n_song">
+        <item quantity="one">%d lagu</item>
         <item quantity="other">%d lagu</item>
     </plurals>
     <plurals name="n_artist">
+        <item quantity="one">%d artis</item>
         <item quantity="other">%d artis</item>
     </plurals>
     <plurals name="n_album">
+        <item quantity="one">%d album</item>
         <item quantity="other">%d album</item>
     </plurals>
     <plurals name="n_playlist">
+        <item quantity="one">%d playlist</item>
         <item quantity="other">%d playlist</item>
     </plurals>
     <plurals name="n_week">
+        <item quantity="one">%d minggu</item>
         <item quantity="other">%d minggu</item>
     </plurals>
     <plurals name="n_month">
+        <item quantity="one">%d bulan</item>
         <item quantity="other">%d bulan</item>
     </plurals>
     <plurals name="n_year">
+        <item quantity="one">%d tahun</item>
         <item quantity="other">%d tahun</item>
     </plurals>
 
-    <string name="playlist_imported">Playlist berhasil diimpor</string>
+    <string name="playlist_imported">Playlist diimpor</string>
     <string name="removed_song_from_playlist">Menghapus \"%s\" dari playlist</string>
-    <string name="playlist_synced">Playlist berhasil disinkronkan</string>
+    <string name="playlist_synced">Playlist disinkronkan</string>
     <string name="undo">Urungkan</string>
 
     <string name="now_playing">Sedang diputar</string>
@@ -235,12 +248,13 @@
     <string name="sleep_timer">Timer tidur</string>
     <string name="end_of_song">Akhir lagu</string>
     <plurals name="minute">
+        <item quantity="one">1 menit</item>
         <item quantity="other">%d menit</item>
     </plurals>
     <string name="error_no_stream">Tidak ada streaming yang tersedia</string>
     <string name="error_no_internet">Tidak ada koneksi jaringan</string>
     <string name="error_timeout">Waktu habis</string>
-    <string name="error_unknown">Kesalahan tidak dikenal</string>
+    <string name="error_unknown">Kesalahan tidak diketahui</string>
     <string name="menu">Menu</string>
     <string name="share_list">Bagikan Daftar</string>
 
@@ -263,7 +277,7 @@
     <string name="music_player">Pemutar Musik</string>
 
     <string name="notifications">Notifikasi</string>
-    <string name="keep_alive_title">Cegah aplikasi dimatikan oleh sistem</string>
+    <string name="keep_alive_title">Mencegah aplikasi dimatikan oleh sistem</string>
     <string name="keep_alive_description">Gunakan notifikasi latar depan untuk mencegah Loudly ditutup secara acak oleh sistem.</string>
     <string name="notifications_settings">Setelan notifikasi</string>
     <string name="notification_permission_is_required">Izin notifikasi diperlukan</string>
@@ -271,7 +285,7 @@
     <string name="settings">Setelan</string>
     <string name="appearance">Tampilan</string>
     <string name="theme">Tema</string>
-    <string name="proxy">Proxy</string>
+    <string name="proxy">Proksi</string>
     <string name="enable_dynamic_theme">Aktifkan tema dinamis</string>
     <string name="dark_theme">Tema gelap</string>
     <string name="dark_theme_on">Aktif</string>
@@ -345,29 +359,31 @@
 
     <string name="content">Konten</string>
     <string name="login">Login</string>
+    <string name="login_description">Masuk ke playlist YT Music Anda dan lainnya</string>
     <string name="token_hidden">Ketuk untuk menampilkan token</string>
     <string name="token_shown">Ketuk lagi untuk menyalin atau mengedit</string>
-    <string name="token_adv_login_description">Ini adalah metode login LANJUTAN. Sebagai alternatif portal web, Anda dapat langsung memasukkan atau memperbarui token login Anda di sini. Misalnya, ini dapat mempercepat proses login di beberapa perangkat. Harap dicatat bahwa format token yang tidak valid yang gagal diurai oleh aplikasi tidak akan diterima.</string>
+    <string name="token_adv_login_description">Ini adalah metode login LANJUTAN. Sebagai alternatif portal web, Anda dapat langsung memasukkan atau memperbarui token login Anda di sini. Misalnya, ini dapat mempercepat login di beberapa perangkat. Harap dicatat bahwa format token yang tidak valid yang gagal diurai oleh aplikasi tidak akan diterima.</string>
     <string name="import_from_spotify">Impor dari spotify</string>
     <string name="title_spotify">Spotify</string>
     <string name="title_discord">Discord</string>
-    <string name="like_autodownload">Unduh otomatis lagu yang Anda sukai</string>
-    <string name="ytm_sync">Sinkronkan otomatis dengan akun YouTube Music Anda</string>
+    <string name="like_autodownload">Otomatis unduh lagu yang Anda sukai</string>
+    <string name="ytm_sync">Otomatis sinkronisasi dengan akun YouTube Music Anda</string>
+    <string name="ytm_sync_description">Sinkronkan playlist Anda dan lainnya dengan akun Anda</string>
     <string name="wifi_only">Hanya Wifi</string>
     <string name="not_logged_in">Belum login</string>
     <string name="content_language">Bahasa konten default</string>
     <string name="content_country">Negara konten default</string>
     <string name="system_default">Default sistem</string>
-    <string name="enable_proxy">Aktifkan proxy</string>
-    <string name="proxy_type">Jenis proxy</string>
-    <string name="proxy_url">URL Proxy</string>
-    <string name="restart_to_take_effect">Mulai ulang agar diterapkan</string>
+    <string name="enable_proxy">Aktifkan proksi</string>
+    <string name="proxy_type">Jenis proksi</string>
+    <string name="proxy_url">URL Proksi</string>
+    <string name="restart_to_take_effect">Mulai ulang agar berlaku</string>
     <string name="app_language">Bahasa aplikasi</string>
     <string name="configure_app_language">Konfigurasi bahasa aplikasi</string>
-    <string name="intent_app_language_not_found">Tidak dapat menemukan setelan bahasa aplikasi, silakan konfigurasikan secara manual</string>
+    <string name="intent_app_language_not_found">Tidak dapat menemukan setelan bahasa aplikasi, harap konfigurasikan secara manual</string>
     <string name="open_supported_links">Buka tautan yang didukung secara default</string>
     <string name="configure_supported_links">Konfigurasi tautan yang didukung</string>
-    <string name="intent_supported_links_not_found">Tidak dapat menemukan setelan tautan yang didukung, silakan konfigurasikan secara manual</string>
+    <string name="intent_supported_links_not_found">Tidak dapat menemukan setelan tautan yang didukung, harap konfigurasikan secara manual</string>
 
     <string name="player_and_audio">Pemutar dan Audio</string>
     <string name="audio_quality">Kualitas audio</string>
@@ -376,7 +392,7 @@
     <string name="audio_quality_high">Tinggi</string>
     <string name="audio_quality_low">Rendah</string>
     <string name="minimum_playback_duration">Durasi pemutaran minimum</string>
-    <string name="minimum_playback_duration_info">Jumlah minimum lagu yang harus diputar sebelum dianggap "telah diputar"</string>
+    <string name="minimum_playback_duration_info">Jumlah minimum lagu yang harus diputar sebelum dianggap "diputar"</string>
     <string name="queue">Antrean</string>
     <string name="persistent_queue">Antrean persisten</string>
     <string name="persistent_queue_desc">Pulihkan antrean terakhir Anda saat aplikasi dimulai</string>
@@ -386,7 +402,7 @@
     <string name="audio_normalization">Normalisasi audio</string>
     <string name="play_song_when_bluetooth_device_connected">Lanjutkan pemutaran saat perangkat bluetooth terhubung</string>
     <string name="stop_playing_when_song_sound_minimum_volume">Hentikan pemutaran lagu saat suara volume minimum</string>
-    <string name="adding_played_songs_to_ytm_history">Menambahkan lagu yang diputar ke histori YouTube-Music</string>
+    <string name="adding_played_songs_to_ytm_history">Menambahkan lagu yang diputar ke riwayat YouTube-Music</string>
     <string name="auto_skip_next_on_error">Lewati otomatis ke lagu berikutnya saat terjadi kesalahan</string>
     <string name="auto_skip_next_on_error_desc">Pastikan pengalaman pemutaran berkelanjutan Anda</string>
     <string name="stop_music_on_task_clear">Hentikan musik saat tugas dibersihkan</string>
@@ -401,7 +417,7 @@
     <string name="max_cache_size">Ukuran cache maks</string>
     <string name="unlimited">Tidak terbatas</string>
     <string name="audio_offload">Aktifkan offload</string>
-    <string name="audio_offload_description">Gunakan jalur audio offload untuk pemutaran audio. Menonaktifkan ini dapat meningkatkan penggunaan daya tetapi bisa berguna jika Anda mengalami masalah dengan pemutaran audio atau pasca-pemrosesan</string>
+    <string name="audio_offload_description">Gunakan jalur audio offload untuk pemutaran audio. Menonaktifkan ini dapat meningkatkan penggunaan daya tetapi dapat berguna jika Anda mengalami masalah dengan pemutaran audio atau pasca-pemrosesan</string>
     <string name="clear_all_downloads">Hapus semua unduhan</string>
     <string name="max_image_cache_size">Ukuran cache gambar maks</string>
     <string name="clear_image_cache">Hapus cache gambar</string>
@@ -415,18 +431,18 @@
     <string name="clear_translation_models_cache_dialog">Apakah Anda yakin ingin menghapus semua model terjemahan yang di-cache?</string>
 
     <string name="privacy">Privasi</string>
-    <string name="listen_history">Histori dengar</string>
-    <string name="pause_listen_history">Jeda histori dengar</string>
-    <string name="clear_listen_history">Hapus histori dengar</string>
-    <string name="clear_listen_history_confirm">Apakah Anda yakin ingin menghapus semua histori dengar?</string>
-    <string name="pause_search_history">Jeda histori pencarian</string>
-    <string name="clear_search_history">Hapus histori pencarian</string>
-    <string name="clear_search_history_confirm">Apakah Anda yakin ingin menghapus semua histori pencarian?</string>
-    <string name="search_history">Histori pencarian</string>
+    <string name="listen_history">Riwayat dengar</string>
+    <string name="pause_listen_history">Jeda riwayat dengar</string>
+    <string name="clear_listen_history">Hapus riwayat dengar</string>
+    <string name="clear_listen_history_confirm">Apakah Anda yakin ingin menghapus semua riwayat dengar?</string>
+    <string name="pause_search_history">Jeda riwayat pencarian</string>
+    <string name="clear_search_history">Hapus riwayat pencarian</string>
+    <string name="clear_search_history_confirm">Apakah Anda yakin ingin menghapus semua riwayat pencarian?</string>
+    <string name="search_history">Riwayat pencarian</string>
     <string name="use_login_for_browse">Gunakan login untuk menjelajahi konten</string>
     <string name="use_login_for_browse_desc">Ini dapat memengaruhi konten apa yang Anda lihat dan misalnya menampilkan album khusus premium jika Anda login dengan akun Premium</string>
     <string name="disable_screenshot">Nonaktifkan tangkapan layar</string>
-    <string name="disable_screenshot_desc">Saat opsi ini aktif, tangkapan layar dan tampilan aplikasi di Riwayat dinonaktifkan.</string>
+    <string name="disable_screenshot_desc">Saat opsi ini aktif, tangkapan layar dan tampilan aplikasi di Terbaru dinonaktifkan.</string>
     <string name="enable_lrclib">Aktifkan penyedia lirik LrcLib</string>
     <string name="enable_kugou">Aktifkan penyedia lirik KuGou</string>
     <string name="default_lyrics_provider">Penyedia lirik default</string>
@@ -448,7 +464,7 @@
     <string name="restore_failed">Gagal memulihkan cadangan</string>
 
     <string name="discord_integration">Integrasi Discord</string>
-    <string name="discord_information">Loudly menggunakan pustaka KizzyRPC untuk mengatur status akun Discord Anda. Ini melibatkan penggunaan koneksi Discord Gateway, yang dapat dianggap sebagai pelanggaran TOS Discord. Namun, tidak ada kasus yang diketahui di mana akun pengguna ditangguhkan karena alasan ini. Gunakan dengan risiko Anda sendiri.\n\nLoudly hanya akan mengekstrak token Anda, dan semua yang lainnya disimpan secara lokal.</string>
+    <string name="discord_information">Loudly menggunakan pustaka KizzyRPC untuk mengatur status akun Discord Anda. Ini melibatkan penggunaan koneksi Discord Gateway, yang dapat dianggap sebagai pelanggaran TOS Discord. Namun, tidak ada kasus yang diketahui di mana akun pengguna ditangguhkan karena alasan ini. Gunakan dengan risiko Anda sendiri.\n\nLoudly hanya akan mengekstrak token Anda, dan semua yang lain disimpan secara lokal.</string>
     <string name="dismiss">Tutup</string>
     <string name="options">Opsi</string>
     <string name="preview">Pratinjau</string>
@@ -460,7 +476,7 @@
     <string name="app_version">Versi aplikasi</string>
     <string name="checking_for_update">Memeriksa pembaruan...</string>
     <string name="update_card_version_ready_to_download">versi %1$s tersedia untuk diunduh.</string>
-    <string name="update_card_downloading">Mengunduh... %1$d%%</string>
+    <string name="update_card_downloading">Mengunduh...</string>
     <string name="install">Tingkatkan</string>
     <string name="try_again">Coba Lagi</string>
     <string name="download_now">Unduh Sekarang</string>
@@ -469,8 +485,9 @@
     <string name="new_version_available">Versi baru tersedia</string>
     <string name="translation_models">Model Terjemahan</string>
     <string name="clear_translation_models">Hapus model terjemahan</string>
-    <string name="history_duration">Durasi histori</string>
+    <string name="history_duration">Durasi riwayat</string>
     <plurals name="seconds">
+        <item quantity="one">1 detik</item>
         <item quantity="other">%d detik</item>
     </plurals>
     <string name="widget_title">Musik 3x2</string>
@@ -488,10 +505,10 @@
     <string name="currently_used">Saat ini digunakan</string>
     <string name="clear_cache">Hapus cache</string>
     <string name="backup_restore_description">Cadangkan · Pulihkan · Impor</string>
-    <string name="privacy_description">Histori · Cari · Tangkapan Layar</string>
+    <string name="privacy_description">Riwayat · Cari · Tangkapan Layar</string>
     <string name="storage_description">Unduhan · Cache · Gambar</string>
     <string name="player_and_audio_description">Suara · Antrean · Lirik</string>
-    <string name="content_description">Bahasa · Lokasi · Proxy</string>
+    <string name="content_description">Bahasa · Lokasi · Proksi</string>
     <string name="account_description">Login · Spotify · Discord</string>
     <string name="appearance_description">Tema · Slider · Pemutar</string>
 
@@ -503,16 +520,68 @@
     <string name="edit_photo">Edit Foto</string>
     <string name="cancel">Batal</string>
 
-    <string name="vpn_info_message">Penggunaan VPN dapat memengaruhi kualitas koneksi Anda. Jika Anda mengalami masalah jaringan, putuskan koneksi VPN Anda atau gunakan proxy. Anda dapat mengonfigurasinya di “Pengaturan >> Konten >> Proxy.”</string>
+    <string name="send_to_developer">Kirim ke Pengembang</string>
+    <string name="close">Tutup</string>
+    <string name="update_error_details">Tampilkan Detail Kesalahan</string>
+    <string name="download_failed">Unduhan Gagal</string>
+    <string name="show_error">Tampilkan Kesalahan</string>
+    <string name="go_to_update_link">Pembaruan Manual</string>
+    <string name="home_card_update_desc">Periksa halaman setelan untuk detailnya</string>
+    <string name="app_up_to_date">Perangkat Lunak Terbaru</string>
+
+    <string name="app_ui">UI Aplikasi</string>
+    <string name="app_ui_desc">Pilih salah satu dari 3 desain yang berbeda</string>
+    <string name="ui_version_selection">Pemilihan Versi UI</string>
+    <string name="ui_version_1_0_desc">Desain aplikasi versi lama. (Aplikasi, Pemutar, MiniPlayer)</string>
+    <string name="ui_version_1_5_desc">Desain ringkas yang dibuat dengan pendekatan yang lebih modern. (Aplikasi, Pemutar, MiniPlayer)</string>
+    <string name="ui_version_2_0_desc">Desain paling populer. (Aplikasi, Pemutar, MiniPlayer)</string>
+    <string name="ui_version_custom_desc">Buat desain UI aplikasi Anda sendiri. (Aplikasi, Pemutar, MiniPlayer)</string>
+    <string name="custom_app_ui">Kustomisasi UI</string>
+
+    <string name="other_settings">Setelan lainnya</string>
+    <string name="other_settings_description">Klik untuk berbagai setelan lainnya</string>
+
+    <string name="audio_quality_auto_desc">Secara otomatis menyesuaikan kualitas antara 45 dan 512 Kbps</string>
+    <string name="audio_quality_max_desc">Menawarkan kualitas tertinggi hingga 512 Kbps</string>
+    <string name="audio_quality_high_desc">Menetapkan kualitas untuk kecepatan internet rata-rata antara 128 dan 256 Kbps.</string>
+    <string name="audio_quality_low_desc">Membatasi kualitas antara 45 dan 52 Kbps untuk menghemat data (Penghemat Data)</string>
+
+    <string name="could_not_import">Tidak dapat mengimpor</string>
+
+    <string name="text_alignment">Perataan Teks</string>
+    <string name="text_alignment_description">Atur posisi teks pada kartu</string>
+    <string name="gradient_intensity">Intensitas Gradien</string>
+    <string name="corner_round">Sudut Bulat</string>
+    <string name="profile_picture">Gambar Profil</string>
+    <string name="profile_card">Kartu Profil</string>
+    <string name="remove_profile_picture">Hapus Gambar Profil</string>
+    <string name="show_texts">Tampilkan Teks</string>
+    <string name="show_texts_description">Tampilkan teks sapaan dan nama pengguna pada kartu profil</string>
+    <string name="tap_to_change">Ketuk untuk mengubah</string>
+
+    <string name="translate">Terjemahkan (BETA)</string>
+    <string name="copy">Salin</string>
+
+    <string name="error_network_title">Kesalahan Jaringan</string>
+    <string name="error_network_description">Periksa koneksi internet Anda dan coba lagi.</string>
+    <string name="error_unsupported_format_title">Konten Tidak Didukung</string>
+    <string name="error_unsupported_format_description">Format lagu ini tidak didukung di perangkat Anda.</string>
+    <string name="error_behind_live_window_title">Kesalahan Siaran Langsung</string>
+    <string name="error_behind_live_window_description">Ada masalah dengan siaran langsung. Silakan mulai ulang.</string>
+    <string name="error_playback_failed_title">Pemutaran Gagal</string>
+    <string name="error_playback_failed_description">Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.</string>
+    <string name="recovering_playback">Mencoba lagi…</string>
+    <string name="vpn_info_message">Menggunakan VPN dapat memengaruhi kualitas koneksi Anda. Jika Anda mengalami masalah jaringan, putuskan koneksi VPN Anda atau gunakan proksi. Anda dapat mengonfigurasinya di “Setelan >> Konten >> Proksi.”</string>
+
     <string name="sync_local_songs_toast">Sinkronisasi lagu lokal berhasil</string>
     <string name="local_scanner_title">Pemindai lokal</string>
 
     <string name="auto_scanner_title">Pindai secara otomatis</string>
-    <string name="auto_scanner_description">Secara otomatis memindai lagu saat membuka aplikasi</string>
+    <string name="auto_scanner_description">Pindai lagu secara otomatis saat membuka aplikasi</string>
 
     <string name="scanner_settings_title">Setelan pemindai tambahan</string>
     <string name="scanner_strict_file_name_title">Nama file yang ketat</string>
-    <string name="scanner_strict_file_name_description">Saat diaktifkan, ekstensi TIDAK akan diabaikan. Contoh: "Song.ogg" akan menjadi lagu yang berbeda dari "Song.flac"</string>
+    <string name="scanner_strict_file_name_description">Saat diaktifkan, ekstensi TIDAK akan diabaikan. Cth. "Song.ogg" akan menjadi lagu yang berbeda dari "Song.flac"</string>
     <string name="scanner_sensitivity_title">Konfigurasi sensitivitas pemindai</string>
     <string name="scanner_sensitivity_L1">Cocokkan judul</string>
     <string name="scanner_sensitivity_L2">Cocokkan judul dan artis</string>
@@ -525,15 +594,15 @@
     <string name="tips_and_features">Tips &amp; Fitur</string>
     <string name="tips_and_fetures_description"> Tips · Fitur</string>
     <string name="create_your_story">Buat cerita Anda</string>
-    <string name="share_your_story_description">Bagikan lagu yang sedang Anda dengarkan di media sosial dengan desain gaya yang dibuat dengan warna dominan dari sampul album.</string>
+    <string name="share_your_story_description">Bagikan lagu yang sedang Anda dengarkan di media sosial dengan desain gaya yang dibuat dengan warna dominan sampul album.</string>
     <string name="customizable_settings">Setelan yang Dapat Disesuaikan</string>
-    <string name="customizable_settings_description">Jadikan aplikasi ini milik Anda dengan mengganti latar belakang kartu judul di layar setelan dengan gambar dari galeri Anda.</string>
+    <string name="customizable_settings_description">Jadikan aplikasi milik Anda dengan mengganti latar belakang kartu judul di layar setelan dengan gambar dari galeri Anda.</string>
     <string name="new_song_list">Daftar Lagu Baru</string>
     <string name="new_song_list_description">Lihat playlist Anda saat ini dan beralih antar lagu dengan mudah dengan menggeser ke atas dari layar pemutar (desain baru eksklusif untuk UI Pemutar 2.0)</string>
     <string name="remastered_settings">Desain Setelan yang Diperbarui</string>
     <string name="remastered_settings_description">Temukan apa yang Anda cari dengan mudah dengan desain setelan berbasis kartu baru yang lebih modern dan nyaman.</string>
     <string name="classic_music_widget">Widget Musik Klasik</string>
-    <string name="classic_music_widget_description">Akses cepat semua kontrol dan informasi lagu dari layar beranda Anda.</string>
+    <string name="classic_music_widget_description">Akses semua kontrol dan informasi lagu dengan cepat dari layar beranda Anda.</string>
     <string name="minimalist_music_widget">Widget Musik Minimalis</string>
     <string name="minimalist_music_widget_description">Widget musik “Quik” yang terinspirasi dari desain tombol Pengaturan Cepat Android 16</string>
     <string name="share_on_story">Bagikan di Story</string>
@@ -545,17 +614,15 @@
     <string name="fetching_all_playlists">Mengambil semua playlist…</string>
     <string name="import_selected_items">Impor Item yang Dipilih</string>
     <string name="something_went_wrong">Terjadi kesalahan. Kami sama bingungnya dengan Anda.</string>
-    <string name="well_thats_embarrassing">Yah, ini memalukan. Kami juga tidak tahu apa yang terjadi.</string>
-    <string name="instructions_to_get_required_credentials">Instruksi untuk mendapatkan kredensial yang diperlukan</string>
+    <string name="well_thats_embarrassing">Yah, itu memalukan. Kami juga tidak tahu apa yang terjadi.</string>
+    <string name="instructions_to_get_required_credentials">Petunjuk untuk mendapatkan kredensial yang diperlukan</string>
     <string name="make_sure_to_click">3. Pastikan untuk mengklik "Tambah" setelah Anda memasukkan path lokal di atas.</string>
     <string name="accept_the_terms_of_service">5. Terima persyaratan layanan dan klik "Simpan".</string>
-    <string name="you_ll_be_redirected_to_a_new_page">Anda akan diarahkan ke halaman baru. Klik Pengaturan, lalu salin Client ID dan Client Secret, dan tempelkan ke kolom teks di bawah di aplikasi ini.</string>
+    <string name="you_ll_be_redirected_to_a_new_page">Anda akan diarahkan ke halaman baru. Klik Pengaturan, lalu salin ID Klien dan Rahasia Klien, dan tempelkan ke kolom teks di bawah ini di aplikasi ini.</string>
     <string name="enter_the_necessary_details">2. Masukkan detail yang diperlukan dan gunakan http://127.0.0.1:45454 sebagai URI Pengalihan.</string>
-    <string name="toggle_wep_api">4. Aktifkan Web API. Kotak centang sekarang harus memiliki tanda centang.</string>
-    <string name="now_click_the_authorize_and_continue">Sekarang, klik tombol Otorisasi dan Lanjutkan di bawah dan login dengan akun Anda yang ingin Anda impor, dan Otorisasi dan Lanjutkan, yang akan mengarahkan Anda ke situs yang harus dimulai dari http://127.0.0.1:45454/?code=
-
-Tempelkan seluruh URL tersebut di kolom teks di bawah yang bertuliskan Kode Otorisasi dan klik tombol Otentikasi</string>
-    <string name="visit_spotify_for_developers">1. Kunjungi dasbor pengembang Spotify dan klik "Buat aplikasi". </string>
+    <string name="toggle_wep_api">4. Alihkan API Web. Kotak centang sekarang seharusnya memiliki tanda centang.</string>
+    <string name="now_click_the_authorize_and_continue">Sekarang, klik tombol Otorisasi dan Lanjutkan di bawah ini dan login dengan akun Anda yang ingin Anda impor, dan Otorisasi dan Lanjutkan, yang akan mengarahkan Anda ke situs yang seharusnya dimulai dari http://127.0.0.1:45454/?code=\n\nTempelkan seluruh URL tersebut di kolom teks di bawah yang bertuliskan Kode Otorisasi dan klik tombol Otentikasi</string>
+    <string name="visit_spotify_for_developers">1. Kunjungi dasbor pengembang Spotify dan klik "Buat aplikasi".</string>
     <string name="login_with_spotify">Login dengan Kredensial API Spotify</string>
     <string name="authorize_and_continue">Otorisasi dan Lanjutkan</string>
     <string name="authorization_code">Kode Otorisasi</string>
@@ -563,30 +630,9 @@ Tempelkan seluruh URL tersebut di kolom teks di bawah yang bertuliskan Kode Otor
     <string name="client_secret">Rahasia klien</string>
     <string name="client_id">ID Klien</string>
     <string name="import_in_progress">Impor sedang berlangsung…</string>
-    <string name="dont_close_app_message">Jangan tutup aplikasi atau kembali. Operasi ini tidak berjalan di latar belakang, jadi tetaplah di sini sampai selesai!
-JANGAN PANIK JIKA TERLIHAT MACET; terkadang pengambilan bisa memakan waktu.</string>
+    <string name="dont_close_app_message">Jangan tutup aplikasi atau kembali. Operasi ini tidak berjalan di latar belakang, jadi tetaplah di sini sampai selesai!\nJANGAN PANIK JIKA TERLIHAT MACET; terkadang pengambilan mungkin memakan waktu.</string>
     <string name="choose_liked_songs">Pilih Tujuan "Lagu yang Disukai"</string>
     <string name="where_should_the_liked_songs">Ke mana lagu yang disukai harus diimpor?</string>
     <string name="new_playlist_named">Playlist baru bernama "Lagu yang Disukai"</string>
     <string name="default_liked_songs">Di "Lagu yang Disukai" default</string>
-    <string name="show_less">Tampilkan Lebih Sedikit</string>
-    <string name="send_to_developer">Kirim ke Pengembang</string>
-    <string name="close">Tutup</string>
-    <string name="update_error_details">Tampilkan Rincian Kesalahan</string>
-    <string name="download_failed">Unduhan Gagal</string>
-    <string name="show_error">Tampilkan Kesalahan</string>
-    <string name="go_to_update_link">Pembaruan Manual</string>
-    <string name="home_card_update_desc">Periksa halaman pengaturan untuk detailnya.</string>
-    <string name="app_up_to_date">Perangkat Lunak Terbaru</string>
-    <string name="translate">Terjemahkan (BETA)</string>
-    <string name="copy">Salin</string>
-    <string name="error_network_title">Kesalahan Jaringan</string>
-    <string name="error_network_description">Periksa koneksi internet Anda dan coba lagi.</string>
-    <string name="error_unsupported_format_title">Konten yang tidak didukung</string>
-    <string name="error_unsupported_format_description">Format lagu ini tidak didukung di perangkat Anda.</string>
-    <string name="error_behind_live_window_title">Kesalahan Siaran Langsung</string>
-    <string name="error_behind_live_window_description">Ada masalah dengan siaran langsung. Silakan restart.</string>
-    <string name="error_playback_failed_title">Pemutaran Gagal</string>
-    <string name="error_playback_failed_description">Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.</string>
-    <string name="recovering_playback">Coba lagi…</string>
 </resources>

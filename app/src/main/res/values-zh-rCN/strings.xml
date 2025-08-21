@@ -1,25 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="welcome_to_loudly">欢迎来到 Loudly</string>
-    <string name="welcome_to_loudly_description">让我们开始个性化您的音乐体验。</string>
+    <string name="welcome_to_loudly">欢迎使用 Loudly</string>
+    <string name="welcome_to_loudly_description">让我们开始个性化您的音乐体验吧。</string>
     <string name="yt_music_fingertips">YouTube Music 触手可及</string>
-    <string name="ytm_account_sync">YT Music 账户同步</string>
+    <string name="ytm_account_sync">YT Music 账号同步</string>
     <string name="ad_free_playback">播放无广告</string>
     <string name="offline_music_experience">离线音乐体验</string>
     <string name="android_auto">支持 Android Auto</string>
     <string name="discord_support">支持 Discord 状态</string>
     <string name="fos_info">完全开源</string>
     <string name="select_player_ui">选择您的播放器界面</string>
-    <string name="select_player_ui_description">选择应用内播放器视图。您可以稍后在“设置 > 外观”中更改此设置。</string>
+    <string name="select_player_ui_description">选择应用内的播放器视图。您可以稍后在“设置 > 外观”中更改此设置。</string>
     <string name="setup_complete">设置完成！</string>
     <string name="setup_complete_description">您已准备好探索 Loudly。</string>
     <string name="finish">完成</string>
     <string name="back">返回</string>
     <string name="next">下一步</string>
+    <string name="previous">上一步</string>
 
-    <string name="previous">之前</string>
     <string name="home">主页</string>
-    <string name="explore">探索</string>
+    <string name="explore">发现</string>
     <string name="songs">歌曲</string>
     <string name="artists">艺术家</string>
     <string name="albums">专辑</string>
@@ -37,7 +38,7 @@
     <string name="all_time">所有时间</string>
     <string name="past_24_hours">过去 24 小时</string>
     <string name="past_week">过去一周</string>
-    <string name="past_month">过去一个月</string>
+    <string name="past_month">过去一月</string>
     <string name="past_year">过去一年</string>
 
     <plurals name="n_selected">
@@ -50,31 +51,33 @@
     <string name="good_night">晚安</string>
     <string name="recent_activity">最近活动</string>
     <string name="history">历史记录</string>
-    <string name="history_empty">您的历史记录将显示在此处</string>
-    <string name="stats_empty">您的统计数据将显示在此处</string>
+    <string name="history_empty">您的历史记录将显示在这里</string>
+    <string name="stats_empty">您的统计数据将显示在这里</string>
     <string name="stats">统计</string>
-    <string name="show_more">顯示更多</string>
+    <string name="show_less">显示更少</string>
+    <string name="show_more">显示更多</string>
     <string name="mood_and_genres">心情与流派</string>
-    <string name="account">账户</string>
-    <string name="quick_picks">快速精选</string>
-    <string name="quick_picks_empty">收听歌曲以生成您的快速精选</string>
+    <string name="account">账号</string>
+    <string name="quick_picks">快速选择</string>
+    <string name="quick_picks_empty">收听歌曲以生成您的快速选择</string>
     <string name="forgotten_favorites">被遗忘的收藏</string>
-    <string name="keep_listening">继续收听</string>
+    <string name="keep_listening">继续聆听</string>
     <string name="your_youtube_playlists">您的 YouTube 播放列表</string>
     <string name="similar_to">类似于</string>
-    <string name="new_release_albums">新发行专辑</string>
+    <string name="new_release_albums">新发行的专辑</string>
     <string name="not_internet">无网络连接</string>
     <string name="internet_required">您似乎没有网络连接。请检查您的网络。</string>
+    <string name="featured_for_you">为您精选</string>
+    <string name="recommended_for_you_today">今日为您推荐</string>
 
-    <string name="featured_for_you">為您精選</string>
     <string name="today">今天</string>
     <string name="yesterday">昨天</string>
     <string name="this_week">本周</string>
     <string name="last_week">上周</string>
     <string name="local_history">本地</string>
-    <string name="remote_history">远程</string>
+    <string name="remote_history">云端</string>
     <string name="history_queue_title_local">本地历史记录</string>
-    <string name="history_queue_title_online">远程历史记录</string>
+    <string name="history_queue_title_online">云端历史记录</string>
 
     <string name="most_played_songs">播放最多的歌曲</string>
     <string name="most_played_artists">播放最多的艺术家</string>
@@ -82,11 +85,11 @@
 
     <string name="search">搜索</string>
     <string name="search_yt_music">在 Loudly 中搜索</string>
-    <string name="search_library">搜索媒体库…</string>
+    <string name="search_library">搜索音乐库…</string>
     <string name="SearchHistory">搜索历史</string>
     <string name="Sujestions">建议</string>
     <string name="SearchResutls">搜索结果</string>
-    <string name="filter_library">媒体库</string>
+    <string name="filter_library">音乐库</string>
     <string name="filter_liked">已喜欢</string>
     <string name="filter_downloaded">已下载</string>
     <string name="filter_all">全部</string>
@@ -100,23 +103,25 @@
     <string name="filter_bookmarked">已收藏</string>
     <string name="no_results_found">未找到结果</string>
 
-    <string name="library_empty">媒体库将显示在此处</string>
-    <string name="library_song_empty">媒体库歌曲将显示在此处</string>
-    <string name="library_artist_empty">媒体库艺术家将显示在此处</string>
-    <string name="library_album_empty">媒体库专辑将显示在此处</string>
-    <string name="library_playlist_empty">您的播放列表将显示在此处</string>
+    <string name="library_empty">您的音乐库将显示在这里</string>
+    <string name="library_song_empty">音乐库中的歌曲将显示在这里</string>
+    <string name="library_artist_empty">音乐库中的艺术家将显示在这里</string>
+    <string name="library_album_empty">音乐库中的专辑将显示在这里</string>
+    <string name="library_playlist_empty">您的播放列表将显示在这里</string>
 
-    <string name="from_your_library">来自您的媒体库</string>
+    <string name="from_your_library">来自您的音乐库</string>
 
     <string name="other_versions">其他版本</string>
+    <string name="favorite">收藏</string>
+    <string name="top_songs">热门歌曲</string>
 
     <string name="liked_songs">喜欢的歌曲</string>
     <string name="downloaded_songs">已下载的歌曲</string>
-    <string name="playlist_is_empty">播放列表是空的</string>
-    <string name="remove_download_playlist_confirm">您真的要从已下载歌曲存储中删除播放列表“%s”的所有歌曲吗？</string>
+    <string name="playlist_is_empty">播放列表为空</string>
+    <string name="remove_download_playlist_confirm">您真的要从已下载歌曲存储中移除“%s”播放列表中的所有歌曲吗？</string>
     <string name="delete_playlist_confirm">您真的要删除播放列表“%s”吗？</string>
 
-    <string name="off">关闭</string>
+    <string name="off">禁用</string>
 
     <string name="retry">重试</string>
     <string name="radio">电台</string>
@@ -129,10 +134,10 @@
     <string name="play">播放</string>
     <string name="play_next">下一首播放</string>
     <string name="add_to_queue">添加到队列</string>
-    <string name="add_to_library">添加到媒体库</string>
-    <string name="add_all_to_library">全部添加到媒体库</string>
-    <string name="remove_from_library">从媒体库中移除</string>
-    <string name="remove_all_from_library">从媒体库中移除全部</string>
+    <string name="add_to_library">添加到音乐库</string>
+    <string name="add_all_to_library">全部添加到音乐库</string>
+    <string name="remove_from_library">从音乐库移除</string>
+    <string name="remove_all_from_library">全部从音乐库移除</string>
     <string name="download">下载</string>
     <string name="downloading">下载中</string>
     <string name="remove_download">移除下载</string>
@@ -151,7 +156,7 @@
     <string name="search_online">在线搜索</string>
     <string name="sync">同步</string>
     <string name="advanced">高级</string>
-    <string name="tempo_and_pitch">速度和音调</string>
+    <string name="tempo_and_pitch">速度和音高</string>
 
     <string name="sort_by_create_date">添加日期</string>
     <string name="sort_by_last_updated">更新日期</string>
@@ -161,7 +166,7 @@
     <string name="sort_by_song_count">歌曲数量</string>
     <string name="sort_by_length">时长</string>
     <string name="sort_by_play_time">播放时间</string>
-    <string name="sort_by_custom">自定义顺序</string>
+    <string name="sort_by_custom">自定义排序</string>
 
     <string name="media_id">媒体 ID</string>
     <string name="mime_type">MIME 类型</string>
@@ -176,7 +181,7 @@
 
     <string name="edit_lyrics">编辑歌词</string>
     <string name="search_lyrics">搜索歌词</string>
-    <string name="delete_lyric_confirm">您真的要删除为“%s”存储的歌词吗？</string>
+    <string name="delete_lyric_confirm">您真的要删除“%s”的已存歌词吗？</string>
 
     <string name="edit_song">编辑歌曲</string>
     <string name="song_title">歌曲标题</string>
@@ -199,8 +204,8 @@
     <string name="duplicates">重复项</string>
     <string name="skip_duplicates">跳过重复项</string>
     <string name="add_anyway">仍然添加</string>
-    <string name="duplicates_description_single">歌曲已在您的播放列表中</string>
-    <string name="duplicates_description_multiple">您的播放列表中已有 %d 首歌曲</string>
+    <string name="duplicates_description_single">这首歌曲已在您的播放列表中</string>
+    <string name="duplicates_description_multiple">您的播放列表中已有 %d 首重复歌曲</string>
     <string name="allows_for_sync_witch_youtube">注意：这允许与 YouTube Music 同步</string>
 
     <plurals name="n_song">
@@ -225,15 +230,15 @@
         <item quantity="other">%d 年</item>
     </plurals>
 
-    <string name="playlist_imported">播放列表已导入</string>
+    <string name="playlist_imported">已导入播放列表</string>
     <string name="removed_song_from_playlist">已从播放列表中移除“%s”</string>
-    <string name="playlist_synced">播放列表已同步</string>
+    <string name="playlist_synced">已同步播放列表</string>
     <string name="undo">撤销</string>
 
     <string name="now_playing">正在播放</string>
     <string name="lyrics_not_found">未找到歌词</string>
     <string name="sleep_timer">睡眠定时器</string>
-    <string name="end_of_song">歌曲结束</string>
+    <string name="end_of_song">歌曲结束时</string>
     <plurals name="minute">
         <item quantity="other">%d 分钟</item>
     </plurals>
@@ -251,9 +256,9 @@
     <string name="action_like_all">全部喜欢</string>
     <string name="action_remove_like">取消喜欢</string>
     <string name="action_remove_like_all">全部取消喜欢</string>
-    <string name="action_shuffle_on">随机播放开启</string>
-    <string name="action_shuffle_off">随机播放关闭</string>
-    <string name="repeat_mode_off">单曲循环关闭</string>
+    <string name="action_shuffle_on">随机播放已开启</string>
+    <string name="action_shuffle_off">随机播放已关闭</string>
+    <string name="repeat_mode_off">循环模式已关闭</string>
     <string name="repeat_mode_one">单曲循环</string>
     <string name="repeat_mode_all">列表循环</string>
 
@@ -263,8 +268,8 @@
     <string name="music_player">音乐播放器</string>
 
     <string name="notifications">通知</string>
-    <string name="keep_alive_title">防止系统终止应用</string>
-    <string name="keep_alive_description">使用前台通知来防止 Loudly 被系统随机关闭。</string>
+    <string name="keep_alive_title">防止应用被系统终止</string>
+    <string name="keep_alive_description">使用前台通知，防止 Loudly 被系统随机关闭。</string>
     <string name="notifications_settings">通知设置</string>
     <string name="notification_permission_is_required">需要通知权限</string>
 
@@ -285,8 +290,8 @@
     <string name="visit_the_loudly">访问 Loudly</string>
     <string name="artist">艺术家</string>
     <string name="listen_to_loudly">收听 Loudly</string>
-    <string name="enable_swipe_thumbnail">在缩略图上滑动以切换歌曲</string>
-    <string name="customize_navigation_tabs">自定义导航标签</string>
+    <string name="enable_swipe_thumbnail">启用滑动缩略图切换歌曲</string>
+    <string name="customize_navigation_tabs">自定义导航标签页</string>
     <string name="player">播放器</string>
     <string name="player_text_alignment">播放器文本对齐</string>
     <string name="lyrics_text_position">歌词文本位置</string>
@@ -307,7 +312,7 @@
     <string name="slider_style">滑块样式</string>
     <string name="default_">默认</string>
     <string name="squiggly">波浪形</string>
-    <string name="compose">Compose</string>
+    <string name="compose">组合</string>
     <string name="thumbnail_corner_radius">配置缩略图圆角半径</string>
     <string name="show_content_filter">显示内容筛选器</string>
     <string name="misc">杂项</string>
@@ -319,8 +324,8 @@
     <string name="show_cached_auto_playlist">显示“已缓存”自动播放列表</string>
     <string name="show_local_auto_playlist">显示“本地”自动播放列表</string>
     <string name="swipe_song_to_dismiss">向右滑动歌曲播放下一首，向左滑动添加到队列</string>
-    <string name="default_open_tab">默认打开标签页</string>
-    <string name="default_lib_chips">默认媒体库筛选标签</string>
+    <string name="default_open_tab">默认打开的标签页</string>
+    <string name="default_lib_chips">默认音乐库筛选</string>
     <string name="grid_cell_size">网格单元格大小</string>
     <string name="slim_navbar">显示底部导航栏标签</string>
     <string name="small">小</string>
@@ -337,14 +342,15 @@
     <string name="web_site_info">官方网站 ❯</string>
     <string name="code">源代码</string>
     <string name="code_text">访问应用的源代码</string>
-    <string name="bugs">问题</string>
-    <string name="bugs_text">错误报告及更多</string>
+    <string name="bugs">问题反馈</string>
+    <string name="bugs_text">报告 Bug 及其他</string>
     <string name="help">帮助</string>
     <string name="contribution_text">如果您想做出贡献，请点击此处 ❯</string>
     <string name="Developer">开发者 | @RRechz</string>
 
     <string name="content">内容</string>
     <string name="login">登录</string>
+    <string name="login_description">登录您的 YT Music 播放列表等</string>
     <string name="token_hidden">点击以显示令牌</string>
     <string name="token_shown">再次点击以复制或编辑</string>
     <string name="token_adv_login_description">这是一种高级登录方法。作为 Web 门户的替代方案，您可以直接在此处输入或更新您的登录令牌。例如，这可以加快在多个设备上的登录速度。请注意，应用无法解析的任何无效令牌格式都将不被接受。</string>
@@ -352,16 +358,17 @@
     <string name="title_spotify">Spotify</string>
     <string name="title_discord">Discord</string>
     <string name="like_autodownload">自动下载您喜欢的歌曲</string>
-    <string name="ytm_sync">与您的 YouTube Music 账户自动同步</string>
-    <string name="wifi_only">仅限 Wi-Fi</string>
+    <string name="ytm_sync">与您的 YouTube Music 账号自动同步</string>
+    <string name="ytm_sync_description">将您的播放列表等与您的账号同步</string>
+    <string name="wifi_only">仅 Wi-Fi</string>
     <string name="not_logged_in">未登录</string>
     <string name="content_language">默认内容语言</string>
-    <string name="content_country">默认内容国家/地区</string>
-    <string name="system_default">跟随系统</string>
+    <string name="content_country">默认内容国家</string>
+    <string name="system_default">系统默认</string>
     <string name="enable_proxy">启用代理</string>
     <string name="proxy_type">代理类型</string>
     <string name="proxy_url">代理 URL</string>
-    <string name="restart_to_take_effect">重启以生效</string>
+    <string name="restart_to_take_effect">重启后生效</string>
     <string name="app_language">应用语言</string>
     <string name="configure_app_language">配置应用语言</string>
     <string name="intent_app_language_not_found">找不到应用语言设置，请手动配置</string>
@@ -369,25 +376,25 @@
     <string name="configure_supported_links">配置支持的链接</string>
     <string name="intent_supported_links_not_found">找不到支持的链接设置，请手动配置</string>
 
-    <string name="player_and_audio">播放器和音频</string>
-    <string name="audio_quality">音频质量</string>
+    <string name="player_and_audio">播放器与音频</string>
+    <string name="audio_quality">音质</string>
     <string name="audio_quality_max">最高</string>
     <string name="audio_quality_auto">自动</string>
     <string name="audio_quality_high">高</string>
     <string name="audio_quality_low">低</string>
-    <string name="minimum_playback_duration">最小播放时长</string>
-    <string name="minimum_playback_duration_info">歌曲必须播放的最短时间，之后才被视为“已播放”</string>
+    <string name="minimum_playback_duration">最短播放时长</string>
+    <string name="minimum_playback_duration_info">一首歌曲必须播放的最短时间，才会被计为“已播放”</string>
     <string name="queue">队列</string>
     <string name="persistent_queue">持久队列</string>
     <string name="persistent_queue_desc">应用启动时恢复您上次的队列</string>
     <string name="auto_load_more">自动加载更多歌曲</string>
     <string name="auto_load_more_desc">当到达队列末尾时，如果可能，自动添加更多歌曲</string>
     <string name="skip_silence">跳过静音</string>
-    <string name="audio_normalization">音频标准化</string>
-    <string name="play_song_when_bluetooth_device_connected">蓝牙设备连接时继续播放</string>
-    <string name="stop_playing_when_song_sound_minimum_volume">歌曲音量最小时停止播放</string>
-    <string name="adding_played_songs_to_ytm_history">将播放过的歌曲添加到 YouTube Music 历史记录</string>
-    <string name="auto_skip_next_on_error">出错时自动跳到下一首歌曲</string>
+    <string name="audio_normalization">音量标准化</string>
+    <string name="play_song_when_bluetooth_device_connected">连接蓝牙设备时继续播放</string>
+    <string name="stop_playing_when_song_sound_minimum_volume">当音量最小时停止播放</string>
+    <string name="adding_played_songs_to_ytm_history">将播放的歌曲添加到 YouTube Music 历史记录</string>
+    <string name="auto_skip_next_on_error">发生错误时自动跳到下一首</string>
     <string name="auto_skip_next_on_error_desc">确保您的连续播放体验</string>
     <string name="stop_music_on_task_clear">清除任务时停止音乐</string>
     <string name="equalizer">均衡器</string>
@@ -400,8 +407,8 @@
     <string name="song_cache">歌曲缓存</string>
     <string name="max_cache_size">最大缓存大小</string>
     <string name="unlimited">无限制</string>
-    <string name="audio_offload">启用音频分流</string>
-    <string name="audio_offload_description">使用音频分流路径进行音频播放。禁用此功能可能会增加功耗，但如果您在音频播放或后处理方面遇到问题，则可能很有用</string>
+    <string name="audio_offload">启用音频硬件加速</string>
+    <string name="audio_offload_description">使用硬件加速音频路径进行播放。禁用此选项可能会增加功耗，但如果您在音频播放或后处理方面遇到问题，可能会有所帮助。</string>
     <string name="clear_all_downloads">清除所有下载</string>
     <string name="max_image_cache_size">最大图片缓存大小</string>
     <string name="clear_image_cache">清除图片缓存</string>
@@ -424,12 +431,12 @@
     <string name="clear_search_history_confirm">您确定要清除所有搜索历史吗？</string>
     <string name="search_history">搜索历史</string>
     <string name="use_login_for_browse">使用登录信息浏览内容</string>
-    <string name="use_login_for_browse_desc">这可能会影响您看到的内容，例如，如果您使用高级账户登录，则会显示仅限高级会员的专辑</string>
-    <string name="disable_screenshot">禁用屏幕截图</string>
-    <string name="disable_screenshot_desc">开启此选项后，屏幕截图和应用在最近任务中的视图将被禁用。</string>
-    <string name="enable_lrclib">启用 LrcLib 歌词提供商</string>
-    <string name="enable_kugou">启用酷狗歌词提供商</string>
-    <string name="default_lyrics_provider">默认歌词提供商</string>
+    <string name="use_login_for_browse_desc">这可能会影响您看到的内容，例如，如果您使用高级帐户登录，则会显示仅限高级会员的专辑。</string>
+    <string name="disable_screenshot">禁止截图</string>
+    <string name="disable_screenshot_desc">开启此选项后，将禁用截图和最近任务中的应用预览。</string>
+    <string name="enable_lrclib">启用 LrcLib 歌词源</string>
+    <string name="enable_kugou">启用酷狗歌词源</string>
+    <string name="default_lyrics_provider">默认歌词源</string>
     <string name="lyrics_multiline_title">读取多行歌词</string>
     <string name="lyrics_multiline_description">将同步点之间的所有行视为一个歌词文本</string>
     <string name="lyrics_trim_title">移除歌词周围的空格</string>
@@ -437,30 +444,30 @@
     <string name="hide_explicit">隐藏露骨内容</string>
     <string name="enable_notifications">启用通知</string>
 
-    <string name="backup_restore">备份和恢复</string>
+    <string name="backup_restore">备份与恢复</string>
     <string name="backup">备份</string>
     <string name="restore">恢复</string>
     <string name="import_m3u">导入播放列表 (m3u)</string>
     <string name="m3u_import_failed">导入播放列表失败</string>
     <string name="imported_playlist">已导入的播放列表</string>
-    <string name="backup_create_success">备份成功创建</string>
+    <string name="backup_create_success">备份创建成功</string>
     <string name="backup_create_failed">无法创建备份</string>
     <string name="restore_failed">恢复备份失败</string>
 
     <string name="discord_integration">Discord 集成</string>
-    <string name="discord_information">Loudly 使用 KizzyRPC 库来设置您的 Discord 账户状态。这涉及到使用 Discord 网关连接，可能被视为违反 Discord 的服务条款。然而，目前还没有用户账户因此被暂停的已知案例。请自行承担风险。\n\nLoudly 只会提取您的令牌，其他所有内容都存储在本地。</string>
+    <string name="discord_information">Loudly 使用 KizzyRPC 库来设置您的 Discord 账号状态。这涉及到使用 Discord 网关连接，可能被视为违反 Discord 的服务条款。但是，目前没有已知用户账号因此被暂停的案例。请自行承担风险。\n\nLoudly 只会提取您的令牌，其他所有内容都存储在本地。</string>
     <string name="dismiss">忽略</string>
     <string name="options">选项</string>
     <string name="preview">预览</string>
     <string name="login_failed">登录失败</string>
     <string name="logout">登出</string>
-    <string name="enable_discord_rpc">启用丰富状态</string>
+    <string name="enable_discord_rpc">启用 Rich Presence</string>
 
     <string name="about">关于</string>
     <string name="app_version">应用版本</string>
-    <string name="checking_for_update">正在检查更新...</string>
+    <string name="checking_for_update">正在检查更新…</string>
     <string name="update_card_version_ready_to_download">版本 %1$s 可供下载。</string>
-    <string name="update_card_downloading">下载中... %1$d%%</string>
+    <string name="update_card_downloading">下载中…</string>
     <string name="install">升级</string>
     <string name="try_again">重试</string>
     <string name="download_now">立即下载</string>
@@ -478,32 +485,84 @@
     <string name="play_pause">播放/暂停</string>
     <string name="about_subtitle">版本 · 开发者 · 许可证</string>
     <string name="category_interface">界面</string>
-    <string name="category_content">内容与账户</string>
+    <string name="category_content">内容与账号</string>
     <string name="category_player">播放器</string>
     <string name="category_system">系统</string>
-    <string name="library">媒体库</string>
+    <string name="library">音乐库</string>
     <string name="integrations">集成</string>
     <string name="system_integration">系统集成</string>
-    <string name="total_used_space">总占用空间</string>
+    <string name="total_used_space">总使用空间</string>
     <string name="currently_used">当前已用</string>
     <string name="clear_cache">清除缓存</string>
     <string name="backup_restore_description">备份 · 恢复 · 导入</string>
-    <string name="privacy_description">历史 · 搜索 · 截图</string>
+    <string name="privacy_description">历史记录 · 搜索 · 截图</string>
     <string name="storage_description">下载 · 缓存 · 图片</string>
     <string name="player_and_audio_description">声音 · 队列 · 歌词</string>
-    <string name="content_description">语言 · 地点 · 代理</string>
+    <string name="content_description">语言 · 位置 · 代理</string>
     <string name="account_description">登录 · Spotify · Discord</string>
     <string name="appearance_description">主题 · 滑块 · 播放器</string>
 
     <string name="header_background">个人资料卡片图片</string>
     <string name="header_background_description">自定义个人资料卡片上的图片</string>
     <string name="select_header_image">选择个人资料图片</string>
-    <string name="predefined_images">预制图片</string>
+    <string name="predefined_images">预设图片</string>
     <string name="select_from_gallery">从相册选择</string>
     <string name="edit_photo">编辑照片</string>
     <string name="cancel">取消</string>
 
-    <string name="vpn_info_message">使用 VPN 可能會影響您的連線品質。如果您遇到網路問題，請中斷 VPN 連線或使用代理。您可以在 「設定 >> 內容 >> 代理」 中進行設定。</string>
+    <string name="send_to_developer">发送给开发者</string>
+    <string name="close">关闭</string>
+    <string name="update_error_details">显示错误详情</string>
+    <string name="download_failed">下载失败</string>
+    <string name="show_error">显示错误</string>
+    <string name="go_to_update_link">手动更新</string>
+    <string name="home_card_update_desc">详情请查看设置页面</string>
+    <string name="app_up_to_date">软件已是最新版本</string>
+
+    <string name="app_ui">应用界面</string>
+    <string name="app_ui_desc">从 3 种不同的设计中选择一种</string>
+    <string name="ui_version_selection">界面版本选择</string>
+    <string name="ui_version_1_0_desc">应用的旧版本设计。（应用、播放器、迷你播放器）</string>
+    <string name="ui_version_1_5_desc">以更现代的方式创建的紧凑设计。（应用、播放器、迷你播放器）</string>
+    <string name="ui_version_2_0_desc">最流行的设计。（应用、播放器、迷你播放器）</string>
+    <string name="ui_version_custom_desc">创建您自己的应用界面设计。（应用、播放器、迷你播放器）</string>
+    <string name="custom_app_ui">自定义界面</string>
+
+    <string name="other_settings">其他设置</string>
+    <string name="other_settings_description">点击查看其他各种设置</string>
+
+    <string name="audio_quality_auto_desc">自动在 45 至 512 Kbps 之间调整质量</string>
+    <string name="audio_quality_max_desc">提供最高 512 Kbps 的质量</string>
+    <string name="audio_quality_high_desc">为平均网速设置 128 至 256 Kbps 的质量。</string>
+    <string name="audio_quality_low_desc">将质量限制在 45 至 52 Kbps 之间以节省数据（数据节省程序）</string>
+
+    <string name="could_not_import">无法导入</string>
+
+    <string name="text_alignment">文本对齐</string>
+    <string name="text_alignment_description">设置卡片上文本的位置</string>
+    <string name="gradient_intensity">渐变强度</string>
+    <string name="corner_round">圆角</string>
+    <string name="profile_picture">个人资料图片</string>
+    <string name="profile_card">个人资料卡片</string>
+    <string name="remove_profile_picture">移除个人资料图片</string>
+    <string name="show_texts">显示文本</string>
+    <string name="show_texts_description">在个人资料卡片上显示问候语和用户名的文本</string>
+    <string name="tap_to_change">点击以更改</string>
+
+    <string name="translate">翻译 (BETA)</string>
+    <string name="copy">复制</string>
+
+    <string name="error_network_title">网络错误</string>
+    <string name="error_network_description">请检查您的网络连接并重试。</string>
+    <string name="error_unsupported_format_title">不支持的内容</string>
+    <string name="error_unsupported_format_description">您的设备不支持此歌曲格式。</string>
+    <string name="error_behind_live_window_title">直播错误</string>
+    <string name="error_behind_live_window_description">直播流出现问题。请重新启动。</string>
+    <string name="error_playback_failed_title">播放失败</string>
+    <string name="error_playback_failed_description">发生未知错误。请重试。</string>
+    <string name="recovering_playback">正在重试…</string>
+    <string name="vpn_info_message">使用 VPN 可能会影响您的连接质量。如果您遇到网络问题，请断开 VPN 连接或使用代理。您可以在“设置 >> 内容 >> 代理”中进行配置。</string>
+
     <string name="sync_local_songs_toast">本地歌曲同步成功</string>
     <string name="local_scanner_title">本地扫描器</string>
 
@@ -511,32 +570,32 @@
     <string name="auto_scanner_description">打开应用时自动扫描歌曲</string>
 
     <string name="scanner_settings_title">附加扫描器设置</string>
-    <string name="scanner_strict_file_name_title">严格的文件名</string>
-    <string name="scanner_strict_file_name_description">启用后，扩展名将不会被忽略。例如，“Song.ogg”将与“Song.flac”是不同的歌曲</string>
+    <string name="scanner_strict_file_name_title">严格文件名</string>
+    <string name="scanner_strict_file_name_description">启用后，扩展名将不会被忽略。例如，“Song.ogg”将与“Song.flac”是不同的歌曲。</string>
     <string name="scanner_sensitivity_title">配置扫描器灵敏度</string>
     <string name="scanner_sensitivity_L1">匹配标题</string>
     <string name="scanner_sensitivity_L2">匹配标题和艺术家</string>
     <string name="scanner_sensitivity_L3">匹配标题、艺术家、专辑</string>
 
     <string name="folders_settings_title">文件夹</string>
-    <string name="flat_subfolders_title">平展子文件夹</string>
+    <string name="flat_subfolders_title">平铺子文件夹</string>
     <string name="flat_subfolders_description">禁用以保留磁盘上的文件结构</string>
 
-    <string name="tips_and_features">提示与功能</string>
-    <string name="tips_and_fetures_description"> 提示 · 功能</string>
+    <string name="tips_and_features">贴士与功能</string>
+    <string name="tips_and_fetures_description"> 贴士 · 功能</string>
     <string name="create_your_story">创建您的故事</string>
-    <string name="share_your_story_description">用专辑封面主色调创建的时尚设计，在社交媒体上分享您正在听的歌曲。</string>
+    <string name="share_your_story_description">用专辑封面的主色调创建时尚的设计，将您正在听的歌曲分享到社交媒体。</string>
     <string name="customizable_settings">可自定义的设置</string>
-    <string name="customizable_settings_description">通过将设置屏幕上标题卡的背景替换为您相册中的图片，使应用成为您自己的。</string>
+    <string name="customizable_settings_description">通过将设置屏幕上标题卡的背景替换为您相册中的图片，让应用成为您自己的。</string>
     <string name="new_song_list">新歌曲列表</string>
-    <string name="new_song_list_description">通过从播放器屏幕向上滑动查看您当前的播放列表并轻松在歌曲之间切换（播放器界面 2.0 专属新设计）</string>
+    <string name="new_song_list_description">查看您当前的播放列表，并通过从播放器屏幕向上滑动轻松切换歌曲（Player UI 2.0 独有的新设计）。</string>
     <string name="remastered_settings">重制设置设计</string>
-    <string name="remastered_settings_description">通过新的基于卡片的设置设计，轻松找到您要找的东西，更现代、更方便。</string>
-    <string name="classic_music_widget">经典音乐小部件</string>
+    <string name="remastered_settings_description">通过新的基于卡片的设置设计，更现代、更方便地轻松找到您想要的内容。</string>
+    <string name="classic_music_widget">经典音乐小组件</string>
     <string name="classic_music_widget_description">从您的主屏幕快速访问所有控件和歌曲信息。</string>
-    <string name="minimalist_music_widget">极简音乐小部件</string>
-    <string name="minimalist_music_widget_description">“Quik”音乐小部件，灵感来自 Android 16 的快速设置按钮设计</string>
-    <string name="share_on_story">分享到快拍</string>
+    <string name="minimalist_music_widget">极简音乐小组件</string>
+    <string name="minimalist_music_widget_description">灵感来自 Android 16 快速设置按钮设计的“Quik”音乐小组件。</string>
+    <string name="share_on_story">分享到故事</string>
     <string name="copy_song_link">复制歌曲链接</string>
     <string name="link_copied">链接已复制到剪贴板！</string>
     <string name="streamed_on_loudly">在 Loudly 上播放</string>
@@ -545,48 +604,25 @@
     <string name="fetching_all_playlists">正在获取所有播放列表…</string>
     <string name="import_selected_items">导入所选项目</string>
     <string name="something_went_wrong">出了点问题。我们和您一样困惑。</string>
-    <string name="well_thats_embarrassing">好吧，这很尴尬。我们也不知道发生了什么。</string>
-    <string name="instructions_to_get_required_credentials">获取所需凭据的说明</string>
+    <string name="well_thats_embarrassing">嗯，这很尴尬。我们也不知道发生了什么。</string>
+    <string name="instructions_to_get_required_credentials">获取所需凭证的说明</string>
     <string name="make_sure_to_click">3. 确保在输入上述本地路径后点击“添加”。</string>
     <string name="accept_the_terms_of_service">5. 接受服务条款并点击“保存”。</string>
-    <string name="you_ll_be_redirected_to_a_new_page">您将被重定向到一个新页面。点击“设置”，然后复制客户端 ID 和客户端密钥，并将它们粘贴到此应用下方的文本字段中。</string>
+    <string name="you_ll_be_redirected_to_a_new_page">您将被重定向到一个新页面。点击“设置”，然后复制客户端 ID 和客户端密钥，并将其粘贴到此应用下方的文本字段中。</string>
     <string name="enter_the_necessary_details">2. 输入必要的详细信息，并使用 http://127.0.0.1:45454 作为重定向 URI。</string>
     <string name="toggle_wep_api">4. 切换 Web API。复选框现在应该有一个勾号。</string>
-    <string name="now_click_the_authorize_and_continue">现在，点击下方的“授权并继续”按钮，并使用您要从中导入的账户登录，然后授权并继续，这将把您重定向到一个以 http://127.0.0.1:45454/?code= 开头的网站
-
-将该完整 URL 粘贴到下方显示“授权码”的文本字段中，然后点击“验证”按钮</string>
-    <string name="visit_spotify_for_developers">1. 访问 Spotify 开发者面板并点击“创建应用”。 </string>
-    <string name="login_with_spotify">使用 Spotify API 凭据登录</string>
+    <string name="now_click_the_authorize_and_continue">现在，点击下方的“授权并继续”按钮，并使用您要从中导入的帐户登录，然后授权并继续，这将把您重定向到一个以 http://127.0.0.1:45454/?code= 开头的网站。\n\n将整个 URL 粘贴到下方名为“授权码”的文本字段中，然后点击“验证”按钮。</string>
+    <string name="visit_spotify_for_developers">1. 访问 Spotify 开发者仪表板，然后点击“创建应用”。</string>
+    <string name="login_with_spotify">使用 Spotify API 凭证登录</string>
     <string name="authorize_and_continue">授权并继续</string>
     <string name="authorization_code">授权码</string>
     <string name="authenticate">验证</string>
     <string name="client_secret">客户端密钥</string>
     <string name="client_id">客户端 ID</string>
     <string name="import_in_progress">正在导入…</string>
-    <string name="dont_close_app_message">不要关闭应用或返回。此操作不会在后台运行，所以请在此停留直到完成！
-如果看起来卡住了，不要惊慌；有时检索可能需要一些时间。</string>
+    <string name="dont_close_app_message">请不要关闭应用或返回。此操作不会在后台运行，请等待其完成！\n如果看起来卡住了，请不要惊慌；有时检索可能需要一些时间。</string>
     <string name="choose_liked_songs">选择“喜欢的歌曲”目的地</string>
     <string name="where_should_the_liked_songs">喜欢的歌曲应该导入到哪里？</string>
     <string name="new_playlist_named">一个名为“喜欢的歌曲”的新播放列表</string>
     <string name="default_liked_songs">在默认的“喜欢的歌曲”中</string>
-    <string name="show_less">顯示更少</string>
-    <string name="send_to_developer">傳送至開發人員</string>
-    <string name="close">關閉</string>
-    <string name="update_error_details">顯示錯誤詳細資訊</string>
-    <string name="download_failed">下載失敗</string>
-    <string name="show_error">顯示錯誤</string>
-    <string name="go_to_update_link">Manuel 更新</string>
-    <string name="home_card_update_desc">檢查設定頁面的詳細資訊</string>
-    <string name="app_up_to_date">軟體更新</string>
-    <string name="translate">翻譯 (BETA)</string>
-    <string name="copy">複製</string>
-    <string name="error_network_title">網路錯誤</string>
-    <string name="error_network_description">檢查您的網際網路連線，然後再試一次。</string>
-    <string name="error_unsupported_format_title">不支援的內容</string>
-    <string name="error_unsupported_format_description">您的裝置不支援此歌曲格式。</string>
-    <string name="error_behind_live_window_title">現場廣播錯誤</string>
-    <string name="error_behind_live_window_description">即時串流出現問題。請重新啟動。</string>
-    <string name="error_playback_failed_title">播放失敗</string>
-    <string name="error_playback_failed_description">發生未知錯誤。請再試一次。</string>
-    <string name="recovering_playback">再試一次...</string>
 </resources>

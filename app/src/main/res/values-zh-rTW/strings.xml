@@ -1,23 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="welcome_to_loudly">歡迎使用 Loudly</string>
-    <string name="welcome_to_loudly_description">讓我們開始個人化您的音樂體驗。</string>
-    <string name="yt_music_fingertips">YouTube Music 隨手可得</string>
-    <string name="ytm_account_sync">同步 YT Music 帳戶</string>
-    <string name="ad_free_playback">播放時無廣告</string>
+    <string name="welcome_to_loudly_description">讓我們開始打造個人化的音樂體驗。</string>
+    <string name="yt_music_fingertips">YouTube Music 觸手可及</string>
+    <string name="ytm_account_sync">同步 YT Music 帳號</string>
+    <string name="ad_free_playback">無廣告播放</string>
     <string name="offline_music_experience">離線音樂體驗</string>
     <string name="android_auto">支援 Android Auto</string>
     <string name="discord_support">支援 Discord 狀態</string>
     <string name="fos_info">完全開放原始碼</string>
-    <string name="select_player_ui">選取您的播放器介面</string>
-    <string name="select_player_ui_description">選取應用程式內的播放器畫面。您可以稍後在「設定 > 外觀」中變更此設定。</string>
+    <string name="select_player_ui">選擇您的播放器介面</string>
+    <string name="select_player_ui_description">選擇應用程式內的播放器畫面。您可以稍後在「設定 > 外觀」中變更此設定。</string>
     <string name="setup_complete">設定完成！</string>
     <string name="setup_complete_description">您已準備好探索 Loudly。</string>
     <string name="finish">完成</string>
     <string name="back">返回</string>
     <string name="next">下一步</string>
+    <string name="previous">上一步</string>
 
-    <string name="home">首頁</string>
+    <string name="home">主畫面</string>
     <string name="explore">探索</string>
     <string name="songs">歌曲</string>
     <string name="artists">演出者</string>
@@ -47,15 +49,17 @@
     <string name="good_afternoon">午安</string>
     <string name="good_evening">晚安</string>
     <string name="good_night">晚安</string>
-    <string name="recent_activity">最近活動</string>
+    <string name="recent_activity">最近的活動</string>
     <string name="history">歷史記錄</string>
-    <string name="history_empty">您的歷史記錄將會顯示在此</string>
-    <string name="stats_empty">您的統計資料將會顯示在此</string>
+    <string name="history_empty">您的歷史記錄將會顯示在此處</string>
+    <string name="stats_empty">您的統計資料將會顯示在此處</string>
     <string name="stats">統計資料</string>
+    <string name="show_less">顯示較少</string>
+    <string name="show_more">顯示更多</string>
     <string name="mood_and_genres">心情與類型</string>
-    <string name="account">帳戶</string>
+    <string name="account">帳號</string>
     <string name="quick_picks">快速選取</string>
-    <string name="quick_picks_empty">聆聽歌曲以產生您的快速選取項目</string>
+    <string name="quick_picks_empty">聆聽歌曲以產生您的快速選取</string>
     <string name="forgotten_favorites">遺忘的摯愛</string>
     <string name="keep_listening">繼續聆聽</string>
     <string name="your_youtube_playlists">您的 YouTube 播放清單</string>
@@ -63,15 +67,17 @@
     <string name="new_release_albums">新發行專輯</string>
     <string name="not_internet">沒有網際網路連線</string>
     <string name="internet_required">您似乎沒有網際網路連線。請檢查您的網路設定。</string>
+    <string name="featured_for_you">為您精選</string>
+    <string name="recommended_for_you_today">今日為您推薦</string>
 
     <string name="today">今天</string>
     <string name="yesterday">昨天</string>
     <string name="this_week">本週</string>
     <string name="last_week">上週</string>
     <string name="local_history">本機</string>
-    <string name="remote_history">遠端</string>
+    <string name="remote_history">雲端</string>
     <string name="history_queue_title_local">本機歷史記錄</string>
-    <string name="history_queue_title_online">遠端歷史記錄</string>
+    <string name="history_queue_title_online">雲端歷史記錄</string>
 
     <string name="most_played_songs">最常播放的歌曲</string>
     <string name="most_played_artists">最常播放的演出者</string>
@@ -80,7 +86,7 @@
     <string name="search">搜尋</string>
     <string name="search_yt_music">在 Loudly 中搜尋</string>
     <string name="search_library">搜尋媒體庫…</string>
-    <string name="SearchHistory">搜尋歷史</string>
+    <string name="SearchHistory">搜尋記錄</string>
     <string name="Sujestions">建議</string>
     <string name="SearchResutls">搜尋結果</string>
     <string name="filter_library">媒體庫</string>
@@ -97,23 +103,25 @@
     <string name="filter_bookmarked">已加入書籤</string>
     <string name="no_results_found">找不到結果</string>
 
-    <string name="library_empty">媒體庫將會顯示在此</string>
-    <string name="library_song_empty">媒體庫中的歌曲將會顯示在此</string>
-    <string name="library_artist_empty">媒體庫中的演出者將會顯示在此</string>
-    <string name="library_album_empty">媒體庫中的專輯將會顯示在此</string>
-    <string name="library_playlist_empty">您的播放清單將會顯示在此</string>
+    <string name="library_empty">您的媒體庫將會顯示在此處</string>
+    <string name="library_song_empty">媒體庫中的歌曲將會顯示在此處</string>
+    <string name="library_artist_empty">媒體庫中的演出者將會顯示在此處</string>
+    <string name="library_album_empty">媒體庫中的專輯將會顯示在此處</string>
+    <string name="library_playlist_empty">您的播放清單將會顯示在此處</string>
 
     <string name="from_your_library">來自您的媒體庫</string>
 
     <string name="other_versions">其他版本</string>
+    <string name="favorite">最愛</string>
+    <string name="top_songs">熱門歌曲</string>
 
     <string name="liked_songs">喜歡的歌曲</string>
     <string name="downloaded_songs">已下載的歌曲</string>
-    <string name="playlist_is_empty">此播放清單是空的</string>
-    <string name="remove_download_playlist_confirm">您確定要從已下載的歌曲儲存空間中移除播放清單「%s」的所有歌曲嗎？</string>
-    <string name="delete_playlist_confirm">您確定要刪除播放清單「%s」嗎？</string>
+    <string name="playlist_is_empty">播放清單是空的</string>
+    <string name="remove_download_playlist_confirm">您確定要從已下載歌曲儲存空間中移除「%s」播放清單中的所有歌曲嗎？</string>
+    <string name="delete_playlist_confirm">您確定要刪除「%s」播放清單嗎？</string>
 
-    <string name="off">關閉</string>
+    <string name="off">停用</string>
 
     <string name="retry">重試</string>
     <string name="radio">電台</string>
@@ -137,7 +145,7 @@
     <string name="add_to_playlist">新增至播放清單</string>
     <string name="view_artist">檢視演出者</string>
     <string name="view_album">檢視專輯</string>
-    <string name="refetch">重新擷取</string>
+    <string name="refetch">重新整理</string>
     <string name="share">分享</string>
     <string name="delete">刪除</string>
     <string name="remove_from_history">從歷史記錄中移除</string>
@@ -173,7 +181,7 @@
 
     <string name="edit_lyrics">編輯歌詞</string>
     <string name="search_lyrics">搜尋歌詞</string>
-    <string name="delete_lyric_confirm">您確定要刪除為「%s」儲存的歌詞嗎？</string>
+    <string name="delete_lyric_confirm">您確定要刪除「%s」的已儲存歌詞嗎？</string>
 
     <string name="edit_song">編輯歌曲</string>
     <string name="song_title">歌曲標題</string>
@@ -194,11 +202,11 @@
     <string name="error_artist_name_empty">演出者名稱不能為空。</string>
 
     <string name="duplicates">重複項目</string>
-    <string name="skip_duplicates">略過重複項目</string>
+    <string name="skip_duplicates">跳過重複項目</string>
     <string name="add_anyway">仍要新增</string>
-    <string name="duplicates_description_single">歌曲已在您的播放清單中</string>
-    <string name="duplicates_description_multiple">您的播放清單中已有 %d 首歌曲</string>
-    <string name="allows_for_sync_witch_youtube">注意：此選項允許與 YouTube Music 同步</string>
+    <string name="duplicates_description_single">這首歌曲已在您的播放清單中</string>
+    <string name="duplicates_description_multiple">您的播放清單中已有 %d 首重複歌曲</string>
+    <string name="allows_for_sync_witch_youtube">注意：這允許與 YouTube Music 同步</string>
 
     <plurals name="n_song">
         <item quantity="other">%d 首歌曲</item>
@@ -222,15 +230,15 @@
         <item quantity="other">%d 年</item>
     </plurals>
 
-    <string name="playlist_imported">播放清單已匯入</string>
+    <string name="playlist_imported">已匯入播放清單</string>
     <string name="removed_song_from_playlist">已從播放清單中移除「%s」</string>
-    <string name="playlist_synced">播放清單已同步</string>
+    <string name="playlist_synced">已同步播放清單</string>
     <string name="undo">復原</string>
 
     <string name="now_playing">正在播放</string>
     <string name="lyrics_not_found">找不到歌詞</string>
     <string name="sleep_timer">睡眠計時器</string>
-    <string name="end_of_song">歌曲結束</string>
+    <string name="end_of_song">歌曲結束時</string>
     <plurals name="minute">
         <item quantity="other">%d 分鐘</item>
     </plurals>
@@ -241,8 +249,8 @@
     <string name="menu">選單</string>
     <string name="share_list">分享清單</string>
 
-    <string name="seek_backward">後退 5 秒</string>
-    <string name="seek_forward">前進 5 秒</string>
+    <string name="seek_backward">倒退 5 秒</string>
+    <string name="seek_forward">快轉 5 秒</string>
 
     <string name="action_like">喜歡</string>
     <string name="action_like_all">全部喜歡</string>
@@ -250,7 +258,7 @@
     <string name="action_remove_like_all">全部取消喜歡</string>
     <string name="action_shuffle_on">隨機播放已開啟</string>
     <string name="action_shuffle_off">隨機播放已關閉</string>
-    <string name="repeat_mode_off">關閉重複播放</string>
+    <string name="repeat_mode_off">重複播放模式已關閉</string>
     <string name="repeat_mode_one">重複播放目前歌曲</string>
     <string name="repeat_mode_all">重複播放待播清單</string>
 
@@ -260,8 +268,8 @@
     <string name="music_player">音樂播放器</string>
 
     <string name="notifications">通知</string>
-    <string name="keep_alive_title">防止系統終止應用程式</string>
-    <string name="keep_alive_description">使用前景通知來防止 Loudly 被系統隨機關閉。</string>
+    <string name="keep_alive_title">防止應用程式被系統終止</string>
+    <string name="keep_alive_description">使用前景通知，防止 Loudly 被系統隨機關閉。</string>
     <string name="notifications_settings">通知設定</string>
     <string name="notification_permission_is_required">需要通知權限</string>
 
@@ -282,14 +290,14 @@
     <string name="visit_the_loudly">造訪 Loudly</string>
     <string name="artist">演出者</string>
     <string name="listen_to_loudly">聆聽 Loudly</string>
-    <string name="enable_swipe_thumbnail">在縮圖上滑動以切換歌曲</string>
-    <string name="customize_navigation_tabs">自訂導覽標籤</string>
+    <string name="enable_swipe_thumbnail">啟用滑動縮圖來切換歌曲</string>
+    <string name="customize_navigation_tabs">自訂導覽分頁</string>
     <string name="player">播放器</string>
     <string name="player_text_alignment">播放器文字對齊</string>
     <string name="lyrics_text_position">歌詞文字位置</string>
     <string name="sided">側邊</string>
-    <string name="left">左</string>
-    <string name="center">中</string>
+    <string name="left">靠左</string>
+    <string name="center">置中</string>
     <string name="mini_player_style">迷你播放器樣式</string>
     <string name="player_style">播放器樣式</string>
     <string name="player_style_old_ui">舊版播放器介面</string>
@@ -298,33 +306,33 @@
     <string name="follow_theme">跟隨主題</string>
     <string name="gradient">漸層</string>
     <string name="blur">模糊</string>
-    <string name="blurmv">模糊 (動態)</string>
+    <string name="blurmv">模糊（動態）</string>
     <string name="player_background_style">播放器背景樣式</string>
-    <string name="right">右</string>
+    <string name="right">靠右</string>
     <string name="slider_style">滑桿樣式</string>
     <string name="default_">預設</string>
     <string name="squiggly">波浪形</string>
-    <string name="compose">Compose</string>
+    <string name="compose">組合</string>
     <string name="thumbnail_corner_radius">設定縮圖圓角半徑</string>
     <string name="show_content_filter">顯示內容篩選器</string>
     <string name="misc">雜項</string>
     <string name="main">主要</string>
-    <string name="auto_playlists_customization">自動播放清單自訂</string>
+    <string name="auto_playlists_customization">自訂自動播放清單</string>
     <string name="show_liked_auto_playlist">顯示「已按讚」自動播放清單</string>
     <string name="show_download_auto_playlist">顯示「已下載」自動播放清單</string>
     <string name="show_top_auto_playlist">顯示「熱門」自動播放清單</string>
     <string name="show_cached_auto_playlist">顯示「已快取」自動播放清單</string>
     <string name="show_local_auto_playlist">顯示「本機」自動播放清單</string>
-    <string name="swipe_song_to_dismiss">向右滑動歌曲以播放下一首，或向左滑動以新增至待播清單</string>
+    <string name="swipe_song_to_dismiss">向右滑動歌曲以播放下一首，向左滑動以新增至待播清單</string>
     <string name="default_open_tab">預設開啟的分頁</string>
-    <string name="default_lib_chips">預設媒體庫篩選標籤</string>
+    <string name="default_lib_chips">預設媒體庫篩選</string>
     <string name="grid_cell_size">網格儲存格大小</string>
     <string name="slim_navbar">顯示底部導覽列標籤</string>
     <string name="small">小</string>
     <string name="big">大</string>
     <string name="Changelog">更新日誌</string>
     <string name="no_changes">找不到最近的變更</string>
-    <string name="changelogs">最近變更：</string>
+    <string name="changelogs">最近的變更：</string>
     <string name="closepopup">關閉</string>
     <string name="NewVersion">有新版本可用</string>
     <string name="Hi">再次問好</string>
@@ -334,31 +342,33 @@
     <string name="web_site_info">官方網站 ❯</string>
     <string name="code">原始碼</string>
     <string name="code_text">存取應用程式的原始碼</string>
-    <string name="bugs">問題</string>
-    <string name="bugs_text">錯誤回報與更多</string>
+    <string name="bugs">問題回報</string>
+    <string name="bugs_text">回報錯誤及其他</string>
     <string name="help">說明</string>
     <string name="contribution_text">如果您想做出貢獻，請點擊此處 ❯</string>
     <string name="Developer">開發者 | @RRechz</string>
 
     <string name="content">內容</string>
     <string name="login">登入</string>
-    <string name="token_hidden">輕觸以顯示權杖</string>
-    <string name="token_shown">再次輕觸以複製或編輯</string>
+    <string name="login_description">登入您的 YT Music 播放清單等</string>
+    <string name="token_hidden">點擊以顯示權杖</string>
+    <string name="token_shown">再次點擊以複製或編輯</string>
     <string name="token_adv_login_description">這是一種進階登入方法。作為網頁入口的替代方案，您可以直接在此處輸入或更新您的登入權杖。例如，這可以加快在多個裝置上的登入速度。請注意，任何應用程式無法解析的無效權杖格式都將不被接受。</string>
     <string name="import_from_spotify">從 Spotify 匯入</string>
     <string name="title_spotify">Spotify</string>
     <string name="title_discord">Discord</string>
     <string name="like_autodownload">自動下載您喜歡的歌曲</string>
-    <string name="ytm_sync">與您的 YouTube Music 帳戶自動同步</string>
-    <string name="wifi_only">僅限 Wi-Fi</string>
+    <string name="ytm_sync">與您的 YouTube Music 帳號自動同步</string>
+    <string name="ytm_sync_description">將您的播放清單等與您的帳號同步</string>
+    <string name="wifi_only">僅 Wi-Fi</string>
     <string name="not_logged_in">未登入</string>
     <string name="content_language">預設內容語言</string>
-    <string name="content_country">預設內容國家/地區</string>
-    <string name="system_default">跟隨系統</string>
+    <string name="content_country">預設內容國家</string>
+    <string name="system_default">系統預設</string>
     <string name="enable_proxy">啟用代理伺服器</string>
     <string name="proxy_type">代理伺服器類型</string>
-    <string name="proxy_url">代理伺服器網址</string>
-    <string name="restart_to_take_effect">重新啟動以生效</string>
+    <string name="proxy_url">代理伺服器 URL</string>
+    <string name="restart_to_take_effect">重新啟動後生效</string>
     <string name="app_language">應用程式語言</string>
     <string name="configure_app_language">設定應用程式語言</string>
     <string name="intent_app_language_not_found">找不到應用程式語言設定，請手動設定</string>
@@ -367,25 +377,25 @@
     <string name="intent_supported_links_not_found">找不到支援的連結設定，請手動設定</string>
 
     <string name="player_and_audio">播放器與音訊</string>
-    <string name="audio_quality">音訊品質</string>
+    <string name="audio_quality">音質</string>
     <string name="audio_quality_max">最高</string>
     <string name="audio_quality_auto">自動</string>
     <string name="audio_quality_high">高</string>
     <string name="audio_quality_low">低</string>
-    <string name="minimum_playback_duration">最小播放長度</string>
-    <string name="minimum_playback_duration_info">歌曲必須播放的最短時間，之後才會被視為「已播放」</string>
+    <string name="minimum_playback_duration">最短播放長度</string>
+    <string name="minimum_playback_duration_info">一首歌曲必須播放的最短時間，才會被視為「已播放」</string>
     <string name="queue">待播清單</string>
     <string name="persistent_queue">保留待播清單</string>
     <string name="persistent_queue_desc">應用程式啟動時還原您上次的待播清單</string>
     <string name="auto_load_more">自動載入更多歌曲</string>
     <string name="auto_load_more_desc">當到達待播清單末尾時，如果可能，自動新增更多歌曲</string>
-    <string name="skip_silence">略過無聲片段</string>
-    <string name="audio_normalization">音訊正常化</string>
-    <string name="play_song_when_bluetooth_device_connected">藍牙裝置連線時繼續播放</string>
-    <string name="stop_playing_when_song_sound_minimum_volume">歌曲音量最小時停止播放</string>
-    <string name="adding_played_songs_to_ytm_history">將播放過的歌曲新增至 YouTube Music 歷史記錄</string>
-    <string name="auto_skip_next_on_error">發生錯誤時自動跳至下一首歌曲</string>
-    <string name="auto_skip_next_on_error_desc">確保您連續的播放體驗</string>
+    <string name="skip_silence">跳過靜音</string>
+    <string name="audio_normalization">音量正常化</string>
+    <string name="play_song_when_bluetooth_device_connected">連接藍牙裝置時繼續播放</string>
+    <string name="stop_playing_when_song_sound_minimum_volume">當音量最小時停止播放</string>
+    <string name="adding_played_songs_to_ytm_history">將播放的歌曲新增至 YouTube Music 歷史記錄</string>
+    <string name="auto_skip_next_on_error">發生錯誤時自動跳到下一首</string>
+    <string name="auto_skip_next_on_error_desc">確保您的連續播放體驗</string>
     <string name="stop_music_on_task_clear">清除任務時停止音樂</string>
     <string name="equalizer">等化器</string>
     <string name="lyrics">歌詞</string>
@@ -398,7 +408,7 @@
     <string name="max_cache_size">最大快取大小</string>
     <string name="unlimited">無限制</string>
     <string name="audio_offload">啟用音訊卸載</string>
-    <string name="audio_offload_description">使用音訊卸載路徑進行音訊播放。停用此功能可能會增加功耗，但如果您在音訊播放或後續處理方面遇到問題，則可能很有用</string>
+    <string name="audio_offload_description">使用音訊卸載路徑進行播放。停用此選項可能會增加功耗，但如果您在音訊播放或後製處理方面遇到問題，可能會有所幫助。</string>
     <string name="clear_all_downloads">清除所有下載</string>
     <string name="max_image_cache_size">最大圖片快取大小</string>
     <string name="clear_image_cache">清除圖片快取</string>
@@ -412,21 +422,21 @@
     <string name="clear_translation_models_cache_dialog">您確定要清除所有快取的翻譯模型嗎？</string>
 
     <string name="privacy">隱私</string>
-    <string name="listen_history">聆聽歷史</string>
-    <string name="pause_listen_history">暫停聆聽歷史</string>
-    <string name="clear_listen_history">清除聆聽歷史</string>
-    <string name="clear_listen_history_confirm">您確定要清除所有聆聽歷史嗎？</string>
-    <string name="pause_search_history">暫停搜尋歷史</string>
-    <string name="clear_search_history">清除搜尋歷史</string>
-    <string name="clear_search_history_confirm">您確定要清除所有搜尋歷史嗎？</string>
-    <string name="search_history">搜尋歷史</string>
+    <string name="listen_history">聆聽記錄</string>
+    <string name="pause_listen_history">暫停聆聽記錄</string>
+    <string name="clear_listen_history">清除聆聽記錄</string>
+    <string name="clear_listen_history_confirm">您確定要清除所有聆聽記錄嗎？</string>
+    <string name="pause_search_history">暫停搜尋記錄</string>
+    <string name="clear_search_history">清除搜尋記錄</string>
+    <string name="clear_search_history_confirm">您確定要清除所有搜尋記錄嗎？</string>
+    <string name="search_history">搜尋記錄</string>
     <string name="use_login_for_browse">使用登入資訊瀏覽內容</string>
-    <string name="use_login_for_browse_desc">這可能會影響您看到的內容，例如，如果您使用 Premium 帳戶登入，則會顯示僅限 Premium 會員的專輯</string>
-    <string name="disable_screenshot">停用螢幕截圖</string>
-    <string name="disable_screenshot_desc">開啟此選項後，螢幕截圖和應用程式在最近使用項目中的畫面將被停用。</string>
-    <string name="enable_lrclib">啟用 LrcLib 歌詞提供者</string>
-    <string name="enable_kugou">啟用酷狗歌詞提供者</string>
-    <string name="default_lyrics_provider">預設歌詞提供者</string>
+    <string name="use_login_for_browse_desc">這可能會影響您看到的內容，例如，如果您使用 Premium 帳號登入，則會顯示僅限 Premium 會員的專輯。</string>
+    <string name="disable_screenshot">禁止螢幕截圖</string>
+    <string name="disable_screenshot_desc">開啟此選項後，將停用螢幕截圖和最近任務中的應用程式預覽。</string>
+    <string name="enable_lrclib">啟用 LrcLib 歌詞來源</string>
+    <string name="enable_kugou">啟用酷狗歌詞來源</string>
+    <string name="default_lyrics_provider">預設歌詞來源</string>
     <string name="lyrics_multiline_title">讀取多行歌詞</string>
     <string name="lyrics_multiline_description">將同步點之間的所有行視為一個歌詞文字</string>
     <string name="lyrics_trim_title">移除歌詞周圍的空格</string>
@@ -440,13 +450,13 @@
     <string name="import_m3u">匯入播放清單 (m3u)</string>
     <string name="m3u_import_failed">匯入播放清單失敗</string>
     <string name="imported_playlist">已匯入的播放清單</string>
-    <string name="backup_create_success">備份成功建立</string>
+    <string name="backup_create_success">成功建立備份</string>
     <string name="backup_create_failed">無法建立備份</string>
     <string name="restore_failed">還原備份失敗</string>
 
     <string name="discord_integration">Discord 整合</string>
-    <string name="discord_information">Loudly 使用 KizzyRPC 函式庫來設定您的 Discord 帳戶狀態。這涉及到使用 Discord 閘道連線，可能被視為違反 Discord 的服務條款。然而，目前還沒有使用者帳戶因此被停權的已知案例。請自行承擔風險。\n\nLoudly 只會擷取您的權杖，其他所有內容都儲存在本機。</string>
-    <string name="dismiss">忽略</string>
+    <string name="discord_information">Loudly 使用 KizzyRPC 函式庫來設定您的 Discord 帳號狀態。這會使用到 Discord 閘道連線，可能被視為違反 Discord 的服務條款。但是，目前沒有已知使用者帳號因此被停權的案例。請自行承擔風險。\n\nLoudly 只會擷取您的權杖，其他所有內容都儲存在本機。</string>
+    <string name="dismiss">關閉</string>
     <string name="options">選項</string>
     <string name="preview">預覽</string>
     <string name="login_failed">登入失敗</string>
@@ -455,11 +465,11 @@
 
     <string name="about">關於</string>
     <string name="app_version">應用程式版本</string>
-    <string name="checking_for_update">正在檢查更新...</string>
+    <string name="checking_for_update">正在檢查更新…</string>
     <string name="update_card_version_ready_to_download">版本 %1$s 可供下載。</string>
-    <string name="update_card_downloading">下載中... %1$d%%</string>
+    <string name="update_card_downloading">下載中…</string>
     <string name="install">升級</string>
-    <string name="try_again">再試一次</string>
+    <string name="try_again">重試</string>
     <string name="download_now">立即下載</string>
     <string name="app_type">應用程式類型</string>
 
@@ -475,7 +485,7 @@
     <string name="play_pause">播放/暫停</string>
     <string name="about_subtitle">版本 · 開發者 · 授權</string>
     <string name="category_interface">介面</string>
-    <string name="category_content">內容與帳戶</string>
+    <string name="category_content">內容與帳號</string>
     <string name="category_player">播放器</string>
     <string name="category_system">系統</string>
     <string name="library">媒體庫</string>
@@ -485,30 +495,83 @@
     <string name="currently_used">目前已用</string>
     <string name="clear_cache">清除快取</string>
     <string name="backup_restore_description">備份 · 還原 · 匯入</string>
-    <string name="privacy_description">歷史 · 搜尋 · 螢幕截圖</string>
+    <string name="privacy_description">歷史記錄 · 搜尋 · 螢幕截圖</string>
     <string name="storage_description">下載 · 快取 · 圖片</string>
     <string name="player_and_audio_description">聲音 · 待播清單 · 歌詞</string>
-    <string name="content_description">語言 · 地點 · 代理伺服器</string>
+    <string name="content_description">語言 · 位置 · 代理伺服器</string>
     <string name="account_description">登入 · Spotify · Discord</string>
     <string name="appearance_description">主題 · 滑桿 · 播放器</string>
 
     <string name="header_background">個人資料卡片圖片</string>
     <string name="header_background_description">自訂個人資料卡片上的圖片</string>
     <string name="select_header_image">選擇個人資料圖片</string>
-    <string name="predefined_images">預製圖片</string>
+    <string name="predefined_images">預設圖片</string>
     <string name="select_from_gallery">從相簿選擇</string>
     <string name="edit_photo">編輯相片</string>
     <string name="cancel">取消</string>
 
-    <string name="sync_local_songs_toast">本機歌曲同步成功</string>
+    <string name="send_to_developer">傳送給開發者</string>
+    <string name="close">關閉</string>
+    <string name="update_error_details">顯示錯誤詳細資訊</string>
+    <string name="download_failed">下載失敗</string>
+    <string name="show_error">顯示錯誤</string>
+    <string name="go_to_update_link">手動更新</string>
+    <string name="home_card_update_desc">詳細資訊請查看設定頁面</string>
+    <string name="app_up_to_date">軟體已是最新版本</string>
+
+    <string name="app_ui">應用程式介面</string>
+    <string name="app_ui_desc">從 3 種不同的設計中選擇一種</string>
+    <string name="ui_version_selection">介面版本選擇</string>
+    <string name="ui_version_1_0_desc">應用程式的舊版本設計。（應用程式、播放器、迷你播放器）</string>
+    <string name="ui_version_1_5_desc">以更現代的方式建立的緊湊設計。（應用程式、播放器、迷你播放器）</string>
+    <string name="ui_version_2_0_desc">最受歡迎的設計。（應用程式、播放器、迷你播放器）</string>
+    <string name="ui_version_custom_desc">建立您自己的應用程式介面設計。（應用程式、播放器、迷你播放器）</string>
+    <string name="custom_app_ui">自訂介面</string>
+
+    <string name="other_settings">其他設定</string>
+    <string name="other_settings_description">點擊以查看其他各種設定</string>
+
+    <string name="audio_quality_auto_desc">自動在 45 至 512 Kbps 之間調整品質</string>
+    <string name="audio_quality_max_desc">提供最高 512 Kbps 的品質</string>
+    <string name="audio_quality_high_desc">為平均網速設定 128 至 256 Kbps 的品質。</string>
+    <string name="audio_quality_low_desc">將品質限制在 45 至 52 Kbps 之間以節省數據（數據節省模式）</string>
+
+    <string name="could_not_import">無法匯入</string>
+
+    <string name="text_alignment">文字對齊</string>
+    <string name="text_alignment_description">設定卡片上文字的位置</string>
+    <string name="gradient_intensity">漸層強度</string>
+    <string name="corner_round">圓角</string>
+    <string name="profile_picture">個人資料圖片</string>
+    <string name="profile_card">個人資料卡片</string>
+    <string name="remove_profile_picture">移除個人資料圖片</string>
+    <string name="show_texts">顯示文字</string>
+    <string name="show_texts_description">在個人資料卡片上顯示問候語和使用者名稱的文字</string>
+    <string name="tap_to_change">點擊以變更</string>
+
+    <string name="translate">翻譯 (BETA)</string>
+    <string name="copy">複製</string>
+
+    <string name="error_network_title">網路錯誤</string>
+    <string name="error_network_description">請檢查您的網路連線並重試。</string>
+    <string name="error_unsupported_format_title">不支援的內容</string>
+    <string name="error_unsupported_format_description">您的裝置不支援此歌曲格式。</string>
+    <string name="error_behind_live_window_title">直播錯誤</string>
+    <string name="error_behind_live_window_description">直播串流發生問題。請重新啟動。</string>
+    <string name="error_playback_failed_title">播放失敗</string>
+    <string name="error_playback_failed_description">發生未知的錯誤。請重試。</string>
+    <string name="recovering_playback">正在重試…</string>
+    <string name="vpn_info_message">使用 VPN 可能會影響您的連線品質。如果您遇到網路問題，請中斷 VPN 連線或使用代理伺服器。您可以在「設定 >> 內容 >> 代理伺服器」中進行設定。</string>
+
+    <string name="sync_local_songs_toast">成功同步本機歌曲</string>
     <string name="local_scanner_title">本機掃描器</string>
 
     <string name="auto_scanner_title">自動掃描</string>
     <string name="auto_scanner_description">開啟應用程式時自動掃描歌曲</string>
 
     <string name="scanner_settings_title">附加掃描器設定</string>
-    <string name="scanner_strict_file_name_title">嚴格的檔案名稱</string>
-    <string name="scanner_strict_file_name_description">啟用後，副檔名將不會被忽略。例如，「Song.ogg」將與「Song.flac」是不同的歌曲</string>
+    <string name="scanner_strict_file_name_title">嚴格檔案名稱</string>
+    <string name="scanner_strict_file_name_description">啟用後，副檔名將不會被忽略。例如，「Song.ogg」將與「Song.flac」是不同的歌曲。</string>
     <string name="scanner_sensitivity_title">設定掃描器靈敏度</string>
     <string name="scanner_sensitivity_L1">符合標題</string>
     <string name="scanner_sensitivity_L2">符合標題和演出者</string>
@@ -521,17 +584,17 @@
     <string name="tips_and_features">提示與功能</string>
     <string name="tips_and_fetures_description"> 提示 · 功能</string>
     <string name="create_your_story">建立您的限時動態</string>
-    <string name="share_your_story_description">以專輯封面主色調建立的時尚設計，在社群媒體上分享您正在聽的歌曲。</string>
+    <string name="share_your_story_description">用專輯封面的主色調建立時尚的設計，將您正在聽的歌曲分享到社群媒體。</string>
     <string name="customizable_settings">可自訂的設定</string>
     <string name="customizable_settings_description">透過將設定畫面上標題卡的背景替換為您相簿中的圖片，讓應用程式成為您自己的。</string>
     <string name="new_song_list">新歌曲清單</string>
-    <string name="new_song_list_description">從播放器畫面向上滑動即可檢視您目前的播放清單並輕鬆在歌曲之間切換（播放器介面 2.0 專屬新設計）</string>
+    <string name="new_song_list_description">檢視您目前的播放清單，並透過從播放器畫面上滑輕鬆切換歌曲（Player UI 2.0 獨有的新設計）。</string>
     <string name="remastered_settings">重製設定設計</string>
-    <string name="remastered_settings_description">透過新的基於卡片的設定設計，輕鬆找到您要找的東西，更現代、更方便。</string>
+    <string name="remastered_settings_description">透過新的基於卡片的設定設計，更現代、更方便地輕鬆找到您想要的內容。</string>
     <string name="classic_music_widget">經典音樂小工具</string>
-    <string name="classic_music_widget_description">從您的主畫面快速存取所有控制項和歌曲資訊。</string>
+    <string name="classic_music_widget_description">從您的主畫面上快速存取所有控制項和歌曲資訊。</string>
     <string name="minimalist_music_widget">極簡音樂小工具</string>
-    <string name="minimalist_music_widget_description">「Quik」音樂小工具，靈感來自 Android 16 的快速設定按鈕設計</string>
+    <string name="minimalist_music_widget_description">靈感來自 Android 16 快速設定按鈕設計的「Quik」音樂小工具。</string>
     <string name="share_on_story">分享到限時動態</string>
     <string name="copy_song_link">複製歌曲連結</string>
     <string name="link_copied">連結已複製到剪貼簿！</string>
@@ -545,13 +608,11 @@
     <string name="instructions_to_get_required_credentials">取得所需憑證的說明</string>
     <string name="make_sure_to_click">3. 確保在輸入上述本機路徑後點擊「新增」。</string>
     <string name="accept_the_terms_of_service">5. 接受服務條款並點擊「儲存」。</string>
-    <string name="you_ll_be_redirected_to_a_new_page">您將被重新導向到一個新頁面。點擊「設定」，然後複製用戶端 ID 和用戶端密鑰，並將它們貼到此應用程式下方的文字欄位中。</string>
+    <string name="you_ll_be_redirected_to_a_new_page">您將被重新導向到一個新頁面。點擊「設定」，然後複製用戶端 ID 和用戶端密鑰，並將其貼到此應用程式下方的文字欄位中。</string>
     <string name="enter_the_necessary_details">2. 輸入必要的詳細資訊，並使用 http://127.0.0.1:45454 作為重新導向 URI。</string>
-    <string name="toggle_wep_api">4. 切換 Web API。核取方塊現在應該有一個勾號。</string>
-    <string name="now_click_the_authorize_and_continue">現在，點擊下方的「授權並繼續」按鈕，並使用您要從中匯入的帳戶登入，然後授權並繼續，這將把您重新導向到一個以 http://127.0.0.1:45454/?code= 開頭的網站
-
-將該完整網址貼到下方顯示「授權碼」的文字欄位中，然後點擊「驗證」按鈕</string>
-    <string name="visit_spotify_for_developers">1. 造訪 Spotify 開發者儀表板並點擊「建立應用程式」。 </string>
+    <string name="toggle_wep_api">4. 開啟 Web API。核取方塊現在應該會有一個勾號。</string>
+    <string name="now_click_the_authorize_and_continue">現在，點擊下方的「授權並繼續」按鈕，並使用您要從中匯入的帳號登入，然後授權並繼續，這將把您重新導向到一個以 http://127.0.0.1:45454/?code= 開頭的網站。\n\n將整個 URL 貼到下方名為「授權碼」的文字欄位中，然後點擊「驗證」按鈕。</string>
+    <string name="visit_spotify_for_developers">1. 造訪 Spotify 開發者儀表板，然後點擊「建立應用程式」。</string>
     <string name="login_with_spotify">使用 Spotify API 憑證登入</string>
     <string name="authorize_and_continue">授權並繼續</string>
     <string name="authorization_code">授權碼</string>
@@ -559,8 +620,7 @@
     <string name="client_secret">用戶端密鑰</string>
     <string name="client_id">用戶端 ID</string>
     <string name="import_in_progress">正在匯入…</string>
-    <string name="dont_close_app_message">請勿關閉應用程式或返回。此操作不會在背景執行，所以請在此停留直到完成！
-如果看起來卡住了，請不要慌張；有時擷取資料可能需要一些時間。</string>
+    <string name="dont_close_app_message">請不要關閉應用程式或返回。此操作不會在背景執行，請等待其完成！\n如果看起來卡住了，請不要驚慌；有時擷取可能需要一些時間。</string>
     <string name="choose_liked_songs">選擇「喜歡的歌曲」目的地</string>
     <string name="where_should_the_liked_songs">喜歡的歌曲應該匯入到哪裡？</string>
     <string name="new_playlist_named">一個名為「喜歡的歌曲」的新播放清單</string>
