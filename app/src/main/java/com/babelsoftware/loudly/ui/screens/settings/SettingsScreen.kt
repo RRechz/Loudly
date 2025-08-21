@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,8 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -31,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -46,13 +51,19 @@ import com.babelsoftware.innertube.utils.parseCookieString
 import com.babelsoftware.loudly.LocalPlayerAwareWindowInsets
 import com.babelsoftware.loudly.R
 import com.babelsoftware.loudly.constants.AccountNameKey
+import com.babelsoftware.loudly.constants.HeaderCardAlignmentKey
+import com.babelsoftware.loudly.constants.HeaderCardCornerRadiusKey
+import com.babelsoftware.loudly.constants.HeaderCardGradientIntensityKey
+import com.babelsoftware.loudly.constants.HeaderCardProfilePictureUriKey
 import com.babelsoftware.loudly.constants.HeaderImageKey
 import com.babelsoftware.loudly.constants.InnerTubeCookieKey
+import com.babelsoftware.loudly.constants.ShowHeaderCardTextKey
 import com.babelsoftware.loudly.ui.screens.settings.card_design.IconResource
 import com.babelsoftware.loudly.ui.screens.settings.card_design.SettingCategory
 import com.babelsoftware.loudly.ui.screens.settings.card_design.SettingsBox
 import com.babelsoftware.loudly.ui.screens.settings.card_design.shapeManager
 import com.babelsoftware.loudly.ui.screens.settings.viewmodel.SettingsViewModel
+import com.babelsoftware.loudly.utils.rememberEnumPreference
 import com.babelsoftware.loudly.utils.rememberPreference
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -180,6 +191,11 @@ private fun AccountHeaderCard() {
     val innerTubeCookie by rememberPreference(InnerTubeCookieKey, "")
     val isLoggedIn = remember(innerTubeCookie) { "SAPISID" in parseCookieString(innerTubeCookie) }
     val (headerImageKey, _) = rememberPreference(HeaderImageKey, "Loudly-1")
+    val (showHeaderCardText, _) = rememberPreference(ShowHeaderCardTextKey, true)
+    val (headerCardAlignment, _) = rememberEnumPreference(HeaderCardAlignmentKey, HeaderCardContentAlignment.BottomStart)
+    val (gradientIntensity, _) = rememberPreference(HeaderCardGradientIntensityKey, 0.6f)
+    val (headerCardCornerRadius, _) = rememberPreference(HeaderCardCornerRadiusKey, 24)
+    val (profilePictureUri, _) = rememberPreference(HeaderCardProfilePictureUriKey, "")
 
     val painter = when {
         headerImageKey.startsWith("content://") -> {
@@ -196,11 +212,11 @@ private fun AccountHeaderCard() {
         modifier = Modifier
             .fillMaxWidth()
             .height(150.dp),
-        shape = RoundedCornerShape(24.dp)
+        shape = RoundedCornerShape(headerCardCornerRadius.dp)
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomStart
+            contentAlignment = headerCardAlignment.alignment
         ) {
             Image(
                 painter = painter,
@@ -213,37 +229,57 @@ private fun AccountHeaderCard() {
                     .fillMaxSize()
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f)),
-                            startY = 300f
+                            colorStops = arrayOf(
+                                0.5f to Color.Transparent,
+                                1.0f to Color.Black.copy(alpha = gradientIntensity)
+                            )
                         )
                     )
             )
-            Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.Bottom
-            ) {
-                if (isLoggedIn) {
-                    Text(
-                        stringResource(R.string.Hi),
-                        color = Color.White.copy(alpha = 0.8f),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        accountName.replace("@", ""),
-                        color = Color.White,
-                        fontSize = 22.sp,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                } else {
-                    Text(
-                        stringResource(R.string.not_logged_in),
-                        color = Color.White,
-                        fontSize = 22.sp,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
+            if (showHeaderCardText) {
+                Row(
+                    modifier = Modifier.padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (profilePictureUri.isNotBlank()) {
+                        Image(
+                            painter = rememberAsyncImagePainter(model = Uri.parse(profilePictureUri)),
+                            contentDescription = "Profile Image",
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                    }
+
+                    Column(
+                        verticalArrangement = Arrangement.Bottom,
+                    ) {
+                        if (isLoggedIn) {
+                            Text(
+                                stringResource(R.string.Hi),
+                                color = Color.White.copy(alpha = 0.8f),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                accountName.replace("@", ""),
+                                color = Color.White,
+                                fontSize = 22.sp,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                        } else {
+                            Text(
+                                stringResource(R.string.not_logged_in),
+                                color = Color.White,
+                                fontSize = 22.sp,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
                 }
             }
         }

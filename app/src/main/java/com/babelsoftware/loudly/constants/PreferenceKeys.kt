@@ -66,6 +66,11 @@ val ProxyEnabledKey = booleanPreferencesKey("proxyEnabled")
 val ProxyUrlKey = stringPreferencesKey("proxyUrl")
 val ProxyTypeKey = stringPreferencesKey("proxyType")
 val YtmSyncKey = booleanPreferencesKey("ytmSync")
+val ShowHeaderCardTextKey = booleanPreferencesKey("show_header_card_text")
+val HeaderCardAlignmentKey = stringPreferencesKey("header_card_alignment")
+val HeaderCardGradientIntensityKey = floatPreferencesKey("header_card_gradient_intensity")
+val HeaderCardCornerRadiusKey = intPreferencesKey("header_card_corner_radius")
+val HeaderCardProfilePictureUriKey = stringPreferencesKey("header_card_profile_picture_uri")
 
 val AudioQualityKey = stringPreferencesKey("audioQuality")
 

@@ -570,6 +570,17 @@
 
     <string name="could_not_import">Could not import</string>
 
+    <string name="text_alignment">Text Alignment</string>
+    <string name="text_alignment_description">Set the position of the text on the card</string>
+    <string name="gradient_intensity">Gradient Intensity</string>
+    <string name="corner_round">Corner Round</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="profile_card">Profile Card</string>
+    <string name="remove_profile_picture">Remove Profile Picture</string>
+    <string name="show_texts">Show Texts</string>
+    <string name="show_texts_description">Display the greeting and username text on the profile card</string>
+    <string name="tap_to_change">Tap to change</string>
+
     <!-- Player UI -->
     <string name="translate">Translate (BETA)</string>
     <string name="copy">Copy</string>

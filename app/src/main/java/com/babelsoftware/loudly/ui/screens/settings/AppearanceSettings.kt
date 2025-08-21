@@ -1,6 +1,7 @@
 package com.babelsoftware.loudly.ui.screens.settings
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -31,6 +32,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -38,12 +40,21 @@ import androidx.compose.material.icons.automirrored.rounded.TrendingUp
 import androidx.compose.material.icons.rounded.Cached
 import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.compose.material.icons.rounded.DesignServices
+import androidx.compose.material.icons.rounded.East
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FilterCenterFocus
 import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material.icons.rounded.MusicNote
+import androidx.compose.material.icons.rounded.North
+import androidx.compose.material.icons.rounded.NorthEast
+import androidx.compose.material.icons.rounded.NorthWest
 import androidx.compose.material.icons.rounded.QueryStats
+import androidx.compose.material.icons.rounded.South
+import androidx.compose.material.icons.rounded.SouthEast
+import androidx.compose.material.icons.rounded.SouthWest
 import androidx.compose.material.icons.rounded.Tune
+import androidx.compose.material.icons.rounded.West
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -51,6 +62,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
@@ -75,10 +87,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -88,6 +102,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.babelsoftware.innertube.utils.parseCookieString
 import com.babelsoftware.loudly.LocalPlayerAwareWindowInsets
 import com.babelsoftware.loudly.R
+import com.babelsoftware.loudly.constants.AccountNameKey
 import com.babelsoftware.loudly.constants.AppDesignVariantKey
 import com.babelsoftware.loudly.constants.AppDesignVariantType
 import com.babelsoftware.loudly.constants.AutoPlaylistCachedPlaylistShowKey
@@ -103,6 +118,10 @@ import com.babelsoftware.loudly.constants.DefaultOpenTabOldKey
 import com.babelsoftware.loudly.constants.DynamicThemeKey
 import com.babelsoftware.loudly.constants.GridCellSize
 import com.babelsoftware.loudly.constants.GridCellSizeKey
+import com.babelsoftware.loudly.constants.HeaderCardAlignmentKey
+import com.babelsoftware.loudly.constants.HeaderCardCornerRadiusKey
+import com.babelsoftware.loudly.constants.HeaderCardGradientIntensityKey
+import com.babelsoftware.loudly.constants.HeaderCardProfilePictureUriKey
 import com.babelsoftware.loudly.constants.HeaderImageKey
 import com.babelsoftware.loudly.constants.InnerTubeCookieKey
 import com.babelsoftware.loudly.constants.LibraryFilter
@@ -114,6 +133,7 @@ import com.babelsoftware.loudly.constants.PlayerStyle
 import com.babelsoftware.loudly.constants.PlayerStyleKey
 import com.babelsoftware.loudly.constants.PureBlackKey
 import com.babelsoftware.loudly.constants.ShowContentFilterKey
+import com.babelsoftware.loudly.constants.ShowHeaderCardTextKey
 import com.babelsoftware.loudly.constants.ShowRecentActivityKey
 import com.babelsoftware.loudly.constants.SliderStyle
 import com.babelsoftware.loudly.constants.SliderStyleKey
@@ -226,6 +246,29 @@ fun AppearanceSettings(
         PlayerStyleKey,
         defaultValue = PlayerStyle.NEW
     )
+    val (showHeaderCardText, onShowHeaderCardTextChange) = rememberPreference(
+        ShowHeaderCardTextKey, defaultValue = true
+    )
+    val (headerCardAlignment, onHeaderCardAlignmentChange) = rememberEnumPreference(
+        HeaderCardAlignmentKey,
+        defaultValue = HeaderCardContentAlignment.BottomStart
+    )
+    var showAlignmentDialog by remember { mutableStateOf(false) }
+    val (gradientIntensity, onGradientIntensityChange) = rememberPreference(
+        HeaderCardGradientIntensityKey,
+        defaultValue = 0.6f
+    )
+    val (headerCardCornerRadius, onHeaderCardCornerRadiusChange) = rememberPreference(
+        HeaderCardCornerRadiusKey,
+        defaultValue = 24
+    )
+    var showHeaderCardCornerDialog by remember { mutableStateOf(false) }
+    val (profilePictureUri, onProfilePictureUriChange) = rememberPreference(
+        HeaderCardProfilePictureUriKey,
+        defaultValue = ""
+    )
+    var showProfilePictureDialog by remember { mutableStateOf(false) }
+    var showGradientDialog by remember { mutableStateOf(false) }
     val (miniPlayerStyle, onMiniPlayerStyle) = rememberEnumPreference(
         MiniPlayerStyleKey,
         defaultValue = MiniPlayerStyle.NEW
@@ -286,6 +329,17 @@ fun AppearanceSettings(
             imageCropper.launch(cropOptions)
         }
     }
+
+    val contentResolver = LocalContext.current.contentResolver
+    val profilePicturePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            uri?.let {
+                contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                onProfilePictureUriChange(it.toString())
+            }
+        }
+    )
 
     if (showHeaderImageDialog) {
         HeaderImagePickerDialog(
@@ -652,6 +706,211 @@ fun AppearanceSettings(
         }
     }
 
+    if (showAlignmentDialog) {
+        var tempAlignment by remember { mutableStateOf(headerCardAlignment) }
+        val (gradientIntensity, _) = rememberPreference(HeaderCardGradientIntensityKey, 0.6f)
+        val (headerCardCornerRadius, _) = rememberPreference(HeaderCardCornerRadiusKey, 24)
+        val (profilePictureUri, _) = rememberPreference(HeaderCardProfilePictureUriKey, "")
+        val (headerImageKey, _) = rememberPreference(HeaderImageKey, "Loudly-1")
+        val accountName by rememberPreference(AccountNameKey, "")
+
+        val painter = when {
+            headerImageKey.startsWith("content://") -> rememberAsyncImagePainter(model = Uri.parse(headerImageKey))
+            headerImageKey == "Loudly-1" -> painterResource(id = R.drawable.loudly_picutre_1)
+            headerImageKey == "Loudly-2" -> painterResource(id = R.drawable.loudly_picutre_2)
+            headerImageKey == "Loudly-3" -> painterResource(id = R.drawable.loudly_picutre_3)
+            else -> painterResource(id = R.drawable.loudly_picutre_1)
+        }
+
+        AlertDialog(
+            onDismissRequest = { showAlignmentDialog = false },
+            title = { Text(stringResource(R.string.text_alignment)) },
+            text = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    // --- PREVİEW CARD ---
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(16 / 9f),
+                        shape = RoundedCornerShape(headerCardCornerRadius.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = tempAlignment.alignment
+                        ) {
+                            Image(painter = painter, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                            Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(colorStops = arrayOf(0.5f to Color.Transparent, 1.0f to Color.Black.copy(alpha = gradientIntensity)))))
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (profilePictureUri.isNotBlank()) {
+                                    Image(painter = rememberAsyncImagePainter(model = Uri.parse(profilePictureUri)), contentDescription = null, modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
+                                Text(
+                                    text = accountName.ifBlank { "User Name" },
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 2
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // --- ALIGNMENT CONTROL GRID (3x3) ---
+                    Column(
+                        modifier = Modifier.width(150.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            IconButton(onClick = { tempAlignment = HeaderCardContentAlignment.TopStart }) {
+                                Icon(Icons.Rounded.NorthWest, contentDescription = "Sol Üst")
+                            }
+                            IconButton(onClick = { tempAlignment = HeaderCardContentAlignment.TopCenter }) {
+                                Icon(Icons.Rounded.North, contentDescription = "Orta Üst")
+                            }
+                            IconButton(onClick = { tempAlignment = HeaderCardContentAlignment.TopEnd }) {
+                                Icon(Icons.Rounded.NorthEast, contentDescription = "Sağ Üst")
+                            }
+                        }
+                        // Center Row
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            IconButton(onClick = { tempAlignment = HeaderCardContentAlignment.CenterStart }) {
+                                Icon(Icons.Rounded.West, contentDescription = "Sol Orta")
+                            }
+                            IconButton(onClick = { tempAlignment = HeaderCardContentAlignment.Center }) {
+                                Icon(Icons.Rounded.FilterCenterFocus, contentDescription = "Orta")
+                            }
+                            IconButton(onClick = { tempAlignment = HeaderCardContentAlignment.CenterEnd }) {
+                                Icon(Icons.Rounded.East, contentDescription = "Sağ Orta")
+                            }
+                        }
+                        // Bottom Row
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            IconButton(onClick = { tempAlignment = HeaderCardContentAlignment.BottomStart }) {
+                                Icon(Icons.Rounded.SouthWest, contentDescription = "Sol Alt")
+                            }
+                            IconButton(onClick = { tempAlignment = HeaderCardContentAlignment.BottomCenter }) {
+                                Icon(Icons.Rounded.South, contentDescription = "Orta Alt")
+                            }
+                            IconButton(onClick = { tempAlignment = HeaderCardContentAlignment.BottomEnd }) {
+                                Icon(Icons.Rounded.SouthEast, contentDescription = "Sağ Alt")
+                            }
+                        }
+                    }
+                    }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onHeaderCardAlignmentChange(tempAlignment)
+                        showAlignmentDialog = false
+                    }
+                ) { Text(stringResource(R.string.save)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAlignmentDialog = false }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
+
+    if (showGradientDialog) {
+        var tempIntensity by remember { mutableFloatStateOf(gradientIntensity) }
+        AlertDialog(
+            onDismissRequest = { showGradientDialog = false },
+            title = { Text(stringResource(R.string.gradient_intensity)) },
+            text = {
+                Column {
+                    Text("${"%.0f".format(tempIntensity * 100)}%", modifier = Modifier.padding(bottom = 8.dp))
+                    Slider(
+                        value = tempIntensity,
+                        onValueChange = { tempIntensity = it },
+                        valueRange = 0f..1f
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onGradientIntensityChange(tempIntensity)
+                        showGradientDialog = false
+                    }
+                ) { Text(stringResource(R.string.save)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showGradientDialog = false }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
+
+    if (showHeaderCardCornerDialog) {
+        CounterDialog(
+            title = stringResource(R.string.corner_round),
+            onDismiss = { showHeaderCardCornerDialog = false },
+            initialValue = headerCardCornerRadius,
+            upperBound = 40,
+            lowerBound = 0,
+            resetValue = 24,
+            unitDisplay = "dp",
+            onConfirm = {
+                onHeaderCardCornerRadiusChange(it)
+                showHeaderCardCornerDialog = false
+            },
+            onCancel = {
+                showHeaderCardCornerDialog = false
+            },
+            onReset = { onHeaderCardCornerRadiusChange(24) },
+        )
+    }
+
+    if (showProfilePictureDialog) {
+        AlertDialog(
+            onDismissRequest = { showProfilePictureDialog = false },
+            title = { Text(stringResource(R.string.profile_picture)) },
+            text = {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Image(
+                        painter = if (profilePictureUri.isBlank()) {
+                            painterResource(id = R.drawable.person)
+                        } else {
+                            rememberAsyncImagePainter(model = Uri.parse(profilePictureUri))
+                        },
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .size(96.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = {
+                        profilePicturePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    }) {
+                        Text(stringResource(R.string.select_from_gallery))
+                    }
+                    if (profilePictureUri.isNotBlank()) {
+                        TextButton(onClick = {
+                            onProfilePictureUriChange("")
+                        }) {
+                            Text(stringResource(R.string.remove_profile_picture))
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showProfilePictureDialog = false }) {
+                    Text(stringResource(R.string.close))
+                }
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -898,13 +1157,6 @@ fun AppearanceSettings(
                     onClick = { onPureBlackChange(!pureBlack) }
                 )
             }
-            SettingsBox(
-                title = stringResource(R.string.header_background),
-                description = stringResource(R.string.header_background_description),
-                icon = IconResource.Vector(Icons.Rounded.Image),
-                shape = shapeManager(isLast = false),
-                onClick = { showHeaderImageDialog = true }
-            )
 
             if (selectedPreset == "Custom") {
                 SettingsBox(
@@ -962,6 +1214,54 @@ fun AppearanceSettings(
                     onClick = { showUiDialog = true }
                 )
             }
+
+            // --- PROFILE CARD GROUP ---
+            SettingCategory(title = stringResource(R.string.profile_card))
+            SettingsBox(
+                title = stringResource(R.string.show_texts),
+                description = stringResource(R.string.show_texts_description),
+                icon = IconResource.Drawable(painterResource(R.drawable.badge)),
+                shape = shapeManager(isFirst = true, isLast = false), // DEĞİŞTİ: Artık son eleman değil.
+                actionType = ActionType.SWITCH,
+                isChecked = showHeaderCardText,
+                onCheckedChange = onShowHeaderCardTextChange,
+                onClick = { onShowHeaderCardTextChange(!showHeaderCardText) }
+            )
+            SettingsBox(
+                title = stringResource(R.string.header_background),
+                description = stringResource(R.string.header_background_description),
+                icon = IconResource.Vector(Icons.Rounded.Image),
+                shape = shapeManager(isFirst = false, isLast = false),
+                onClick = { showHeaderImageDialog = true }
+            )
+            SettingsBox(
+                title = stringResource(R.string.text_alignment),
+                description = stringResource(R.string.text_alignment_description),
+                icon = IconResource.Drawable(painterResource(R.drawable.format_align_left)),
+                shape = shapeManager(isFirst = false, isLast = false),
+                onClick = { showAlignmentDialog = true }
+            )
+            SettingsBox(
+                title = stringResource(R.string.gradient_intensity),
+                description = "%${"%.0f".format(gradientIntensity * 100)}",
+                icon = IconResource.Drawable(painterResource(R.drawable.gradient)),
+                shape = shapeManager(isFirst = false, isLast = false),
+                onClick = { showGradientDialog = true }
+            )
+            SettingsBox(
+                title = stringResource(R.string.corner_round),
+                description = "${headerCardCornerRadius}dp",
+                icon = IconResource.Drawable(painterResource(R.drawable.rounded_corner)),
+                shape = shapeManager(isFirst = false, isLast = false),
+                onClick = { showHeaderCardCornerDialog = true }
+            )
+            SettingsBox(
+                title = stringResource(R.string.profile_picture),
+                description = if (profilePictureUri.isBlank()) stringResource(R.string.not_selected) else stringResource(R.string.tap_to_change),
+                icon = IconResource.Drawable(painterResource(R.drawable.account_circle)),
+                shape = shapeManager(isFirst = false, isLast = true),
+                onClick = { showProfilePictureDialog = true }
+            )
 
             // --- HOME GROUP ---
             SettingCategory(title = stringResource(R.string.home))
@@ -1274,4 +1574,16 @@ enum class NavigationTab(val stringId: Int) {
 
 enum class LyricsPosition {
     LEFT, CENTER, RIGHT
+}
+
+enum class HeaderCardContentAlignment(val alignment: Alignment) {
+    TopStart(Alignment.TopStart),
+    TopCenter(Alignment.TopCenter),
+    TopEnd(Alignment.TopEnd),
+    CenterStart(Alignment.CenterStart),
+    Center(Alignment.Center),
+    CenterEnd(Alignment.CenterEnd),
+    BottomStart(Alignment.BottomStart),
+    BottomCenter(Alignment.BottomCenter),
+    BottomEnd(Alignment.BottomEnd)
 }
