@@ -46,7 +46,7 @@ object TranslationHelper {
             val traditionalChinese = Locale.getDefault().toLanguageTag().replace("-Hant", "") == "zh-TW"
             lyrics.copy(
                 lyrics = if (isSynced) {
-                    LyricsUtils.parseLyrics(lyrics.lyrics).map {
+                    LyricsUtils.parseLyrics(lyrics.lyrics, trim = true, multilineEnable = false).map {
                         val translated = translator.translate(it.text).await()
                         it.copy(
                             text = if (traditionalChinese) ZhConverterUtil.toTraditional(translated) else translated
