@@ -16,7 +16,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -188,6 +187,10 @@ import java.net.URLDecoder
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.days
+
+// YENİ EKLENEN IMPORT
+import com.babelsoftware.loudly.ui.component.LoudlyBottomNavBar
+import com.google.android.datatransport.BuildConfig
 
 @Suppress("NAME_SHADOWING")
 @AndroidEntryPoint
@@ -371,7 +374,7 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-                    val (slimNav) = rememberPreference(SlimNavBarKey, defaultValue = true)
+                    // DEĞİŞİKLİK: slimNav kaldırıldı, çünkü yeni tasarımda bu ayara gerek yok.
                     val navigationItems = remember(appDesignVariant) {
                         if (appDesignVariant == AppDesignVariantType.NEW) {
                             Screens.MainScreens
@@ -462,7 +465,10 @@ class MainActivity : ComponentActivity() {
                     }
                     // ==================== KEYS & ADDICTIONS ====================
                     val miniPlayerMargin = if (playerStyle == PlayerStyle.UI_2_0) 8.dp else 0.dp
-                    val collapsedBound = bottomInset + (if (shouldShowNavigationBar) NavigationBarHeight else 0.dp) + MiniPlayerHeight + miniPlayerMargin
+
+                    // DEĞİŞİKLİK: collapsedBound hesaplaması yeni tasarıma göre ayarlandı.
+                    val collapsedBound = bottomInset + (if (shouldShowNavigationBar) 80.dp else 0.dp) + MiniPlayerHeight + miniPlayerMargin
+
                     val maxHeightInDp = with(density) { constraints.maxHeight.toDp() }
                     val playerBottomSheetState = rememberBottomSheetState(
                         dismissedBound = 0.dp,
@@ -479,20 +485,7 @@ class MainActivity : ComponentActivity() {
                     val currentSong by playerConnection?.service?.currentMediaMetadata?.collectAsState(initial = null)
                         ?: remember { mutableStateOf(null) }
 
-                    val isMiniPlayerVisible by remember(currentSong, playerBottomSheetState.isDismissed) {
-                        derivedStateOf { currentSong != null && !playerBottomSheetState.isDismissed }
-                    }
-
-                    val bottomIslandHeight by animateDpAsState(
-                        targetValue = when {
-                            isMiniPlayerVisible && shouldShowNavigationBar -> NavigationBarHeight + MiniPlayerHeight + 16.dp
-                            !isMiniPlayerVisible && shouldShowNavigationBar -> NavigationBarHeight + 8.dp
-                            isMiniPlayerVisible && !shouldShowNavigationBar -> MiniPlayerHeight + 16.dp
-                            else -> 0.dp
-                        },
-                        animationSpec = tween(durationMillis = 400),
-                        label = "BottomIslandHeight"
-                    )
+                    // DEĞİŞİKLİK: bottomIslandHeight kaldırıldı. Artık bu mantık MiniPlayer'da yönetilecek.
 
                     LaunchedEffect(currentSong) {
                         if (currentSong == null) {
@@ -508,7 +501,8 @@ class MainActivity : ComponentActivity() {
 
                     val playerAwareWindowInsets = remember(bottomInset, shouldShowNavigationBar, playerBottomSheetState.isDismissed, miniPlayerMargin) {
                         var bottom = bottomInset
-                        if (shouldShowNavigationBar) bottom += NavigationBarHeight
+                        // DEĞİŞİKLİK: Navigasyon barı yüksekliği sabit 80dp olarak ayarlandı (boşluklar dahil).
+                        if (shouldShowNavigationBar) bottom += 80.dp
                         if (!playerBottomSheetState.isDismissed) {
                             bottom += MiniPlayerHeight
                             bottom += miniPlayerMargin
@@ -531,6 +525,14 @@ class MainActivity : ComponentActivity() {
                         }
                     )
                     // ========================================================================
+
+                    // YENİ EKLENDİ: Kaydırma durumunu takip etmek için.
+                    val isScrolled by remember {
+                        derivedStateOf {
+                            searchBarScrollBehavior.state.heightOffset < -5f // Küçük bir eşik değeri
+                        }
+                    }
+
 
                     val (firstSetupPassed) = rememberPreference(FirstSetupPassed, defaultValue = false)
 
@@ -990,25 +992,8 @@ class MainActivity : ComponentActivity() {
                         }
 
                         Box(modifier = Modifier.fillMaxSize()) {
-                            // ---> Island NavBar Background
-                            if (bottomIslandHeight > 0.dp) {
-                                Card(
-                                    modifier = Modifier
-                                        .align(Alignment.BottomCenter)
-                                        .padding(bottom = bottomInset)
-                                        .padding(horizontal = 12.dp)
-                                        .fillMaxWidth()
-                                        .height(bottomIslandHeight),
-                                    shape = RoundedCornerShape(24.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.surface.copy(
-                                            alpha = 0.8f
-                                        )
-                                    ),
-                                    border = BorderStroke(1.dp, Color.White.copy(alpha = 1.50f))
-                                ) { /* This card is only a visual background and has no content. */ }
-                            }
-                            // <---
+                            // DEĞİŞİKLİK: Eski arkaplan Card'ı kaldırıldı.
+
                             if (firstSetupPassed) {
                                 BottomSheetPlayer(
                                     state = playerBottomSheetState,
@@ -1018,128 +1003,27 @@ class MainActivity : ComponentActivity() {
                             val isPlayerExpanded =
                                 playerBottomSheetState.progress > 0.9f
 
+                            // DEĞİŞİKLİK: Eski navigasyon barı tamamen kaldırıldı ve yerine yenisi eklendi.
                             if (shouldShowNavigationBar && !isPlayerExpanded) {
-                                Row(
-                                    modifier = Modifier
-                                        .align(Alignment.BottomCenter)
-                                        .padding(bottom = bottomInset)
-                                        .height(NavigationBarHeight)
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 12.dp),
-                                    horizontalArrangement = Arrangement.SpaceAround,
-                                    verticalAlignment = Alignment.CenterVertically
+                                Box(modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .navigationBarsPadding() // Sistem çubuğu için boşluk
                                 ) {
-                                    val homeScreens = navigationItems.take(2)
-                                    val libraryScreen = navigationItems.drop(2)
-
-                                    homeScreens.forEach { screen ->
-                                        val isSelected =
-                                            navBackStackEntry?.destination?.hierarchy?.any { it.route == screen.route } == true
-                                        NavigationBarItem(
-                                            selected = isSelected,
-                                            onClick = {
-                                                if (isSelected) {
-                                                    navController.currentBackStackEntry?.savedStateHandle?.set(
-                                                        "scrollToTop",
-                                                        true
-                                                    )
-                                                    coroutineScope.launch { searchBarScrollBehavior.state.resetHeightOffset() }
-                                                } else {
-                                                    navController.navigate(screen.route) {
-                                                        popUpTo(navController.graph.startDestinationId) {
-                                                            saveState = true
-                                                        }
-                                                        launchSingleTop = true
-                                                        restoreState = true
-                                                    }
-                                                }
-                                            },
-                                            icon = {
-                                                Icon(
-                                                    painter = painterResource(id = if (isSelected) screen.iconIdActive else screen.iconIdInactive),
-                                                    contentDescription = null
-                                                )
-                                            },
-                                            label = {
-                                                if (slimNav) {
-                                                    Text(
-                                                        text = stringResource(screen.titleId),
-                                                        maxLines = 1,
-                                                        overflow = TextOverflow.Ellipsis
-                                                    )
-                                                }
-                                            },
-                                            colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
-                                        )
-                                    }
-                                    NavigationBarItem(
-                                        selected = active,
-                                        onClick = {
+                                    LoudlyBottomNavBar(
+                                        navController = navController,
+                                        currentDestination = navBackStackEntry?.destination,
+                                        isScrolled = isScrolled,
+                                        onSearchClick = {
                                             onActiveChange(true)
                                             coroutineScope.launch {
                                                 delay(100)
                                                 searchBarFocusRequester.requestFocus()
                                             }
-                                        },
-                                        icon = {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.search),
-                                                contentDescription = stringResource(R.string.search)
-                                            )
-                                        },
-                                        label = {
-                                            if (slimNav) {
-                                                Text(
-                                                    text = stringResource(R.string.search),
-                                                    maxLines = 1,
-                                                    overflow = TextOverflow.Ellipsis
-                                                )
-                                            }
-                                        },
-                                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
+                                        }
                                     )
-                                    libraryScreen.forEach { screen ->
-                                        val isSelected =
-                                            navBackStackEntry?.destination?.hierarchy?.any { it.route == screen.route } == true
-                                        NavigationBarItem(
-                                            selected = isSelected,
-                                            onClick = {
-                                                if (isSelected) {
-                                                    navController.currentBackStackEntry?.savedStateHandle?.set(
-                                                        "scrollToTop",
-                                                        true
-                                                    )
-                                                    coroutineScope.launch { searchBarScrollBehavior.state.resetHeightOffset() }
-                                                } else {
-                                                    navController.navigate(screen.route) {
-                                                        popUpTo(navController.graph.startDestinationId) {
-                                                            saveState = true
-                                                        }
-                                                        launchSingleTop = true
-                                                        restoreState = true
-                                                    }
-                                                }
-                                            },
-                                            icon = {
-                                                Icon(
-                                                    painter = painterResource(id = if (isSelected) screen.iconIdActive else screen.iconIdInactive),
-                                                    contentDescription = null
-                                                )
-                                            },
-                                            label = {
-                                                if (slimNav) {
-                                                    Text(
-                                                        text = stringResource(screen.titleId),
-                                                        maxLines = 1,
-                                                        overflow = TextOverflow.Ellipsis
-                                                    )
-                                                }
-                                            },
-                                            colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
-                                        )
-                                    }
                                 }
                             }
+
                             BottomSheetMenu(
                                 state = LocalMenuState.current,
                                 modifier = Modifier.align(Alignment.BottomCenter)
