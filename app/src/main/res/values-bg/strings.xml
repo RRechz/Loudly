@@ -307,7 +307,6 @@
     <string name="sided">Странично</string>
     <string name="left">Ляво</string>
     <string name="center">Център</string>
-    <string name="mini_player_style">Стил на мини плейъра</string>
     <string name="player_style">Стил на плейъра</string>
     <string name="player_style_old_ui">Стар UI на плейъра</string>
     <string name="player_style_ui_1_0">UI на плейъра 1.0</string>

@@ -307,7 +307,6 @@
     <string name="sided">Laterale</string>
     <string name="left">Sinistra</string>
     <string name="center">Centro</string>
-    <string name="mini_player_style">Stile mini-lettore</string>
     <string name="player_style">Stile del lettore</string>
     <string name="player_style_old_ui">Interfaccia Lettore Vecchia</string>
     <string name="player_style_ui_1_0">Interfaccia Lettore 1.0</string>

@@ -11,17 +11,14 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,10 +36,13 @@ import androidx.compose.material.icons.automirrored.rounded.NavigateBefore
 import androidx.compose.material.icons.automirrored.rounded.NavigateNext
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.DirectionsCar
+import androidx.compose.material.icons.rounded.FastForward
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.MusicVideo
 import androidx.compose.material.icons.rounded.NotInterested
 import androidx.compose.material.icons.rounded.OfflinePin
 import androidx.compose.material.icons.rounded.Sync
+import androidx.compose.material.icons.rounded.SystemUpdateAlt
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -51,8 +51,10 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.surfaceColorAtElevation
@@ -67,9 +69,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -78,12 +80,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.babelsoftware.innertube.utils.parseCookieString
 import com.babelsoftware.loudly.R
-import com.babelsoftware.loudly.constants.AppDesignVariantKey
-import com.babelsoftware.loudly.constants.AppDesignVariantType
+import com.babelsoftware.loudly.constants.AudioQuality
+import com.babelsoftware.loudly.constants.AudioQualityKey
+import com.babelsoftware.loudly.constants.DynamicThemeKey
 import com.babelsoftware.loudly.constants.FirstSetupPassed
-import com.babelsoftware.loudly.constants.PlayerStyle
-import com.babelsoftware.loudly.constants.PlayerStyleKey
+import com.babelsoftware.loudly.constants.InnerTubeCookieKey
+import com.babelsoftware.loudly.constants.MiniPlayerAction
+import com.babelsoftware.loudly.constants.MiniPlayerActionButtonKey
+import com.babelsoftware.loudly.constants.SkipSilenceKey
+import com.babelsoftware.loudly.constants.SliderStyle
+import com.babelsoftware.loudly.constants.SliderStyleKey
+import com.babelsoftware.loudly.constants.StopMusicOnTaskClearKey
+import com.babelsoftware.loudly.constants.UseLoginForBrowse
 import com.babelsoftware.loudly.utils.rememberEnumPreference
 import com.babelsoftware.loudly.utils.rememberPreference
 
@@ -97,7 +107,7 @@ fun SetupWizard(
     )
 
     var position by remember { mutableIntStateOf(0) }
-    val maxPosition = 6 // 0: Welcome, 1: Style, 2: Story, 3: Header, 4: Playlist, 5: Settings, 6: Finish
+    val maxPosition = 4 // 0: Welcome, 1: Appearance, 2: Player, 3: Account, 4: Finish
 
     if (position > 0) {
         BackHandler {
@@ -154,12 +164,10 @@ fun SetupWizard(
                 ) { targetPosition ->
                     when (targetPosition) {
                         0 -> WelcomeStep()
-                        1 -> AppUiStyleStep()
-                        2 -> StoryShareFeatureStep()
-                        3 -> SettingsHeaderFeatureStep()
-                        4 -> PlayerPlaylistFeatureStep()
-                        5 -> NewSettingsUiFeatureStep()
-                        6 -> FinishStep()
+                        1 -> AppearanceSettingsStep()
+                        2 -> PlayerSettingsStep()
+                        3 -> AccountSettingsStep(navController)
+                        4 -> FinishStep()
                     }
                 }
             }
@@ -220,443 +228,195 @@ fun WelcomeStep() {
 }
 
 @Composable
-fun AppUiStyleStep() {
-    val (appDesignVariant, onAppDesignVariantChange) = rememberEnumPreference(AppDesignVariantKey, AppDesignVariantType.NEW)
-    val (playerStyle, onPlayerStyleChange) = rememberEnumPreference(PlayerStyleKey, PlayerStyle.UI_2_0)
+fun AppearanceSettingsStep() {
+    val (dynamicTheme, onDynamicThemeChange) = rememberPreference(DynamicThemeKey, defaultValue = true)
+    val (sliderStyle, onSliderStyleChange) = rememberEnumPreference(SliderStyleKey, defaultValue = SliderStyle.COMPOSE)
+    val (miniPlayerAction, onMiniPlayerActionChange) = rememberEnumPreference(MiniPlayerActionButtonKey, defaultValue = MiniPlayerAction.Like)
 
-    val selectedPackage = remember(appDesignVariant, playerStyle) {
-        when {
-            playerStyle == PlayerStyle.UI_2_0 -> PlayerStyle.UI_2_0
-            appDesignVariant == AppDesignVariantType.NEW && playerStyle == PlayerStyle.NEW -> PlayerStyle.NEW
-            else -> PlayerStyle.OLD
-        }
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    StepLayout(
+        title = stringResource(R.string.appearance),
+        description = stringResource(R.string.appearance_setup_desc)
     ) {
-        Text(
-            text = stringResource(R.string.select_player_ui),
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = stringResource(R.string.select_player_ui_description),
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-        )
-        Spacer(modifier = Modifier.height(32.dp))
+        // Dynamic Theme
+        WizardSettingsRow(
+            title = stringResource(R.string.enable_dynamic_theme),
+            description = stringResource(R.string.dynamic_theme_setup_dec),
+            icon = painterResource(R.drawable.palette)
+        ) {
+            Switch(checked = dynamicTheme, onCheckedChange = onDynamicThemeChange)
+        }
+
+        // Slider Style
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(stringResource(R.string.slider_style), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            PlayerStylePreview(
-                title = "App UI v2.0",
-                isSelected = selectedPackage == PlayerStyle.UI_2_0,
-                onClick = {
-                    onPlayerStyleChange(PlayerStyle.UI_2_0)
-                    onAppDesignVariantChange(AppDesignVariantType.NEW)
-                },
-                modifier = Modifier.weight(1f)
-            ) {
-                PlayerUIV2Preview()
-            }
-            PlayerStylePreview(
-                title = "App UI v1.5",
-                isSelected = selectedPackage == PlayerStyle.NEW,
-                onClick = {
-                    onPlayerStyleChange(PlayerStyle.NEW)
-                    onAppDesignVariantChange(AppDesignVariantType.NEW)
-                },
-                modifier = Modifier.weight(1f)
-            ) {
-                PlayerUIV15Preview()
-            }
-            PlayerStylePreview(
-                title = "App UI v1.0",
-                isSelected = selectedPackage == PlayerStyle.OLD,
-                onClick = {
-                    onPlayerStyleChange(PlayerStyle.OLD)
-                    onAppDesignVariantChange(AppDesignVariantType.OLD)
-                },
-                modifier = Modifier.weight(1f)
-            ) {
-                PlayerUIV10Preview()
-            }
-        }
-    }
-}
-
-@Composable
-private fun PlayerUIV2Preview() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(9f / 16f)
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.Black)
-            .padding(8.dp)
-    ) {
-        Box(
             modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .aspectRatio(1f)
-                .align(Alignment.TopCenter)
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
-        )
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(0.95f)
-                .align(Alignment.BottomCenter),
-            shape = RoundedCornerShape(8.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
-            )
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Box(modifier = Modifier.fillMaxWidth(0.9f).height(4.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)))
-                Row(
-                    modifier = Modifier.fillMaxWidth(0.8f),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
+            SliderStyle.values().forEach { style ->
+                val isSelected = sliderStyle == style
+                Card(
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(2.dp, if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent),
+                    onClick = { onSliderStyleChange(style) }
                 ) {
-                    Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)))
-                    Box(modifier = Modifier.size(20.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface))
-                    Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)))
+                    Text(
+                        text = style.name.lowercase().replaceFirstChar { it.uppercase() },
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .align(Alignment.CenterHorizontally),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
         }
-    }
-}
 
-@Composable
-private fun PlayerUIV15Preview() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(9f / 16f)
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .border(2.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
-            .padding(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .weight(1f, fill = false)
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
-        )
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Box(modifier = Modifier.fillMaxWidth(0.9f).height(4.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)))
-            Row(
-                modifier = Modifier.fillMaxWidth(0.8f),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)))
-                Box(modifier = Modifier.size(20.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface))
-                Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)))
-            }
-        }
-    }
-}
-
-@Composable
-private fun PlayerUIV10Preview() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(9f / 16f)
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp))
-            .border(2.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
-            .padding(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .weight(1f, fill = false)
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(4.dp))
-                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
-        )
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Box(modifier = Modifier.fillMaxWidth(0.9f).height(4.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)))
-                Box(modifier = Modifier.size(20.dp).clip(RoundedCornerShape(4.dp)).background(MaterialTheme.colorScheme.onSurface))
-                Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)))
-            }
-        }
-    }
-}
-
-
-@Composable
-private fun FeatureGuideStep(
-    title: String,
-    description: String,
-    content: @Composable BoxScope.() -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = title, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = description,
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.6f)
-                .aspectRatio(9f / 16f)
-                .clip(RoundedCornerShape(24.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .border(2.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), RoundedCornerShape(24.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            content()
-        }
-    }
-}
-
-@Composable
-fun StoryShareFeatureStep() {
-    FeatureGuideStep(
-        title = stringResource(R.string.create_your_story),
-        description = stringResource(R.string.share_your_story_description)
-    ) {
-        StorySharePreview()
-    }
-}
-
-@Composable
-fun SettingsHeaderFeatureStep() {
-    FeatureGuideStep(
-        title = stringResource(R.string.customizable_settings),
-        description = stringResource(R.string.customizable_settings_description)
-    ) {
-        SettingsHeaderPreview()
-    }
-}
-
-@Composable
-fun PlayerPlaylistFeatureStep() {
-    FeatureGuideStep(
-        title = stringResource(R.string.new_song_list),
-        description = stringResource(R.string.new_song_list_description)
-    ) {
-        PlayerPlaylistPreview()
-    }
-}
-
-@Composable
-fun NewSettingsUiFeatureStep() {
-    FeatureGuideStep(
-        title = stringResource(R.string.remastered_settings),
-        description = stringResource(R.string.remastered_settings_description)
-    ) {
-        NewSettingsUiPreview()
-    }
-}
-
-@Composable
-private fun StorySharePreview() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-                        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f)
-                    )
-                )
-            )
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Spacer(modifier = Modifier.weight(0.5f))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Box(modifier = Modifier.fillMaxWidth(0.7f).height(8.dp).clip(RoundedCornerShape(4.dp)).background(Color.White.copy(alpha = 0.8f)))
-            Spacer(modifier = Modifier.height(4.dp))
-            Box(modifier = Modifier.fillMaxWidth(0.5f).height(6.dp).clip(RoundedCornerShape(4.dp)).background(Color.White.copy(alpha = 0.5f)))
-            Spacer(modifier = Modifier.weight(0.2f))
-            Column(
-                modifier = Modifier.fillMaxWidth(0.8f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box(
+        // Mini Player Actions
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(stringResource(R.string.mini_player_action_button), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+        Column(modifier = Modifier.padding(top = 8.dp)) {
+            MiniPlayerAction.values().forEach { action ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(6.dp)
-                        .clip(RoundedCornerShape(3.dp))
-                        .background(Color.White.copy(alpha = 0.3f))
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { onMiniPlayerActionChange(action) }
+                        .padding(vertical = 4.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.3f)
-                            .height(6.dp)
-                            .clip(RoundedCornerShape(3.dp))
-                            .background(Color.White)
+                    RadioButton(
+                        selected = miniPlayerAction == action,
+                        onClick = { onMiniPlayerActionChange(action) }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = when (action) {
+                        MiniPlayerAction.Like -> stringResource(R.string.like)
+                        MiniPlayerAction.Next -> stringResource(R.string.next)
+                        MiniPlayerAction.Download -> stringResource(R.string.download)
+                        MiniPlayerAction.None -> stringResource(R.string.none)
+                    })
+                    Spacer(modifier = Modifier.weight(1f))
+                    // Preview
+                    Icon(
+                        imageVector = when(action) {
+                            MiniPlayerAction.Like -> Icons.Rounded.Favorite
+                            MiniPlayerAction.Next -> Icons.Rounded.FastForward
+                            MiniPlayerAction.Download -> Icons.Rounded.SystemUpdateAlt
+                            MiniPlayerAction.None -> Icons.Rounded.NotInterested
+                        },
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        modifier = Modifier.size(20.dp)
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(modifier = Modifier.size(20.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.7f)))
-                    Box(modifier = Modifier.size(30.dp).clip(CircleShape).background(Color.White))
-                    Box(modifier = Modifier.size(20.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.7f)))
-                }
-            }
-            Spacer(modifier = Modifier.weight(0.3f))
-        }
-    }
-}
-
-@Composable
-private fun SettingsHeaderPreview() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.35f)
-                .background(MaterialTheme.colorScheme.secondaryContainer),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(modifier = Modifier.size(15.dp).clip(CircleShape).background(MaterialTheme.colorScheme.tertiary))
-                Spacer(modifier = Modifier.height(2.dp))
-                Box(modifier = Modifier.fillMaxWidth(0.5f).height(20.dp).clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)).background(MaterialTheme.colorScheme.primary))
-            }
-        }
-        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            repeat(2) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Box(modifier = Modifier.size(18.dp).clip(RoundedCornerShape(6.dp)).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)))
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Box(modifier = Modifier.width(80.dp).height(8.dp).clip(RoundedCornerShape(4.dp)).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)))
-                        Box(modifier = Modifier.width(50.dp).height(6.dp).clip(RoundedCornerShape(4.dp)).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)))
-                    }
-                }
             }
         }
     }
 }
 
 @Composable
-private fun PlayerPlaylistPreview() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.fillMaxSize().background(
-            Brush.verticalGradient(
-                colors = listOf(
-                    MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                    MaterialTheme.colorScheme.surfaceVariant
-                )
-            )
-        ))
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .fillMaxHeight(0.65f)
-                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Box(modifier = Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(4.dp)).background(MaterialTheme.colorScheme.primary))
-            Box(modifier = Modifier.fillMaxWidth(0.8f).height(10.dp).clip(RoundedCornerShape(4.dp)).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)))
-            Box(modifier = Modifier.fillMaxWidth(0.9f).height(10.dp).clip(RoundedCornerShape(4.dp)).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)))
-        }
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 20.dp)
-                .fillMaxWidth(0.5f)
-                .aspectRatio(1f)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
-        )
-    }
-}
+fun PlayerSettingsStep() {
+    val (audioQuality, onAudioQualityChange) = rememberEnumPreference(AudioQualityKey, defaultValue = AudioQuality.AUTO)
+    val (skipSilence, onSkipSilenceChange) = rememberPreference(SkipSilenceKey, defaultValue = false)
+    val (stopMusicOnTaskClear, onStopMusicOnTaskClearChange) = rememberPreference(StopMusicOnTaskClearKey, defaultValue = false)
 
-@Composable
-private fun NewSettingsUiPreview() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(12.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+    StepLayout(
+        title = stringResource(R.string.player_and_audio),
+        description = stringResource(R.string.player_and_audio_setup_desc)
     ) {
-        Box(modifier = Modifier.width(50.dp).height(8.dp).clip(RoundedCornerShape(4.dp)).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)))
-        Box(modifier = Modifier.fillMaxWidth().height(30.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)))
-        Spacer(modifier = Modifier.height(4.dp))
-        Box(modifier = Modifier.width(60.dp).height(8.dp).clip(RoundedCornerShape(4.dp)).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)))
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
-                .padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+        // Audio Quality
+        Text(stringResource(R.string.audio_quality), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+        Column(modifier = Modifier.padding(top = 8.dp)) {
+            AudioQuality.values().forEach { quality ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { onAudioQualityChange(quality) }
+                        .padding(vertical = 4.dp)
+                ) {
+                    RadioButton(
+                        selected = audioQuality == quality,
+                        onClick = { onAudioQualityChange(quality) }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = when (quality) {
+                        AudioQuality.AUTO -> stringResource(R.string.audio_quality_auto)
+                        AudioQuality.MAX -> stringResource(R.string.audio_quality_max)
+                        AudioQuality.HIGH -> stringResource(R.string.audio_quality_high)
+                        AudioQuality.LOW -> stringResource(R.string.audio_quality_low)
+                    })
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Skip Silence
+        WizardSettingsRow(
+            title = stringResource(R.string.skip_silence),
+            description = stringResource(R.string.skip_silence_setup_desc),
+            icon = painterResource(R.drawable.fast_forward)
         ) {
-            Box(modifier = Modifier.fillMaxWidth().height(12.dp).clip(RoundedCornerShape(6.dp)).background(MaterialTheme.colorScheme.surfaceVariant))
-            Box(modifier = Modifier.fillMaxWidth().height(12.dp).clip(RoundedCornerShape(6.dp)).background(MaterialTheme.colorScheme.surfaceVariant))
+            Switch(checked = skipSilence, onCheckedChange = onSkipSilenceChange)
+        }
+
+        // Stop music on task clear
+        WizardSettingsRow(
+            title = stringResource(R.string.stop_music_on_task_clear),
+            description = stringResource(R.string.stop_music_setup_desc),
+            icon = painterResource(R.drawable.clear_all)
+        ) {
+            Switch(checked = stopMusicOnTaskClear, onCheckedChange = onStopMusicOnTaskClearChange)
         }
     }
 }
+
+@Composable
+fun AccountSettingsStep(navController: NavController) {
+    val (innerTubeCookie, _) = rememberPreference(InnerTubeCookieKey, "")
+    val isLoggedIn = remember(innerTubeCookie) { "SAPISID" in parseCookieString(innerTubeCookie) }
+    val (useLoginForBrowse, onUseLoginForBrowseChange) = rememberPreference(key = UseLoginForBrowse, defaultValue = false)
+
+    StepLayout(
+        title = stringResource(R.string.account),
+        description = stringResource(R.string.login_description)
+    ) {
+        if (isLoggedIn) {
+            Text(
+                stringResource(R.string.login_successful),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
+            )
+        } else {
+            Button(
+                onClick = {
+                    navController.navigate("login")
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.login))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        WizardSettingsRow(
+            title = stringResource(R.string.use_login_for_browse),
+            description = stringResource(R.string.use_login_for_browse_desc),
+            // Assuming R.drawable.person exists
+            icon = painterResource(R.drawable.person),
+            enabled = isLoggedIn
+        ) {
+            Switch(checked = useLoginForBrowse, onCheckedChange = onUseLoginForBrowseChange, enabled = isLoggedIn)
+        }
+    }
+}
+
 
 @Composable
 fun FinishStep() {
@@ -686,37 +446,6 @@ fun FinishStep() {
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-        )
-    }
-}
-
-@Composable
-fun PlayerStylePreview(
-    title: String,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    content: @Composable BoxScope.() -> Unit
-) {
-    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(16.dp))
-                .border(BorderStroke(2.dp, borderColor), RoundedCornerShape(16.dp))
-                .clickable(onClick = onClick)
-                .padding(8.dp)
-        ) {
-            content()
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = if (isSelected) MaterialTheme.colorScheme.primary else LocalContentColor.current
         )
     }
 }
@@ -820,4 +549,87 @@ fun FeatureChip(
             )
         }
     }
+}
+
+@Composable
+fun StepLayout(
+    title: String,
+    description: String,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = description,
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+        Spacer(modifier = Modifier.height(32.dp))
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            content = content
+        )
+    }
+}
+
+@Composable
+fun WizardSettingsRow(
+    title: String,
+    description: String,
+    icon: Painter,
+    enabled: Boolean = true,
+    content: @Composable () -> Unit
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ),
+        modifier = Modifier.alpha(if (enabled) 1f else 0.5f)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(
+                    painter = icon,
+                    contentDescription = title,
+                    tint = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(modifier = Modifier.padding(end = 8.dp)) {
+                    Text(text = title, fontWeight = FontWeight.Medium, style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = LocalContentColor.current.copy(alpha = 0.7f)
+                    )
+                }
+            }
+            content()
+        }
+    }
+    Spacer(modifier = Modifier.height(12.dp))
 }

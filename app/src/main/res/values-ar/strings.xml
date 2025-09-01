@@ -343,7 +343,6 @@
     <string name="sided">جانبي</string>
     <string name="left">يسار</string>
     <string name="center">وسط</string>
-    <string name="mini_player_style">نمط المشغل المصغر</string>
     <string name="player_style">نمط المشغل</string>
     <string name="player_style_old_ui">واجهة المشغل القديمة</string>
     <string name="player_style_ui_1_0">واجهة المشغل 1.0</string>

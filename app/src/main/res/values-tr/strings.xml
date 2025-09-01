@@ -304,7 +304,6 @@
     <string name="sided">Yan</string>
     <string name="left">Sol</string>
     <string name="center">Orta</string>
-    <string name="mini_player_style">Mini oynatıcı stili</string>
     <string name="mini_player_action_button">Mini Oynatıcı Aksiyonları</string>
     <string name="player_style">Oynatıcı stili</string>
     <string name="player_style_old_ui">Eski Oynatıcı Arayüzü</string>
@@ -511,6 +510,7 @@
     <string name="account_description">Giriş Yap · Spotify · Discord</string>
     <string name="appearance_description">Tema · Kaydırıcı · Oynatıcı</string>
 
+    <string name="login_successful">Giriş işleminiz başarıyla tamamlandı!</string>
     <string name="header_background">Profil Kart Resmi</string>
     <string name="header_background_description">Profil kartında ki resmi kişiselleştirin</string>
     <string name="select_header_image">Profil resmi seç</string>
@@ -631,4 +631,9 @@ TAKILMIŞ GÖRÜNÜRSE PANİK YAPMAYIN; bazen alım işlemi biraz zaman alabilir
     <string name="remove_profile_picture">Profil Fotoğrafını Kaldır</string>
     <string name="show_texts">Metni Göster</string>
     <string name="show_texts_description">Profil kartında selamlama ve kullanıcı adı metnini göster</string>
+    <string name="appearance_setup_desc">Uygulamanın ve oynatıcının görünümünü özelleştirin</string>
+    <string name="dynamic_theme_setup_dec">Cihazın renk temasını kullanır</string>
+    <string name="player_and_audio_setup_desc">Ses ve oynatma deneyiminizi özelleştirin</string>
+    <string name="skip_silence_setup_desc">Şarkılardaki sessiz anları atla</string>
+    <string name="stop_music_setup_desc">Uygulama son kullanılanlar listesinden silinirse, müzik durur.</string>
 </resources>

@@ -307,7 +307,6 @@
     <string name="sided">Πλαϊνά</string>
     <string name="left">Αριστερά</string>
     <string name="center">Κέντρο</string>
-    <string name="mini_player_style">Στυλ mini player</string>
     <string name="player_style">Στυλ player</string>
     <string name="player_style_old_ui">Παλιό περιβάλλον player</string>
     <string name="player_style_ui_1_0">Περιβάλλον player 1.0</string>

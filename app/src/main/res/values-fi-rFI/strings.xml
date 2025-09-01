@@ -307,7 +307,6 @@
     <string name="sided">Sivulla</string>
     <string name="left">Vasen</string>
     <string name="center">Keskitetty</string>
-    <string name="mini_player_style">Minisoittimen tyyli</string>
     <string name="player_style">Soittimen tyyli</string>
     <string name="player_style_old_ui">Soittimen vanha käyttöliittymä</string>
     <string name="player_style_ui_1_0">Soittimen käyttöliittymä 1.0</string>

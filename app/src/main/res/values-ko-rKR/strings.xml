@@ -298,7 +298,6 @@
     <string name="sided">측면</string>
     <string name="left">왼쪽</string>
     <string name="center">가운데</string>
-    <string name="mini_player_style">미니 플레이어 스타일</string>
     <string name="player_style">플레이어 스타일</string>
     <string name="player_style_old_ui">이전 플레이어 UI</string>
     <string name="player_style_ui_1_0">플레이어 UI 1.0</string>

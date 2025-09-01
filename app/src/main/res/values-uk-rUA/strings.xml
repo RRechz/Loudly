@@ -308,7 +308,6 @@
     <string name="theme">Тема</string>
     <string name="proxy">Проксі</string>
     <string name="enable_dynamic_theme">Увімкнути динамічну тему</string>
-    <string name="mini_player_style">Стиль міні плеєра</string>
     <string name="player_style">Стиль гравця</string>
     <string name="dark_theme">Темна тема</string>
     <string name="dark_theme_on">Увімк.</string>

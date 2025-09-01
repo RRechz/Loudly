@@ -325,7 +325,6 @@
     <string name="sided">По бокам</string>
     <string name="left">Слева</string>
     <string name="center">По центру</string>
-    <string name="mini_player_style">Стиль мини-плеера</string>
     <string name="player_style">Стиль плеера</string>
     <string name="player_style_old_ui">Старый интерфейс плеера</string>
     <string name="player_style_ui_1_0">Интерфейс плеера 1.0</string>

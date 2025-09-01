@@ -307,7 +307,6 @@
     <string name="sided">Seitlich</string>
     <string name="left">Links</string>
     <string name="center">Zentriert</string>
-    <string name="mini_player_style">Mini-Player-Stil</string>
     <string name="player_style">Player-Stil</string>
     <string name="player_style_old_ui">Player Alte Benutzeroberfläche</string>
     <string name="player_style_ui_1_0">Player-Benutzeroberfläche 1.0</string>

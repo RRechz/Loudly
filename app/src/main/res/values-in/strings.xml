@@ -307,7 +307,6 @@
     <string name="sided">Samping</string>
     <string name="left">Kiri</string>
     <string name="center">Tengah</string>
-    <string name="mini_player_style">Gaya pemutar mini</string>
     <string name="player_style">Gaya pemutar</string>
     <string name="player_style_old_ui">UI Pemutar Lama</string>
     <string name="player_style_ui_1_0">UI Pemutar 1.0</string>

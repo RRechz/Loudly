@@ -298,7 +298,6 @@
     <string name="sided">側邊</string>
     <string name="left">靠左</string>
     <string name="center">置中</string>
-    <string name="mini_player_style">迷你播放器樣式</string>
     <string name="player_style">播放器樣式</string>
     <string name="player_style_old_ui">舊版播放器介面</string>
     <string name="player_style_ui_1_0">播放器介面 1.0</string>

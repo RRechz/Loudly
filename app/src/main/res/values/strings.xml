@@ -535,6 +535,13 @@
     <string name="account_description">Log in · Spotify · Discord</string>
     <string name="appearance_description">Theme · Slider · Player</string>
 
+    <string name="appearance_setup_desc">Customize the appearance of the app and player</string>
+    <string name="dynamic_theme_setup_dec">Uses color theme of device</string>
+    <string name="player_and_audio_setup_desc">Customize your sound and playback experience</string>
+    <string name="skip_silence_setup_desc">Skip the quiet moments in songs</string>
+    <string name="stop_music_setup_desc">If the application is cleared from the recently used list, it will stop the music</string>
+    <string name="login_successful">You have successfully logged in!</string>
+
     <string name="header_background">Profile Card Picture</string>
     <string name="header_background_description">Customize the picture on the profile card</string>
     <string name="select_header_image">Choose profile image</string>
