@@ -82,8 +82,6 @@ import com.babelsoftware.loudly.R
 import com.babelsoftware.loudly.constants.AppDesignVariantKey
 import com.babelsoftware.loudly.constants.AppDesignVariantType
 import com.babelsoftware.loudly.constants.FirstSetupPassed
-import com.babelsoftware.loudly.constants.MiniPlayerStyle
-import com.babelsoftware.loudly.constants.MiniPlayerStyleKey
 import com.babelsoftware.loudly.constants.PlayerStyle
 import com.babelsoftware.loudly.constants.PlayerStyleKey
 import com.babelsoftware.loudly.utils.rememberEnumPreference
@@ -225,9 +223,8 @@ fun WelcomeStep() {
 fun AppUiStyleStep() {
     val (appDesignVariant, onAppDesignVariantChange) = rememberEnumPreference(AppDesignVariantKey, AppDesignVariantType.NEW)
     val (playerStyle, onPlayerStyleChange) = rememberEnumPreference(PlayerStyleKey, PlayerStyle.UI_2_0)
-    val (miniPlayerStyle, onMiniPlayerStyleChange) = rememberEnumPreference(MiniPlayerStyleKey, MiniPlayerStyle.NEW)
 
-    val selectedPackage = remember(appDesignVariant, playerStyle, miniPlayerStyle) {
+    val selectedPackage = remember(appDesignVariant, playerStyle) {
         when {
             playerStyle == PlayerStyle.UI_2_0 -> PlayerStyle.UI_2_0
             appDesignVariant == AppDesignVariantType.NEW && playerStyle == PlayerStyle.NEW -> PlayerStyle.NEW
@@ -278,7 +275,6 @@ fun AppUiStyleStep() {
                 onClick = {
                     onPlayerStyleChange(PlayerStyle.NEW)
                     onAppDesignVariantChange(AppDesignVariantType.NEW)
-                    onMiniPlayerStyleChange(MiniPlayerStyle.NEW)
                 },
                 modifier = Modifier.weight(1f)
             ) {
@@ -290,7 +286,6 @@ fun AppUiStyleStep() {
                 onClick = {
                     onPlayerStyleChange(PlayerStyle.OLD)
                     onAppDesignVariantChange(AppDesignVariantType.OLD)
-                    onMiniPlayerStyleChange(MiniPlayerStyle.OLD)
                 },
                 modifier = Modifier.weight(1f)
             ) {

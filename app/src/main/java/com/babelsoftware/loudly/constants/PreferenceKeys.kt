@@ -246,9 +246,12 @@ enum class PlayerStyle {
     UI_2_0
 }
 
-enum class MiniPlayerStyle {
-    OLD,
-    NEW,
+val MiniPlayerActionButtonKey = stringPreferencesKey("miniPlayerActionButton")
+enum class MiniPlayerAction {
+    Like,
+    Next,
+    Download,
+    None
 }
 
 enum class PlayerBackgroundStyle {
@@ -260,7 +263,6 @@ enum class PlayerBackgroundStyle {
 
 val PlayerBackgroundStyleKey = stringPreferencesKey("playerBackgroundStyle")
 val PlayerStyleKey = stringPreferencesKey("playerStyle")
-val MiniPlayerStyleKey = stringPreferencesKey("miniPlayerStyle")
 val ShowLyricsKey = booleanPreferencesKey("showLyrics")
 val TranslateLyricsKey = booleanPreferencesKey("translateLyrics")
 val LockQueueKey = booleanPreferencesKey("lockQueue")

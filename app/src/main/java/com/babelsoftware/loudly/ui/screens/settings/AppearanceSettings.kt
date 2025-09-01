@@ -8,6 +8,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,6 +43,7 @@ import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.compose.material.icons.rounded.DesignServices
 import androidx.compose.material.icons.rounded.East
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.FilterCenterFocus
 import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.icons.rounded.Image
@@ -61,6 +63,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -97,6 +100,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.babelsoftware.innertube.utils.parseCookieString
@@ -125,8 +129,8 @@ import com.babelsoftware.loudly.constants.HeaderCardProfilePictureUriKey
 import com.babelsoftware.loudly.constants.HeaderImageKey
 import com.babelsoftware.loudly.constants.InnerTubeCookieKey
 import com.babelsoftware.loudly.constants.LibraryFilter
-import com.babelsoftware.loudly.constants.MiniPlayerStyle
-import com.babelsoftware.loudly.constants.MiniPlayerStyleKey
+import com.babelsoftware.loudly.constants.MiniPlayerAction
+import com.babelsoftware.loudly.constants.MiniPlayerActionButtonKey
 import com.babelsoftware.loudly.constants.PlayerBackgroundStyle
 import com.babelsoftware.loudly.constants.PlayerBackgroundStyleKey
 import com.babelsoftware.loudly.constants.PlayerStyle
@@ -269,10 +273,12 @@ fun AppearanceSettings(
     )
     var showProfilePictureDialog by remember { mutableStateOf(false) }
     var showGradientDialog by remember { mutableStateOf(false) }
-    val (miniPlayerStyle, onMiniPlayerStyle) = rememberEnumPreference(
-        MiniPlayerStyleKey,
-        defaultValue = MiniPlayerStyle.NEW
+
+    val (miniPlayerAction, onMiniPlayerActionChange) = rememberEnumPreference(
+        MiniPlayerActionButtonKey,
+        defaultValue = MiniPlayerAction.Like
     )
+
     val (innerTubeCookie) = rememberPreference(InnerTubeCookieKey, "")
     val isLoggedIn = remember(innerTubeCookie) {
         "SAPISID" in parseCookieString(innerTubeCookie)
@@ -295,7 +301,8 @@ fun AppearanceSettings(
     var showPlayerBackgroundDialog by remember { mutableStateOf(false) }
     var showAppDesignDialog by remember { mutableStateOf(false) }
     var showPlayerStyleDialog by remember { mutableStateOf(false) }
-    var showMiniPlayerStyleDialog by remember { mutableStateOf(false) }
+
+    var showMiniPlayerActionDialog by remember { mutableStateOf(false) }
 
     val cropActivityTitle = stringResource(id = R.string.edit_photo)
     val cropButtonTitle = stringResource(id = R.string.save)
@@ -363,7 +370,6 @@ fun AppearanceSettings(
         )
     }
 
-    // App Design Variant selection dialog
     if (showAppDesignDialog) {
         AlertDialog(
             onDismissRequest = { showAppDesignDialog = false },
@@ -396,7 +402,6 @@ fun AppearanceSettings(
         )
     }
 
-    // Player Style Selection Dialog
     if (showPlayerStyleDialog) {
         AlertDialog(
             onDismissRequest = { showPlayerStyleDialog = false },
@@ -430,40 +435,6 @@ fun AppearanceSettings(
         )
     }
 
-    // Mini Player Style Selection Dialog
-    if (showMiniPlayerStyleDialog) {
-        AlertDialog(
-            onDismissRequest = { showMiniPlayerStyleDialog = false },
-            title = { Text(stringResource(R.string.mini_player_style)) },
-            text = {
-                Column {
-                    val options = mapOf(
-                        MiniPlayerStyle.OLD to stringResource(R.string.player_style_old_ui),
-                        MiniPlayerStyle.NEW to stringResource(R.string.player_style_ui_1_0)
-                    )
-                    options.forEach { (option, description) ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable {
-                                onMiniPlayerStyle(option)
-                                showMiniPlayerStyleDialog = false
-                            }.padding(vertical = 12.dp, horizontal = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(selected = (miniPlayerStyle == option), onClick = {
-                                onMiniPlayerStyle(option)
-                                showMiniPlayerStyleDialog = false
-                            })
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = description)
-                        }
-                    }
-                }
-            },
-            confirmButton = { TextButton(onClick = { showMiniPlayerStyleDialog = false }) { Text(stringResource(R.string.cancel)) } }
-        )
-    }
-
-    // Player Background Selection Dialog
     if (showPlayerBackgroundDialog) {
         AlertDialog(
             onDismissRequest = { showPlayerBackgroundDialog = false },
@@ -515,7 +486,6 @@ fun AppearanceSettings(
         )
     }
 
-    // Dark Mode Selection Dialog
     if (showDarkModeDialog) {
         AlertDialog(
             onDismissRequest = { showDarkModeDialog = false },
@@ -557,6 +527,17 @@ fun AppearanceSettings(
                 TextButton(onClick = { showDarkModeDialog = false }) {
                     Text(stringResource(R.string.cancel))
                 }
+            }
+        )
+    }
+
+    if (showMiniPlayerActionDialog) {
+        MiniPlayerActionDialog(
+            initialAction = miniPlayerAction,
+            onDismiss = { showMiniPlayerActionDialog = false },
+            onSave = { selectedAction ->
+                onMiniPlayerActionChange(selectedAction)
+                showMiniPlayerActionDialog = false
             }
         )
     }
@@ -727,7 +708,6 @@ fun AppearanceSettings(
             title = { Text(stringResource(R.string.text_alignment)) },
             text = {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    // --- PREVİEW CARD ---
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -760,7 +740,6 @@ fun AppearanceSettings(
                     }
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // --- ALIGNMENT CONTROL GRID (3x3) ---
                     Column(
                         modifier = Modifier.width(150.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -776,7 +755,6 @@ fun AppearanceSettings(
                                 Icon(Icons.Rounded.NorthEast, contentDescription = "Sağ Üst")
                             }
                         }
-                        // Center Row
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             IconButton(onClick = { tempAlignment = HeaderCardContentAlignment.CenterStart }) {
                                 Icon(Icons.Rounded.West, contentDescription = "Sol Orta")
@@ -788,7 +766,6 @@ fun AppearanceSettings(
                                 Icon(Icons.Rounded.East, contentDescription = "Sağ Orta")
                             }
                         }
-                        // Bottom Row
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             IconButton(onClick = { tempAlignment = HeaderCardContentAlignment.BottomStart }) {
                                 Icon(Icons.Rounded.SouthWest, contentDescription = "Sol Alt")
@@ -801,7 +778,7 @@ fun AppearanceSettings(
                             }
                         }
                     }
-                    }
+                }
             },
             confirmButton = {
                 TextButton(
@@ -1077,12 +1054,10 @@ fun AppearanceSettings(
                     "1.0" -> {
                         onAppDesignVariantChange(AppDesignVariantType.OLD)
                         onPlayerStyle(PlayerStyle.OLD)
-                        onMiniPlayerStyle(MiniPlayerStyle.OLD)
                     }
                     "1.5" -> {
                         onAppDesignVariantChange(AppDesignVariantType.NEW)
                         onPlayerStyle(PlayerStyle.NEW)
-                        onMiniPlayerStyle(MiniPlayerStyle.NEW)
                     }
                     "2.0" -> {
                         onPlayerStyle(PlayerStyle.UI_2_0)
@@ -1123,7 +1098,6 @@ fun AppearanceSettings(
         ) {
             Spacer(modifier = Modifier.height(4.dp))
 
-            // --- THEME GROUP ---
             SettingCategory(title = stringResource(R.string.theme))
             SettingsBox(
                 title = stringResource(R.string.enable_dynamic_theme),
@@ -1188,20 +1162,8 @@ fun AppearanceSettings(
                         title = stringResource(R.string.player_style),
                         description = playerStyleDesc,
                         icon = IconResource.Drawable(painterResource(R.drawable.play)),
-                        shape = shapeManager(),
-                        onClick = { showPlayerStyleDialog = true }
-                    )
-
-                    val miniPlayerStyleDesc = when (miniPlayerStyle) {
-                        MiniPlayerStyle.OLD -> stringResource(R.string.player_style_old_ui)
-                        MiniPlayerStyle.NEW -> stringResource(R.string.player_style_ui_1_0)
-                    }
-                    SettingsBox(
-                        title = stringResource(R.string.mini_player_style),
-                        description = miniPlayerStyleDesc,
-                        icon = IconResource.Drawable(painterResource(R.drawable.play)),
                         shape = shapeManager(isLast = true),
-                        onClick = { showMiniPlayerStyleDialog = true }
+                        onClick = { showPlayerStyleDialog = true }
                     )
                 }
 
@@ -1215,13 +1177,70 @@ fun AppearanceSettings(
                 )
             }
 
-            // --- PROFILE CARD GROUP ---
+            SettingCategory(title = stringResource(R.string.player))
+            val sliderStyleDesc = when (sliderStyle) {
+                SliderStyle.DEFAULT -> stringResource(R.string.default_)
+                SliderStyle.SQUIGGLY -> stringResource(R.string.squiggly)
+                SliderStyle.COMPOSE -> stringResource(R.string.compose)
+            }
+            SettingsBox(
+                title = stringResource(R.string.slider_style),
+                description = sliderStyleDesc,
+                icon = IconResource.Drawable(painterResource(R.drawable.sliders)),
+                shape = shapeManager(isFirst = true),
+                onClick = { showSliderOptionDialog = true }
+            )
+            val playerBackgroundDesc = when (playerBackground) {
+                PlayerBackgroundStyle.DEFAULT -> stringResource(R.string.follow_theme)
+                PlayerBackgroundStyle.GRADIENT -> stringResource(R.string.gradient)
+                PlayerBackgroundStyle.BLURMOV -> stringResource(R.string.blurmv)
+                PlayerBackgroundStyle.BLUR -> stringResource(R.string.blur)
+            }
+            SettingsBox(
+                title = stringResource(R.string.player_background_style),
+                description = playerBackgroundDesc,
+                icon = IconResource.Drawable(painterResource(R.drawable.gradient)),
+                shape = shapeManager(),
+                onClick = { showPlayerBackgroundDialog = true }
+            )
+
+            val miniPlayerActionDesc = when (miniPlayerAction) {
+                MiniPlayerAction.Like -> stringResource(R.string.like)
+                MiniPlayerAction.Next -> stringResource(R.string.next)
+                MiniPlayerAction.Download -> stringResource(R.string.download)
+                MiniPlayerAction.None -> stringResource(R.string.none)
+            }
+            SettingsBox(
+                title = stringResource(R.string.mini_player_action_button),
+                description = miniPlayerActionDesc,
+                icon = IconResource.Drawable(painterResource(R.drawable.play)),
+                shape = shapeManager(),
+                onClick = { showMiniPlayerActionDialog = true }
+            )
+
+            SettingsBox(
+                title = stringResource(R.string.enable_swipe_thumbnail),
+                icon = IconResource.Drawable(painterResource(R.drawable.swipe)),
+                shape = shapeManager(),
+                actionType = ActionType.SWITCH,
+                isChecked = swipeThumbnail,
+                onCheckedChange = onSwipeThumbnailChange,
+                onClick = { onSwipeThumbnailChange(!swipeThumbnail) }
+            )
+            SettingsBox(
+                title = stringResource(R.string.thumbnail_corner_radius),
+                description = "$thumbnailCornerRadius" + "0%",
+                icon = IconResource.Vector(Icons.Rounded.Image),
+                shape = shapeManager(isLast = true),
+                onClick = { showCornerRadiusDialog = true }
+            )
+
             SettingCategory(title = stringResource(R.string.profile_card))
             SettingsBox(
                 title = stringResource(R.string.show_texts),
                 description = stringResource(R.string.show_texts_description),
                 icon = IconResource.Drawable(painterResource(R.drawable.badge)),
-                shape = shapeManager(isFirst = true, isLast = false), // DEĞİŞTİ: Artık son eleman değil.
+                shape = shapeManager(isFirst = true, isLast = false),
                 actionType = ActionType.SWITCH,
                 isChecked = showHeaderCardText,
                 onCheckedChange = onShowHeaderCardTextChange,
@@ -1263,7 +1282,6 @@ fun AppearanceSettings(
                 onClick = { showProfilePictureDialog = true }
             )
 
-            // --- HOME GROUP ---
             SettingCategory(title = stringResource(R.string.home))
 
             if (isLoggedIn) {
@@ -1297,51 +1315,6 @@ fun AppearanceSettings(
                 )
             }
 
-            // --- PLAYER GROUP ---
-            SettingCategory(title = stringResource(R.string.player))
-            val sliderStyleDesc = when (sliderStyle) {
-                SliderStyle.DEFAULT -> stringResource(R.string.default_)
-                SliderStyle.SQUIGGLY -> stringResource(R.string.squiggly)
-                SliderStyle.COMPOSE -> stringResource(R.string.compose)
-            }
-            SettingsBox(
-                title = stringResource(R.string.slider_style),
-                description = sliderStyleDesc,
-                icon = IconResource.Drawable(painterResource(R.drawable.sliders)),
-                shape = shapeManager(isFirst = true),
-                onClick = { showSliderOptionDialog = true }
-            )
-            val playerBackgroundDesc = when (playerBackground) {
-                PlayerBackgroundStyle.DEFAULT -> stringResource(R.string.follow_theme)
-                PlayerBackgroundStyle.GRADIENT -> stringResource(R.string.gradient)
-                PlayerBackgroundStyle.BLURMOV -> stringResource(R.string.blurmv)
-                PlayerBackgroundStyle.BLUR -> stringResource(R.string.blur)
-            }
-            SettingsBox(
-                title = stringResource(R.string.player_background_style),
-                description = playerBackgroundDesc,
-                icon = IconResource.Drawable(painterResource(R.drawable.gradient)),
-                shape = shapeManager(),
-                onClick = { showPlayerBackgroundDialog = true }
-            )
-            SettingsBox(
-                title = stringResource(R.string.enable_swipe_thumbnail),
-                icon = IconResource.Drawable(painterResource(R.drawable.swipe)),
-                shape = shapeManager(),
-                actionType = ActionType.SWITCH,
-                isChecked = swipeThumbnail,
-                onCheckedChange = onSwipeThumbnailChange,
-                onClick = { onSwipeThumbnailChange(!swipeThumbnail) }
-            )
-            SettingsBox(
-                title = stringResource(R.string.thumbnail_corner_radius),
-                description = "$thumbnailCornerRadius" + "0%",
-                icon = IconResource.Vector(Icons.Rounded.Image),
-                shape = shapeManager(isLast = true),
-                onClick = { showCornerRadiusDialog = true }
-            )
-
-            // --- MISC GROUP ---
             SettingCategory(title = stringResource(R.string.misc))
             SettingsBox(
                 title = stringResource(R.string.other_settings),
@@ -1356,6 +1329,152 @@ fun AppearanceSettings(
     }
 }
 
+@Composable
+fun MiniPlayerActionDialog(
+    initialAction: MiniPlayerAction,
+    onDismiss: () -> Unit,
+    onSave: (MiniPlayerAction) -> Unit
+) {
+    var selectedAction by remember { mutableStateOf(initialAction) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.mini_player_action_button)) },
+        text = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                // --- MiniPlayer PREVIEW ---
+                Text(
+                    text = stringResource(R.string.preview),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                MiniPlayerPreview(action = selectedAction)
+                HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+                Column {
+                    val options = MiniPlayerAction.values()
+                    options.forEach { option ->
+                        val description = when (option) {
+                            MiniPlayerAction.Like -> stringResource(R.string.like)
+                            MiniPlayerAction.Next -> stringResource(R.string.next)
+                            MiniPlayerAction.Download -> stringResource(R.string.download)
+                            MiniPlayerAction.None -> stringResource(R.string.none)
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable { selectedAction = option }
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = (selectedAction == option),
+                                onClick = { selectedAction = option }
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = description)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onSave(selectedAction) }) {
+                Text(stringResource(R.string.save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
+}
+
+@Composable
+private fun MiniPlayerPreview(action: MiniPlayerAction) {
+    val cardColors = CardDefaults.cardColors(
+        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f)
+    )
+    val cardBorder = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = cardColors,
+        border = cardBorder,
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Placeholder Album Art
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.loudly_monochrome),
+                    contentDescription = "Album Art",
+                    modifier = Modifier.align(Alignment.Center).size(24.dp),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+
+            // Placeholder Song Info
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Song Name", fontWeight = FontWeight.SemiBold)
+                Text("Artist", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+            }
+
+            // Placeholder Controls
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                when (action) {
+                    MiniPlayerAction.Like -> {
+                        Icon(
+                            imageVector = Icons.Rounded.FavoriteBorder,
+                            contentDescription = "Like",
+                            modifier = Modifier.size(26.dp),
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                        )
+                    }
+                    MiniPlayerAction.Next -> {
+                        Icon(
+                            painter = painterResource(R.drawable.skip_next),
+                            contentDescription = "Next",
+                            modifier = Modifier.size(28.dp),
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                        )
+                    }
+                    MiniPlayerAction.None -> {}
+                    MiniPlayerAction.Download -> {
+                        Icon(
+                            painter = painterResource(R.drawable.download),
+                            contentDescription = "Download",
+                            modifier = Modifier.size(28.dp),
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                        )
+                    }
+                }
+                Icon(
+                    painter = painterResource(R.drawable.play),
+                    contentDescription = "Play/Pause",
+                    modifier = Modifier.size(32.dp),
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+                )
+            }
+        }
+    }
+}
 @Composable
 private fun HeaderImagePickerDialog(
     initialValue: String,

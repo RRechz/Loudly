@@ -305,10 +305,12 @@
     <string name="left">Sol</string>
     <string name="center">Orta</string>
     <string name="mini_player_style">Mini oynatıcı stili</string>
+    <string name="mini_player_action_button">Mini Oynatıcı Aksiyonları</string>
     <string name="player_style">Oynatıcı stili</string>
     <string name="player_style_old_ui">Eski Oynatıcı Arayüzü</string>
     <string name="player_style_ui_1_0">Oynatıcı Arayüzü 1.0</string>
     <string name="player_style_ui_2_0">Oynatıcı Arayüzü 2.0</string>
+    <string name="none">Yok</string>
     <string name="follow_theme">Temayı takip et</string>
     <string name="gradient">Gradyan</string>
     <string name="blur">Bulanıklık</string>

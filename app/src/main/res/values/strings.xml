@@ -329,11 +329,12 @@
     <string name="sided">Sided</string>
     <string name="left">Left</string>
     <string name="center">Center</string>
-    <string name="mini_player_style">Mini player style</string>
+    <string name="mini_player_action_button">Mini Player Actions</string>
     <string name="player_style">Player style</string>
     <string name="player_style_old_ui">Player Old UI</string>
     <string name="player_style_ui_1_0">Player UI 1.0</string>
     <string name="player_style_ui_2_0">Player UI 2.0</string>
+    <string name="none">None</string>
     <string name="follow_theme">Follow theme</string>
     <string name="gradient">Gradient</string>
     <string name="blur">Blur</string>
