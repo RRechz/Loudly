@@ -132,6 +132,7 @@ import me.saket.squiggles.SquigglySlider
 fun BottomSheetPlayer(
     state: BottomSheetState,
     navController: NavController,
+    isScrolled: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
@@ -251,12 +252,6 @@ fun BottomSheetPlayer(
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
-    val collapsedCardBackgroundColor = if (isSystemInDarkTheme()) {
-        MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
-    } else {
-        MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
-    }
-
     BottomSheet(
         state = state,
         modifier = modifier,
@@ -269,7 +264,9 @@ fun BottomSheetPlayer(
         collapsedContent = {
             MiniPlayer(
                 position = position,
-                duration = duration
+                duration = duration,
+                isScrolled = isScrolled,
+                onExpand = { state.expand() }
             )
         }
     ) {
