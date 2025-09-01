@@ -1,11 +1,8 @@
 package com.babelsoftware.loudly.ui.component
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,13 +18,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -36,17 +32,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.babelsoftware.loudly.R
 import com.babelsoftware.loudly.ui.screens.Screens
 
-// Navigasyon barı elemanlarını temsil eden veri sınıfı
+// Data class representing navigation bar elements
 private data class NavItem(
     val route: String,
     val iconResId: Int,
@@ -54,7 +48,7 @@ private data class NavItem(
     val labelResId: Int
 )
 
-// Navigasyon elemanlarının listesi
+// List of navigation elements
 private val navItems = listOf(
     NavItem(Screens.Home.route, R.drawable.home_outlined, R.drawable.home_filled, R.string.home),
     NavItem(Screens.Explore.route, R.drawable.explore_outlined, R.drawable.explore_filled, R.string.explore),
@@ -62,7 +56,7 @@ private val navItems = listOf(
 )
 
 /**
- * Loudly uygulaması için özel olarak tasarlanmış, animasyonlu ve kaydırma durumuna duyarlı alt navigasyon barı.
+ * Custom-designed animated and scroll-sensitive bottom navigation bar, inspired by Apple Music.
  */
 @Composable
 fun LoudlyBottomNavBar(
@@ -72,53 +66,43 @@ fun LoudlyBottomNavBar(
     onSearchClick: () -> Unit
 ) {
     val liquidAnimationSpec = spring<Dp>(
-        dampingRatio = 0.75f,
-        stiffness = Spring.StiffnessLow
+        dampingRatio = 0.8f,
+        stiffness = Spring.StiffnessMedium
     )
 
-    val containerHeight by animateDpAsState(if (isScrolled) 58.dp else 64.dp, liquidAnimationSpec, label = "containerHeight")
-    val iconSize by animateDpAsState(if (isScrolled) 24.dp else 26.dp, liquidAnimationSpec, label = "iconSize")
-    val gapWidth by animateDpAsState(if (isScrolled) 0.dp else 8.dp, liquidAnimationSpec, label = "gapWidth")
-    val navItemsArrangement by animateDpAsState(if (isScrolled) 16.dp else 20.dp, liquidAnimationSpec, label = "navItemsArrangement")
-    val navGroupHorizontalPadding by animateDpAsState(if (isScrolled) 18.dp else 20.dp, liquidAnimationSpec, label = "navGroupHorizontalPadding")
-    val navGroupShape = RoundedCornerShape(
-        topStart = 32.dp,
-        bottomStart = 32.dp,
-        topEnd = if (isScrolled) 0.dp else 32.dp,
-        bottomEnd = if (isScrolled) 0.dp else 32.dp
-    )
-    val searchGroupShape = RoundedCornerShape(
-        topStart = if (isScrolled) 0.dp else 32.dp,
-        bottomStart = if (isScrolled) 0.dp else 32.dp,
-        topEnd = 32.dp,
-        bottomEnd = 32.dp
-    )
-
+    val containerHeight by animateDpAsState(targetValue = 60.dp, animationSpec = liquidAnimationSpec, label = "containerHeight")
+    val iconSize by animateDpAsState(targetValue = 24.dp, animationSpec = liquidAnimationSpec, label = "iconSize")
+    val cardPadding by animateDpAsState(if (isScrolled) 8.dp else 12.dp, liquidAnimationSpec, label = "cardPadding")
+    val navCardShape = RoundedCornerShape(50.dp)
     val cardColors = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.95f)
+        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.75f)
     )
-    val cardBorder = BorderStroke(1.dp, Color.White.copy(alpha = 0.4f))
-    val cardElevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-
+    val cardBorder = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
+    val cardElevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(containerHeight + 24.dp),
+            .padding(horizontal = cardPadding)
+            .height(containerHeight + 20.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Main Floating Island Card
         Card(
-            modifier = Modifier.height(containerHeight),
-            shape = navGroupShape,
+            modifier = Modifier
+                .height(containerHeight)
+                .weight(1f),
+            shape = navCardShape,
             colors = cardColors,
             border = cardBorder,
             elevation = cardElevation
         ) {
             Row(
                 modifier = Modifier
-                    .padding(horizontal = navGroupHorizontalPadding),
-                horizontalArrangement = Arrangement.spacedBy(navItemsArrangement),
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 navItems.forEach { navItem ->
@@ -126,7 +110,6 @@ fun LoudlyBottomNavBar(
                     NavButton(
                         item = navItem,
                         isSelected = isSelected,
-                        isScrolled = isScrolled,
                         iconSize = iconSize,
                         onClick = {
                             if (!isSelected) {
@@ -142,8 +125,9 @@ fun LoudlyBottomNavBar(
             }
         }
 
-        Spacer(modifier = Modifier.width(gapWidth))
+        Spacer(modifier = Modifier.width(12.dp))
 
+        // Search Button
         Card(
             modifier = Modifier
                 .size(containerHeight)
@@ -152,26 +136,12 @@ fun LoudlyBottomNavBar(
                     indication = null,
                     onClick = onSearchClick
                 ),
-            shape = searchGroupShape,
+            shape = CircleShape,
             colors = cardColors,
             border = cardBorder,
             elevation = cardElevation
         ) {
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = isScrolled,
-                    enter = fadeIn(animationSpec = spring()),
-                    exit = fadeOut(animationSpec = spring())
-                ) {
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .height(24.dp)
-                            .width(1.dp)
-                            .padding(start = 0.5.dp),
-                        color = Color.White.copy(alpha = 0.3f)
-                    )
-                }
                 Icon(
                     painter = painterResource(id = R.drawable.search),
                     contentDescription = stringResource(R.string.search),
@@ -184,17 +154,16 @@ fun LoudlyBottomNavBar(
 }
 
 /**
- * Navigasyon barı içindeki her bir butonu temsil eden Composable.
+ * Composable representing each button in the navigation bar.
  */
 @Composable
 private fun NavButton(
     item: NavItem,
     isSelected: Boolean,
-    isScrolled: Boolean,
     iconSize: Dp,
     onClick: () -> Unit
 ) {
-    val contentColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+    val contentColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
 
     Column(
         modifier = Modifier
@@ -203,10 +172,8 @@ private fun NavButton(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = onClick
-            )
-            .padding(horizontal = 4.dp),
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
-        // DEĞİŞİKLİK: İçeriği dikeyde mükemmel ortalamak için Arrangement.Center kullanılıyor.
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
@@ -215,26 +182,6 @@ private fun NavButton(
             modifier = Modifier.size(iconSize),
             tint = contentColor
         )
-
-        // DEĞİŞİKLİK: AnimatedVisibility, metin kaybolduğunda düzen ağacından tamamen çıkarak
-        // ikonun doğru şekilde ortalanmasını sağlar.
-        AnimatedVisibility(
-            visible = !isScrolled,
-            enter = fadeIn(spring(stiffness = Spring.StiffnessMedium)),
-            exit = fadeOut(spring(stiffness = Spring.StiffnessMedium))
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = stringResource(id = item.labelResId),
-                    color = contentColor,
-                    fontSize = 11.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    softWrap = false
-                )
-            }
-        }
     }
 }
 

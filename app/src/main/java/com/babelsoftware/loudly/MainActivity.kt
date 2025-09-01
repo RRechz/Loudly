@@ -21,7 +21,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -36,7 +35,6 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -48,15 +46,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -82,7 +76,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -90,9 +83,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
@@ -101,7 +92,6 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -122,14 +112,12 @@ import com.babelsoftware.loudly.constants.DynamicThemeKey
 import com.babelsoftware.loudly.constants.FirstSetupPassed
 import com.babelsoftware.loudly.constants.LibraryFilter
 import com.babelsoftware.loudly.constants.MiniPlayerHeight
-import com.babelsoftware.loudly.constants.NavigationBarHeight
 import com.babelsoftware.loudly.constants.PauseSearchHistoryKey
 import com.babelsoftware.loudly.constants.PlayerStyle
 import com.babelsoftware.loudly.constants.PlayerStyleKey
 import com.babelsoftware.loudly.constants.PureBlackKey
 import com.babelsoftware.loudly.constants.SearchSource
 import com.babelsoftware.loudly.constants.SearchSourceKey
-import com.babelsoftware.loudly.constants.SlimNavBarKey
 import com.babelsoftware.loudly.constants.StopMusicOnTaskClearKey
 import com.babelsoftware.loudly.db.MusicDatabase
 import com.babelsoftware.loudly.db.entities.SearchHistory
@@ -144,6 +132,7 @@ import com.babelsoftware.loudly.ui.component.ActionChipButton
 import com.babelsoftware.loudly.ui.component.BottomSheetMenu
 import com.babelsoftware.loudly.ui.component.IconButton
 import com.babelsoftware.loudly.ui.component.LocalMenuState
+import com.babelsoftware.loudly.ui.component.LoudlyBottomNavBar
 import com.babelsoftware.loudly.ui.component.TopSearch
 import com.babelsoftware.loudly.ui.component.rememberBottomSheetState
 import com.babelsoftware.loudly.ui.component.shimmer.ShimmerTheme
@@ -172,6 +161,7 @@ import com.babelsoftware.loudly.utils.get
 import com.babelsoftware.loudly.utils.rememberEnumPreference
 import com.babelsoftware.loudly.utils.rememberPreference
 import com.babelsoftware.loudly.utils.urlEncode
+import com.google.android.datatransport.BuildConfig
 import com.valentinilk.shimmer.LocalShimmerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -187,10 +177,6 @@ import java.net.URLDecoder
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.days
-
-// YENİ EKLENEN IMPORT
-import com.babelsoftware.loudly.ui.component.LoudlyBottomNavBar
-import com.google.android.datatransport.BuildConfig
 
 @Suppress("NAME_SHADOWING")
 @AndroidEntryPoint
@@ -374,7 +360,6 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-                    // DEĞİŞİKLİK: slimNav kaldırıldı, çünkü yeni tasarımda bu ayara gerek yok.
                     val navigationItems = remember(appDesignVariant) {
                         if (appDesignVariant == AppDesignVariantType.NEW) {
                             Screens.MainScreens
@@ -426,7 +411,7 @@ class MainActivity : ComponentActivity() {
                         active = newActive
                         if (!newActive) {
                             focusManager.clearFocus()
-                            if (navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route }) {
+                            if (navigationItems.any { it.route == navBackStackEntry?.destination?.route }) {
                                 onQueryChange(TextFieldValue())
                             }
                         }
@@ -455,18 +440,16 @@ class MainActivity : ComponentActivity() {
 
                     val shouldShowSearchBar = remember(active, navBackStackEntry, inSelectMode?.value) {
                         (active ||
-                                navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route } ||
+                                navigationItems.any { it.route == navBackStackEntry?.destination?.route } ||
                                 navBackStackEntry?.destination?.route?.startsWith("search/") == true) &&
                                 inSelectMode?.value != true
                     }
                     val shouldShowNavigationBar = remember(navBackStackEntry, active) {
                         navBackStackEntry?.destination?.route == null ||
-                                navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route } && !active
+                                navigationItems.any { it.route == navBackStackEntry?.destination?.route } && !active
                     }
                     // ==================== KEYS & ADDICTIONS ====================
                     val miniPlayerMargin = if (playerStyle == PlayerStyle.UI_2_0) 8.dp else 0.dp
-
-                    // DEĞİŞİKLİK: collapsedBound hesaplaması yeni tasarıma göre ayarlandı.
                     val collapsedBound = bottomInset + (if (shouldShowNavigationBar) 80.dp else 0.dp) + MiniPlayerHeight + miniPlayerMargin
 
                     val maxHeightInDp = with(density) { constraints.maxHeight.toDp() }
@@ -485,8 +468,6 @@ class MainActivity : ComponentActivity() {
                     val currentSong by playerConnection?.service?.currentMediaMetadata?.collectAsState(initial = null)
                         ?: remember { mutableStateOf(null) }
 
-                    // DEĞİŞİKLİK: bottomIslandHeight kaldırıldı. Artık bu mantık MiniPlayer'da yönetilecek.
-
                     LaunchedEffect(currentSong) {
                         if (currentSong == null) {
                             if (!playerBottomSheetState.isDismissed) {
@@ -501,7 +482,6 @@ class MainActivity : ComponentActivity() {
 
                     val playerAwareWindowInsets = remember(bottomInset, shouldShowNavigationBar, playerBottomSheetState.isDismissed, miniPlayerMargin) {
                         var bottom = bottomInset
-                        // DEĞİŞİKLİK: Navigasyon barı yüksekliği sabit 80dp olarak ayarlandı (boşluklar dahil).
                         if (shouldShowNavigationBar) bottom += 80.dp
                         if (!playerBottomSheetState.isDismissed) {
                             bottom += MiniPlayerHeight
@@ -525,11 +505,9 @@ class MainActivity : ComponentActivity() {
                         }
                     )
                     // ========================================================================
-
-                    // YENİ EKLENDİ: Kaydırma durumunu takip etmek için.
                     val isScrolled by remember {
                         derivedStateOf {
-                            searchBarScrollBehavior.state.heightOffset < -5f // Küçük bir eşik değeri
+                            searchBarScrollBehavior.state.heightOffset < -5f
                         }
                     }
 
@@ -563,7 +541,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             onQueryChange(TextFieldValue(searchQuery, TextRange(searchQuery.length)))
-                        } else if (navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route }) {
+                        } else if (navigationItems.any { it.route == navBackStackEntry?.destination?.route }) {
                             onQueryChange(TextFieldValue())
                         }
                         searchBarScrollBehavior.state.resetHeightOffset()
@@ -716,7 +694,7 @@ class MainActivity : ComponentActivity() {
                                 },
                                 modifier = Modifier
                                     .nestedScroll(
-                                        if (navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route } ||
+                                        if (navigationItems.any { it.route == navBackStackEntry?.destination?.route } ||
                                             navBackStackEntry?.destination?.route?.startsWith("search/") == true) {
                                             searchBarScrollBehavior.nestedScrollConnection
                                         } else {
@@ -780,7 +758,7 @@ class MainActivity : ComponentActivity() {
                                 },
                                 modifier = Modifier
                                     .nestedScroll(
-                                        if (navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route } ||
+                                        if (navigationItems.any { it.route == navBackStackEntry?.destination?.route } ||
                                             navBackStackEntry?.destination?.route?.startsWith("search/") == true) {
                                             searchBarScrollBehavior.nestedScrollConnection
                                         } else {
@@ -887,7 +865,7 @@ class MainActivity : ComponentActivity() {
                                         onClick = {
                                             when {
                                                 active -> onActiveChange(false)
-                                                !navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route } -> {
+                                                !navigationItems.any { it.route == navBackStackEntry?.destination?.route } -> {
                                                     navController.navigateUp()
                                                 }
 
@@ -897,7 +875,7 @@ class MainActivity : ComponentActivity() {
                                         onLongClick = {
                                             when {
                                                 active -> {}
-                                                !navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route } -> {
+                                                !navigationItems.any { it.route == navBackStackEntry?.destination?.route } -> {
                                                     navController.backToMain()
                                                 }
 
@@ -907,7 +885,7 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         Icon(
                                             painterResource(
-                                                if (active || !navigationItems.fastAny { it.route == navBackStackEntry?.destination?.route }) {
+                                                if (active || !navigationItems.any { it.route == navBackStackEntry?.destination?.route }) {
                                                     R.drawable.arrow_back
                                                 } else {
                                                     R.drawable.search
@@ -992,22 +970,21 @@ class MainActivity : ComponentActivity() {
                         }
 
                         Box(modifier = Modifier.fillMaxSize()) {
-                            // DEĞİŞİKLİK: Eski arkaplan Card'ı kaldırıldı.
 
                             if (firstSetupPassed) {
                                 BottomSheetPlayer(
                                     state = playerBottomSheetState,
-                                    navController = navController
+                                    navController = navController,
+                                    isScrolled = isScrolled
                                 )
                             }
                             val isPlayerExpanded =
                                 playerBottomSheetState.progress > 0.9f
 
-                            // DEĞİŞİKLİK: Eski navigasyon barı tamamen kaldırıldı ve yerine yenisi eklendi.
                             if (shouldShowNavigationBar && !isPlayerExpanded) {
                                 Box(modifier = Modifier
                                     .align(Alignment.BottomCenter)
-                                    .navigationBarsPadding() // Sistem çubuğu için boşluk
+                                    .navigationBarsPadding()
                                 ) {
                                     LoudlyBottomNavBar(
                                         navController = navController,
