@@ -2,12 +2,15 @@ package com.babelsoftware.loudly.ui.screens.settings
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.RenderEffect
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,6 +21,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -32,6 +36,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -72,26 +79,29 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.BlurredEdgeTreatment
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -101,6 +111,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.babelsoftware.innertube.utils.parseCookieString
@@ -164,7 +175,9 @@ import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
+import kotlinx.coroutines.launch
 import me.saket.squiggles.SquigglySlider
+import kotlin.math.absoluteValue
 
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -363,9 +376,6 @@ fun AppearanceSettings(
             },
             onGalleryClick = {
                 imagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-            },
-            onPredefinedClick = { key ->
-                tempImageUri = Uri.parse(key)
             }
         )
     }
@@ -1475,6 +1485,8 @@ private fun MiniPlayerPreview(action: MiniPlayerAction) {
         }
     }
 }
+private data class PredefinedImage(val key: String, val drawableRes: Int)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HeaderImagePickerDialog(
     initialValue: String,
@@ -1482,21 +1494,48 @@ private fun HeaderImagePickerDialog(
     onDismiss: () -> Unit,
     onSave: (String) -> Unit,
     onGalleryClick: () -> Unit,
-    onPredefinedClick: (String) -> Unit
 ) {
-    var currentSelection by remember {
-        mutableStateOf(tempSelectedUri?.toString() ?: initialValue)
+    val predefinedImages = remember {
+        listOf(
+            PredefinedImage("Loudly-1", R.drawable.loudly_picutre_1),
+            PredefinedImage("Loudly-2", R.drawable.loudly_picutre_2),
+            PredefinedImage("Loudly-3", R.drawable.loudly_picutre_3),
+            PredefinedImage("Loudly-4", R.drawable.loudly_picutre_4),
+            PredefinedImage("Loudly-5", R.drawable.loudly_picutre_5),
+            PredefinedImage("Loudly-6", R.drawable.loudly_picutre_6)
+        )
     }
 
-    if (tempSelectedUri != null) {
-        currentSelection = tempSelectedUri.toString()
+    val initialPageIndex = remember {
+        predefinedImages.indexOfFirst { it.key == initialValue }.coerceAtLeast(0)
     }
 
-    val predefinedImages = mapOf(
-        "Loudly-1" to R.drawable.loudly_picutre_1,
-        "Loudly-2" to R.drawable.loudly_picutre_2,
-        "Loudly-3" to R.drawable.loudly_picutre_3
-    )
+    val pagerState = rememberPagerState(initialPage = initialPageIndex) {
+        predefinedImages.size
+    }
+
+    val scope = rememberCoroutineScope()
+
+    var hasGallerySelection by remember { mutableStateOf(tempSelectedUri != null) }
+    LaunchedEffect(tempSelectedUri) {
+        hasGallerySelection = tempSelectedUri != null
+    }
+
+    val currentSelectionKey by remember {
+        derivedStateOf {
+            if (hasGallerySelection) {
+                tempSelectedUri.toString()
+            } else {
+                predefinedImages[pagerState.currentPage].key
+            }
+        }
+    }
+
+    val (profilePictureUri) = rememberPreference(HeaderCardProfilePictureUriKey, "")
+    val (accountName) = rememberPreference(AccountNameKey, "")
+    val (headerCardAlignment) = rememberEnumPreference(HeaderCardAlignmentKey, HeaderCardContentAlignment.BottomStart)
+    val (gradientIntensity) = rememberPreference(HeaderCardGradientIntensityKey, 0.6f)
+
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -1509,84 +1548,158 @@ private fun HeaderImagePickerDialog(
         },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
+                // --- PREVIEW ---
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    contentAlignment = Alignment.Center
+                        .padding(vertical = 8.dp)
+                        .aspectRatio(16 / 9f),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
-                    val glassmorphismModifier = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        Modifier.blur(radius = 24.dp, edgeTreatment = BlurredEdgeTreatment(RoundedCornerShape(24.dp)))
-                    } else {
-                        Modifier
-                    }
                     Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .clip(RoundedCornerShape(24.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
-                            .then(glassmorphismModifier)
-                    )
-
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp)
-                            .aspectRatio(16 / 9f),
-                        shape = RoundedCornerShape(16.dp)
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = headerCardAlignment.alignment
                     ) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            val painter = when {
-                                currentSelection.startsWith("content://") -> {
-                                    rememberAsyncImagePainter(model = Uri.parse(currentSelection))
+                        val currentImageSource: Any by remember {
+                            derivedStateOf {
+                                if (hasGallerySelection) {
+                                    tempSelectedUri ?: R.drawable.loudly_picutre_1
+                                } else {
+                                    predefinedImages[pagerState.currentPage].drawableRes
                                 }
-                                else -> painterResource(id = predefinedImages[currentSelection] ?: R.drawable.loudly_picutre_1)
                             }
+                        }
+
+                        Crossfade(targetState = currentImageSource, animationSpec = tween(durationMillis = 500), label = "imageCrossfade") { imageSource ->
                             Image(
-                                painter = painter,
+                                painter = when (imageSource) {
+                                    is Uri -> rememberAsyncImagePainter(model = imageSource)
+                                    is Int -> painterResource(id = imageSource)
+                                    else -> painterResource(id = R.drawable.loudly_picutre_1)
+                                },
                                 contentDescription = "Preview",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize()
                             )
                         }
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    predefinedImages.forEach { (key, drawableRes) ->
-                        val isSelected = currentSelection == key
-                        Surface(
-                            shape = RoundedCornerShape(20.dp),
-                            tonalElevation = 4.dp,
+                        Box(
                             modifier = Modifier
-                                .size(64.dp)
-                                .clickable {
-                                    onPredefinedClick(key)
-                                    currentSelection = key
-                                }
-                                .border(
-                                    width = 2.dp,
-                                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
-                                    shape = RoundedCornerShape(20.dp)
+                                .fillMaxSize()
+                                .background(
+                                    Brush.verticalGradient(
+                                        colorStops = arrayOf(
+                                            0.5f to Color.Transparent,
+                                            1.0f to Color.Black.copy(alpha = gradientIntensity)
+                                        )
+                                    )
                                 )
+                        )
+
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Image(
-                                painter = painterResource(id = drawableRes),
-                                contentDescription = key,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize()
+                            if (profilePictureUri.isNotBlank()) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(model = Uri.parse(profilePictureUri)),
+                                    contentDescription = "Profile Picture",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .clip(CircleShape),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                            }
+                            Text(
+                                text = accountName.ifBlank { "Your Account Name" },
+                                color = Color.White,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 2
                             )
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                val itemWidth = 200.dp // Width of items
+                val itemHeight = itemWidth * (9f / 16f) // Height in 16:9 aspect ratio
+                val itemPadding = (-16).dp // Negative space between elements, to make them closer together
+                val horizontalPadding = 40.dp // Total padding from the left and right edges
+
+                HorizontalPager(
+                    state = pagerState,
+                    pageSize = PageSize.Fixed(itemWidth),
+                    contentPadding = PaddingValues(horizontal = horizontalPadding),
+                    pageSpacing = itemPadding,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(itemHeight + 32.dp)
+                ) { page ->
+                    val image = predefinedImages[page]
+                    val pageOffset = (
+                            (pagerState.currentPage - page) + pagerState
+                                .currentPageOffsetFraction
+                            ).absoluteValue
+
+                    // Material 3 Expressive animations
+                    val scaleFactor = lerp(0.7f, 1f, 1f - pageOffset.coerceIn(0f, 1f)) // Scale factor
+                    val alphaFactor = lerp(0.3f, 1f, 1f - pageOffset.coerceIn(0f, 1f)) // Visibility
+                    val blurFactor = lerp(8f, 0f, 1f - pageOffset.coerceIn(0f, 1f)) // Blur (center 0)
+
+                    Card(
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier
+                            .width(itemWidth)
+                            .height(itemHeight)
+                            .graphicsLayer {
+                                scaleX = scaleFactor
+                                scaleY = scaleFactor
+                                transformOrigin = TransformOrigin.Center
+                                this.alpha = alphaFactor
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                    renderEffect = if (blurFactor > 0) {
+                                        RenderEffect.createBlurEffect(
+                                            blurFactor,
+                                            blurFactor,
+                                            android.graphics.Shader.TileMode.DECAL
+                                        ).asComposeRenderEffect()
+                                    } else {
+                                        null
+                                    }
+                                } else if (blurFactor > 0) {
+                                    this.alpha = alphaFactor * (1f - blurFactor / 8f)
+                                }
+                            }
+                            .clickable {
+                                hasGallerySelection = false
+                                if (pagerState.currentPage != page) {
+                                    scope.launch {
+                                        pagerState.animateScrollToPage(page)
+                                    }
+                                }
+                            }
+                    ) {
+                        Image(
+                            painter = painterResource(id = image.drawableRes),
+                            contentDescription = image.key,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(20.dp))
 
+                // --- GALLERY BUTTON ---
                 Button(
-                    onClick = onGalleryClick,
+                    onClick = {
+                        hasGallerySelection = true
+                        onGalleryClick()
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(
@@ -1603,7 +1716,7 @@ private fun HeaderImagePickerDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSave(currentSelection) }) {
+            TextButton(onClick = { onSave(currentSelectionKey) }) {
                 Text(stringResource(R.string.save))
             }
         },

@@ -204,6 +204,9 @@ private fun AccountHeaderCard() {
         headerImageKey == "Loudly-1" -> painterResource(id = R.drawable.loudly_picutre_1)
         headerImageKey == "Loudly-2" -> painterResource(id = R.drawable.loudly_picutre_2)
         headerImageKey == "Loudly-3" -> painterResource(id = R.drawable.loudly_picutre_3)
+        headerImageKey == "Loudly-4" -> painterResource(id = R.drawable.loudly_picutre_4)
+        headerImageKey == "Loudly-5" -> painterResource(id = R.drawable.loudly_picutre_5)
+        headerImageKey == "Loudly-6" -> painterResource(id = R.drawable.loudly_picutre_6)
         else -> painterResource(id = R.drawable.loudly_picutre_1) // default
     }
 
