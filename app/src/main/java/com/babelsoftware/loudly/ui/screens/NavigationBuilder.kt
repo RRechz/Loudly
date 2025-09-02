@@ -56,8 +56,7 @@ fun NavGraphBuilder.navigationBuilder(
 ) {
     composable(Screens.Home.route) {
         HomeScreen(
-            navController = navController,
-            playerStyle = playerStyle
+            navController = navController
         )
     }
     composable(Screens.Explore.route) {
