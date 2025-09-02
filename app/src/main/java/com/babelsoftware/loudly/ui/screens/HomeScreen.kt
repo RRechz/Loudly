@@ -162,17 +162,12 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     playerStyle: PlayerStyle
 ) {
-    // --- YENİ EKLENEN KOD BAŞLANGICI ---
-
-    // 1. Güncelleme durumunu tutacak bir state oluşturuyoruz.
     var updateAvailable by remember { mutableStateOf(false) }
 
-    // 2. HomeScreen ekrana geldiğinde güncelleme kontrolünü BİR KEZ çalıştırıyoruz.
     LaunchedEffect(key1 = Unit) {
         updateAvailable = checkForUpdate()
     }
 
-    // --- YENİ EKLENEN KOD SONU ---
     val menuState = LocalMenuState.current
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current ?: return
@@ -469,9 +464,8 @@ fun HomeScreen(
 
         LazyColumn(
             state = lazylistState,
-            contentPadding = WindowInsets.systemBars
-                .only(WindowInsetsSides.Horizontal)
-                .add(LocalPlayerAwareWindowInsets.current.only(WindowInsetsSides.Vertical))
+            contentPadding = LocalPlayerAwareWindowInsets.current
+                .only(WindowInsetsSides.Vertical)
                 .asPaddingValues(LocalDensity.current)
         ) {
             // ==================== CONDITIONAL INTERFACE LOGIC ====================
@@ -594,9 +588,6 @@ fun HomeScreen(
                             flingBehavior = rememberSnapFlingBehavior(
                                 forgottenFavoritesLazyGridState
                             ),
-                            contentPadding = WindowInsets.systemBars
-                                .only(WindowInsetsSides.Horizontal)
-                                .asPaddingValues(),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(60.dp * 4)
@@ -647,9 +638,6 @@ fun HomeScreen(
                                 flingBehavior = rememberSnapFlingBehavior(
                                     quickPicksSnapLayoutInfoProvider
                                 ),
-                                contentPadding = WindowInsets.systemBars
-                                    .only(WindowInsetsSides.Horizontal)
-                                    .asPaddingValues(),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(ListItemHeight * 4)
@@ -733,9 +721,6 @@ fun HomeScreen(
                                 flingBehavior = rememberSnapFlingBehavior(
                                     forgottenFavoritesSnapLayoutInfoProvider
                                 ),
-                                contentPadding = WindowInsets.systemBars
-                                    .only(WindowInsetsSides.Horizontal)
-                                    .asPaddingValues(),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(ListItemHeight * rows)
