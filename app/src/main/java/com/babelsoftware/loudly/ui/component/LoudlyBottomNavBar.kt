@@ -71,11 +71,11 @@ fun LoudlyBottomNavBar(
     )
 
     val containerHeight by animateDpAsState(targetValue = 60.dp, animationSpec = liquidAnimationSpec, label = "containerHeight")
-    val iconSize by animateDpAsState(targetValue = 24.dp, animationSpec = liquidAnimationSpec, label = "iconSize")
+    val iconSize by animateDpAsState(targetValue = 30.dp, animationSpec = liquidAnimationSpec, label = "iconSize")
     val cardPadding by animateDpAsState(if (isScrolled) 8.dp else 12.dp, liquidAnimationSpec, label = "cardPadding")
     val navCardShape = RoundedCornerShape(50.dp)
     val cardColors = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.75f)
+        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.80f)
     )
     val cardBorder = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
     val cardElevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
