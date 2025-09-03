@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,16 +33,15 @@ enum class ActionType {
 @Composable
 fun SettingsBox(
     modifier: Modifier = Modifier,
-    title: String? = null, // Artık nullable, çünkü içerik kendi başlığını sağlayabilir.
+    title: String? = null,
     description: String? = null,
-    icon: IconResource? = null, // Artık nullable
+    icon: IconResource? = null,
     actionType: ActionType = ActionType.NAVIGATION,
     actionText: String = "",
     shape: Shape = RoundedCornerShape(24.dp),
     isChecked: Boolean = false,
     onCheckedChange: (Boolean) -> Unit = {},
-    onClick: (() -> Unit)? = null, // Artık nullable
-    // YENİ: İçine özel bileşen alabilmesi için content parametresi eklendi.
+    onClick: (() -> Unit)? = null,
     content: @Composable (() -> Unit)? = null
 ) {
     val finalOnClick = onClick ?: {
@@ -53,17 +54,13 @@ fun SettingsBox(
         modifier = modifier
             .fillMaxWidth()
             .clip(shape)
-            // Eğer bir onClick varsa tıklanabilir yap
             .then(if (onClick != null || actionType == ActionType.SWITCH) Modifier.clickable(onClick = finalOnClick) else Modifier),
         color = MaterialTheme.colorScheme.surfaceContainer,
         tonalElevation = 1.dp
     ) {
-        // YENİ MANTIK: Eğer özel bir 'content' verilmişse onu göster,
-        // verilmemişse standart satır tasarımını göster.
         if (content != null) {
             content()
         } else {
-            // Standart satır tasarımı (title, icon, action)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)
@@ -131,10 +128,20 @@ fun SettingsBox(
                         )
                     }
                     ActionType.SWITCH -> {
+                        val iconVector = if (isChecked) Icons.Default.Check else Icons.Default.Close
+                        val iconSize = if (isChecked) 18.dp else 12.dp
+
                         Switch(
                             checked = isChecked,
                             onCheckedChange = onCheckedChange,
-                            modifier = Modifier.scale(0.9f)
+                            modifier = Modifier.scale(0.9f),
+                            thumbContent = {
+                                Icon(
+                                    imageVector = iconVector,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(iconSize)
+                                )
+                            }
                         )
                     }
                 }
