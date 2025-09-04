@@ -1,67 +1,36 @@
-// Dosya Yolu: com/babelsoftware/loudly/ui/screens/settings/StorageSettings.kt
 package com.babelsoftware.loudly.ui.screens.settings
 
 import android.annotation.SuppressLint
-import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CloudDownload
-import androidx.compose.material.icons.outlined.CloudOff
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.outlined.DeleteForever
+import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Translate
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarScrollBehavior
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
@@ -72,6 +41,7 @@ import com.babelsoftware.loudly.constants.MaxImageCacheSizeKey
 import com.babelsoftware.loudly.constants.MaxSongCacheSizeKey
 import com.babelsoftware.loudly.extensions.tryOrNull
 import com.babelsoftware.loudly.ui.component.IconButton
+import com.babelsoftware.loudly.ui.screens.settings.card_design.SettingsBox
 import com.babelsoftware.loudly.ui.utils.backToMain
 import com.babelsoftware.loudly.ui.utils.formatFileSize
 import com.babelsoftware.loudly.utils.rememberPreference
@@ -79,54 +49,92 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @SuppressLint("PrivateResource")
-@OptIn(ExperimentalCoilApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalCoilApi::class)
 @Composable
 fun StorageSettings(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
     val context = LocalContext.current
-    val imageDiskCache = context.imageLoader.diskCache
-    val playerCache = LocalPlayerConnection.current?.service?.playerCache
-    val downloadCache = LocalPlayerConnection.current?.service?.downloadCache
-
+    val imageDiskCache = remember { context.imageLoader.diskCache }
+    val playerConnection = LocalPlayerConnection.current
+    val playerCache = remember { playerConnection?.service?.playerCache }
+    val downloadCache = remember { playerConnection?.service?.downloadCache }
     val coroutineScope = rememberCoroutineScope()
     val (maxImageCacheSize, onMaxImageCacheSizeChange) = rememberPreference(key = MaxImageCacheSizeKey, defaultValue = 512)
     val (maxSongCacheSize, onMaxSongCacheSizeChange) = rememberPreference(key = MaxSongCacheSizeKey, defaultValue = 1024)
+    var imageCacheSize by remember { mutableLongStateOf(0L) }
+    var playerCacheSize by remember { mutableLongStateOf(0L) }
+    var downloadCacheSize by remember { mutableLongStateOf(0L) }
+    var translationModelsSize by remember { mutableLongStateOf(0L) }
 
-    var imageCacheSize by remember { mutableLongStateOf(imageDiskCache?.size ?: 0L) }
-    var playerCacheSize by remember { mutableLongStateOf(tryOrNull { playerCache?.cacheSpace } ?: 0L) }
-    var downloadCacheSize by remember { mutableLongStateOf(tryOrNull { downloadCache?.cacheSpace } ?: 0L) }
-
-    LaunchedEffect(Unit, maxImageCacheSize, maxSongCacheSize) {
-        imageCacheSize = imageDiskCache?.size ?: 0L
-        playerCacheSize = tryOrNull { playerCache?.cacheSpace } ?: 0L
-        downloadCacheSize = tryOrNull { downloadCache?.cacheSpace } ?: 0L
+    val refreshCacheSizes: () -> Unit = {
+        coroutineScope.launch(Dispatchers.IO) {
+            imageCacheSize = imageDiskCache?.size ?: 0L
+            playerCacheSize = tryOrNull { playerCache?.cacheSpace } ?: 0L
+            downloadCacheSize = tryOrNull { downloadCache?.cacheSpace } ?: 0L
+            translationModelsSize = 123 * 1024 * 1024L
+        }
     }
 
-    var showClearAllDownloadsDialog by remember { mutableStateOf(false) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                refreshCacheSizes()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    var showClearDownloadsDialog by remember { mutableStateOf(false) }
     var showClearSongCacheDialog by remember { mutableStateOf(false) }
     var showClearImagesCacheDialog by remember { mutableStateOf(false) }
-    var showClearTranslationModels by remember { mutableStateOf(false) }
+    var showClearTranslationModelsDialog by remember { mutableStateOf(false) }
+    var showSelectImageCacheSizeDialog by remember { mutableStateOf(false) }
+    var showSelectSongCacheSizeDialog by remember { mutableStateOf(false) }
 
-    if (showClearAllDownloadsDialog) {
+    if (showClearDownloadsDialog) {
         ConfirmationDialog(
-            title = R.string.clear_all_downloads,
-            icon = Icons.Outlined.CloudOff,
-            onDismiss = { showClearAllDownloadsDialog = false },
+            icon = Icons.Outlined.DeleteForever,
+            title = stringResource(R.string.clear_all_downloads),
+            text = stringResource(R.string.clear_all_downloads_confirmation),
             onConfirm = {
-                coroutineScope.launch(Dispatchers.IO) { downloadCache?.keys?.forEach { downloadCache.removeResource(it) } }
-                showClearAllDownloadsDialog = false
-            }
+                coroutineScope.launch(Dispatchers.IO) {
+                    downloadCache?.keys?.forEach { downloadCache.removeResource(it) }
+                    refreshCacheSizes()
+                }
+            },
+            onDismiss = { showClearDownloadsDialog = false }
         )
     }
+
+    if (showSelectSongCacheSizeDialog) {
+        CacheSizeSelectionDialog(
+            title = stringResource(R.string.max_song_cache_size),
+            onDismiss = { showSelectSongCacheSizeDialog = false },
+            onSelect = onMaxSongCacheSizeChange
+        )
+    }
+    if (showSelectImageCacheSizeDialog) {
+        CacheSizeSelectionDialog(
+            title = stringResource(R.string.max_image_cache_size),
+            onDismiss = { showSelectImageCacheSizeDialog = false },
+            onSelect = onMaxImageCacheSizeChange
+        )
+    }
+
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(R.string.storage)) },
                 navigationIcon = {
                     IconButton(onClick = navController::navigateUp, onLongClick = navController::backToMain) {
-                        Icon(painterResource(R.drawable.arrow_back), contentDescription = stringResource(R.string.back))
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 scrollBehavior = scrollBehavior,
@@ -137,269 +145,289 @@ fun StorageSettings(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(16.dp)
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                val totalUsed = downloadCacheSize + playerCacheSize + imageCacheSize
-                StorageSummaryCard(
-                    totalUsed = totalUsed,
-                    downloadSize = downloadCacheSize,
-                    songCacheSize = playerCacheSize,
-                    imageCacheSize = imageCacheSize
+                val totalUsed = downloadCacheSize + playerCacheSize + imageCacheSize + translationModelsSize
+                val vibrantColors = listOf(
+                    Color(0xFF6C63FF), Color(0xFFFF6584), Color(0xFF36C1C1), Color(0xFFFFBD4A)
                 )
+                val storageItems = listOf(
+                    StorageItemData(stringResource(R.string.downloaded_songs), downloadCacheSize, vibrantColors[0]),
+                    StorageItemData(stringResource(R.string.song_cache), playerCacheSize, vibrantColors[1]),
+                    StorageItemData(stringResource(R.string.image_cache), imageCacheSize, vibrantColors[2]),
+                    StorageItemData(stringResource(R.string.translation_models), translationModelsSize, vibrantColors[3])
+                )
+                StorageOverview(totalUsed = totalUsed, items = storageItems.filter { it.size > 0 })
             }
 
             item {
-                StorageDetailCard(
-                    title = stringResource(R.string.downloaded_songs),
-                    icon = Icons.Outlined.CloudDownload,
-                    usedSpace = downloadCacheSize,
-                    onClearClick = { showClearAllDownloadsDialog = true }
-                )
-            }
-
-            item {
-                StorageDetailCard(
-                    title = stringResource(R.string.song_cache),
-                    icon = Icons.Rounded.MusicNote,
-                    usedSpace = playerCacheSize,
-                    onClearClick = { showClearSongCacheDialog = true }
-                ) {
-                    CacheSizeSelector(
-                        label = stringResource(R.string.max_song_cache_size),
-                        selectedValue = maxSongCacheSize,
-                        onValueChange = onMaxSongCacheSizeChange
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val vibrantColors = listOf(
+                        Color(0xFF6C63FF), Color(0xFFFF6584), Color(0xFF36C1C1), Color(0xFFFFBD4A)
                     )
+                    val storageItems = listOf(
+                        StorageItemData(stringResource(R.string.downloaded_songs), downloadCacheSize, vibrantColors[0]),
+                        StorageItemData(stringResource(R.string.song_cache), playerCacheSize, vibrantColors[1]),
+                        StorageItemData(stringResource(R.string.image_cache), imageCacheSize, vibrantColors[2]),
+                        StorageItemData(stringResource(R.string.translation_models), translationModelsSize, vibrantColors[3])
+                    ).filter { it.size > 0 }
+
+                    storageItems.forEach { item ->
+                        StorageLegend(color = item.color, text = item.label, size = item.size)
+                    }
                 }
             }
 
             item {
-                StorageDetailCard(
-                    title = stringResource(R.string.image_cache),
-                    icon = Icons.Rounded.Image,
-                    usedSpace = imageCacheSize,
-                    onClearClick = { showClearImagesCacheDialog = true }
-                ) {
-                    CacheSizeSelector(
-                        label = stringResource(R.string.max_image_cache_size),
-                        selectedValue = maxImageCacheSize,
-                        onValueChange = onMaxImageCacheSizeChange
-                    )
-                }
+                Text(
+                    text = stringResource(R.string.caches),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 4.dp)
+                )
             }
 
-            if (BuildConfig.FLAVOR != "foss") {
-                item {
-                    StorageDetailCard(
-                        title = stringResource(R.string.translation_models),
-                        icon = Icons.Rounded.Translate,
-                        usedSpace = null, // Boyut bilgisi yok
-                        onClearClick = { showClearTranslationModels = true }
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    CacheControlBox(
+                        icon = Icons.Rounded.MusicNote,
+                        title = stringResource(R.string.song_cache),
+                        usedSpace = playerCacheSize,
+                        maxSize = maxSongCacheSize,
+                        onMaxSizeClick = { showSelectSongCacheSizeDialog = true },
+                        onClearClick = { showClearSongCacheDialog = true }
+                    )
+
+                    CacheControlBox(
+                        icon = Icons.Rounded.Image,
+                        title = stringResource(R.string.image_cache),
+                        usedSpace = imageCacheSize,
+                        maxSize = maxImageCacheSize,
+                        onMaxSizeClick = { showSelectImageCacheSizeDialog = true },
+                        onClearClick = { showClearImagesCacheDialog = true }
+                    )
+
+                    CacheControlBox(
+                        icon = Icons.Outlined.FileDownload,
+                        title = stringResource(R.string.downloaded_songs),
+                        usedSpace = downloadCacheSize,
+                        onClearClick = { showClearDownloadsDialog = true }
+                    )
+
+                    if (BuildConfig.FLAVOR != "foss") {
+                        CacheControlBox(
+                            icon = Icons.Rounded.Translate,
+                            title = stringResource(R.string.translation_models),
+                            usedSpace = translationModelsSize,
+                            onClearClick = { showClearTranslationModelsDialog = true }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Advanced settings card containing the title, field used, maximum size setting, and delete button.
+ */
+@Composable
+private fun CacheControlBox(
+    icon: ImageVector,
+    title: String,
+    usedSpace: Long,
+    maxSize: Int? = null,
+    onMaxSizeClick: (() -> Unit)? = null,
+    onClearClick: () -> Unit
+) {
+    SettingsBox(
+        content = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                // Icon
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = title,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // Title and Field Used
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = title,
+                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Text(
+                        text = stringResource(R.string.currently_used_formatted, formatFileSize(usedSpace)),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                // Actions (Max Size and Delete)
+                if (onMaxSizeClick != null && maxSize != null) {
+                    TextButton(onClick = onMaxSizeClick) {
+                        Text(formatCacheSizeLabel(maxSize))
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                }
+
+                IconButton(onClick = onClearClick) {
+                    Icon(
+                        imageVector = Icons.Rounded.DeleteForever,
+                        contentDescription = stringResource(R.string.delete),
+                        tint = MaterialTheme.colorScheme.error
                     )
                 }
             }
         }
+    )
+}
+
+@Composable
+private fun formatCacheSizeLabel(size: Int): String {
+    return when (size) {
+        0 -> stringResource(R.string.off)
+        -1 -> stringResource(R.string.unlimited)
+        else -> formatFileSize(size * 1024 * 1024L)
     }
 }
 
 @Composable
-private fun StorageSummaryCard(
-    totalUsed: Long,
-    downloadSize: Long,
-    songCacheSize: Long,
-    imageCacheSize: Long
+private fun CacheSizeSelectionDialog(
+    title: String,
+    onDismiss: () -> Unit,
+    onSelect: (Int) -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = stringResource(R.string.total_used_space),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = formatFileSize(totalUsed),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            val totalForProgress = (downloadSize + songCacheSize + imageCacheSize).toFloat().coerceAtLeast(1f)
-            val downloadProgress by animateFloatAsState((downloadSize / totalForProgress), label = "downloadProgress")
-            val songCacheProgress by animateFloatAsState((songCacheSize / totalForProgress), label = "songCacheProgress")
-
-            Row(Modifier.fillMaxWidth()) {
-                LinearProgressIndicator(
-                    progress = { downloadProgress },
-                    modifier = Modifier.weight(if(downloadProgress > 0) downloadProgress else 0.001f),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = Color.Transparent,
-                    strokeCap = StrokeCap.Round
-                )
-                LinearProgressIndicator(
-                    progress = { songCacheProgress },
-                    modifier = Modifier.weight(if(songCacheProgress > 0) songCacheProgress else 0.001f),
-                    color = MaterialTheme.colorScheme.secondary,
-                    trackColor = Color.Transparent,
-                    strokeCap = StrokeCap.Round
-                )
-                LinearProgressIndicator(
-                    progress = { 1f },
-                    modifier = Modifier.weight(if((1f - downloadProgress - songCacheProgress) > 0) (1f - downloadProgress - songCacheProgress) else 0.001f),
-                    color = MaterialTheme.colorScheme.tertiary,
-                    trackColor = Color.Transparent,
-                    strokeCap = StrokeCap.Round
-                )
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            LazyColumn {
+                items(listOf(0, 128, 256, 512, 1024, 2048, 4096, 8192, -1).count()) { index ->
+                    val size = listOf(0, 128, 256, 512, 1024, 2048, 4096, 8192, -1)[index]
+                    TextButton(
+                        onClick = { onSelect(size); onDismiss() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(formatCacheSizeLabel(size), modifier = Modifier.fillMaxWidth())
+                    }
+                }
             }
-            Spacer(modifier = Modifier.height(12.dp))
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.cancel))
+            }
+        }
+    )
+}
 
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                StorageLegend(color = MaterialTheme.colorScheme.primary, text = stringResource(R.string.downloaded_songs), size = downloadSize)
-                StorageLegend(color = MaterialTheme.colorScheme.secondary, text = stringResource(R.string.song_cache), size = songCacheSize)
-                StorageLegend(color = MaterialTheme.colorScheme.tertiary, text = stringResource(R.string.image_cache), size = imageCacheSize)
+@Composable
+private fun StorageOverview(
+    totalUsed: Long,
+    items: List<StorageItemData>
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier.size(200.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            val totalForProgress = items.sumOf { it.size }.toFloat().coerceAtLeast(1f)
+
+            val animatedProgress = items.map {
+                animateFloatAsState(targetValue = it.size / totalForProgress, label = "${it.label}Progress").value
+            }
+
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                var startAngle = -90f
+                animatedProgress.forEachIndexed { index, progress ->
+                    val sweepAngle = progress * 360f
+                    if (sweepAngle > 0.1f) {
+                        drawArc(
+                            color = items[index].color,
+                            startAngle = startAngle,
+                            sweepAngle = sweepAngle,
+                            useCenter = false,
+                            style = Stroke(width = 32.dp.toPx(), cap = StrokeCap.Butt)
+                        )
+                    }
+                    startAngle += sweepAngle
+                }
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = stringResource(R.string.total_used_space),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = formatFileSize(totalUsed),
+                    style = MaterialTheme.typography.displaySmall,
+                    fontWeight = FontWeight.Bold,
+                )
             }
         }
     }
 }
+
+data class StorageItemData(val label: String, val size: Long, val color: Color)
 
 @Composable
 private fun StorageLegend(color: Color, text: String, size: Long) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(modifier = Modifier
-            .size(8.dp)
-            .background(color, CircleShape))
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text = text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-        Text(text = formatFileSize(size), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
-
-@Composable
-private fun StorageDetailCard(
-    title: String,
-    icon: ImageVector,
-    usedSpace: Long?,
-    onClearClick: () -> Unit,
-    content: @Composable (() -> Unit)? = null
-) {
-    Column {
-        Row(
-            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-            Text(text = title, style = MaterialTheme.typography.titleSmall)
-        }
-
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (usedSpace != null) {
-                        Text(
-                            text = stringResource(R.string.currently_used),
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            text = formatFileSize(usedSpace),
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-
-                content?.invoke()
-
-                OutlinedButton(
-                    onClick = onClearClick,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Icon(Icons.Rounded.DeleteForever, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = stringResource(R.string.clear_cache))
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CacheSizeSelector(
-    label: String,
-    selectedValue: Int,
-    onValueChange: (Int) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded }
-    ) {
-        TextField(
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(),
-            readOnly = true,
-            value = when (selectedValue) {
-                0 -> stringResource(R.string.off)
-                -1 -> stringResource(R.string.unlimited)
-                else -> formatFileSize(selectedValue * 1024 * 1024L)
-            },
-            onValueChange = {},
-            label = { Text(label) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                .size(12.dp)
+                .background(color, CircleShape)
         )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            listOf(0, 128, 256, 512, 1024, 2048, 4096, 8192, -1).forEach { size ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            when (size) {
-                                0 -> stringResource(R.string.off)
-                                -1 -> stringResource(R.string.unlimited)
-                                else -> formatFileSize(size * 1024 * 1024L)
-                            }
-                        )
-                    },
-                    onClick = {
-                        onValueChange(size)
-                        expanded = false
-                    }
-                )
-            }
-        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(text = text, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+        Text(text = formatFileSize(size), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
 @Composable
 private fun ConfirmationDialog(
-    @StringRes title: Int,
     icon: ImageVector,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    title: String,
+    text: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        icon = { Icon(icon, null) },
-        title = { Text(stringResource(title)) },
+        icon = { Icon(icon, null, tint = MaterialTheme.colorScheme.error) },
+        title = { Text(title) },
+        text = { Text(text) },
         confirmButton = {
-            TextButton(onClick = {
-                onConfirm()
-                onDismiss()
-            }) {
+            TextButton(
+                onClick = {
+                    onConfirm()
+                    onDismiss()
+                },
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+            ) {
                 Text(stringResource(android.R.string.ok))
             }
         },
