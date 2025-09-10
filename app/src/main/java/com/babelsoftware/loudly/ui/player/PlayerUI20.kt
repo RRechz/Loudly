@@ -291,6 +291,22 @@ fun BluetoothDeviceChip(deviceName: String) {
     )
 }
 
+@Composable
+fun SleepTimerChip(remainingSeconds: Long, onClick: () -> Unit) {
+    val formattedTime = remainingSeconds.let {
+        val minutes = it / 60
+        val seconds = it % 60
+        "%d:%02d".format(minutes, seconds)
+    }
+
+    InfoChip(
+        icon = R.drawable.ic_moon,
+        text = formattedTime,
+        color = Color(0xFFB39DDB),
+        onClick = onClick
+    )
+}
+
 sealed class NetworkInfo {
     data object None : NetworkInfo()
     data class Wifi(val isVpn: Boolean) : NetworkInfo()
@@ -429,11 +445,15 @@ private fun NetworkStatusChip() {
     }
 }
 
+@OptIn(androidx.compose.animation.ExperimentalAnimationApi::class)
 @Composable
 private fun ComradeChipContainer() {
-    val errorState by LocalPlayerConnection.current!!.errorManagerState.collectAsState()
+    val playerConnection = LocalPlayerConnection.current!!
+
+    val errorState by playerConnection.errorManagerState.collectAsState()
     val batteryInfo by rememberBatteryInfoState()
     val connectedBluetoothDevice by rememberBluetoothConnectionState()
+    val sleepTimerState by playerConnection.sleepTimerState.collectAsState()
 
     AnimatedContent(
         targetState = connectedBluetoothDevice,
@@ -455,6 +475,16 @@ private fun ComradeChipContainer() {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                AnimatedVisibility(
+                    visible = sleepTimerState.isActive && sleepTimerState.remainingSeconds < 60,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    SleepTimerChip(
+                        remainingSeconds = sleepTimerState.remainingSeconds,
+                        onClick = { playerConnection.cancelSleepTimer() }
+                    )
+                }
                 AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) {
                     NetworkStatusChip()
                 }
@@ -467,9 +497,7 @@ private fun ComradeChipContainer() {
                     )
                 }
                 AnimatedVisibility(
-                    visible = batteryInfo.isCharging || batteryInfo.level in 1..29,
-                    enter = fadeIn() + slideInHorizontally { it },
-                    exit = fadeOut() + slideOutHorizontally { it }
+                    visible = batteryInfo.isCharging || batteryInfo.level in 1..29
                 ) {
                     BatteryChip(info = batteryInfo)
                 }

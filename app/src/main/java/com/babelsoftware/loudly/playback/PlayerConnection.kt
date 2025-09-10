@@ -25,13 +25,21 @@ import com.babelsoftware.loudly.utils.dataStore
 import com.babelsoftware.loudly.reportException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+
+data class SleepTimerState(
+    val isActive: Boolean = false,
+    val remainingSeconds: Long = 0
+)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlayerConnection(
@@ -89,6 +97,17 @@ class PlayerConnection(
 
     val errorManagerState = service.errorManagerState
 
+    private val _sleepTimerState = MutableStateFlow(SleepTimerState())
+    val sleepTimerState: StateFlow<SleepTimerState> = _sleepTimerState
+
+    fun startSleepTimer(minutes: Int) {
+        service.sleepTimer.start(minutes)
+    }
+
+    fun cancelSleepTimer() {
+        service.sleepTimer.clear()
+    }
+
     init {
         player.addListener(this)
 
@@ -101,6 +120,23 @@ class PlayerConnection(
         currentMediaItemIndex.value = player.currentMediaItemIndex
         shuffleModeEnabled.value = player.shuffleModeEnabled
         repeatMode.value = player.repeatMode
+
+        scope.launch {
+            while (true) {
+                val timer = service.sleepTimer
+                val isActive = timer.isActive
+                val remaining = if (isActive) {
+                    if (timer.pauseWhenSongEnd) {
+                        (player.duration - player.currentPosition).coerceAtLeast(0) / 1000
+                    } else {
+                        (timer.triggerTime - System.currentTimeMillis()).coerceAtLeast(0) / 1000
+                    }
+                } else 0
+
+                _sleepTimerState.value = SleepTimerState(isActive, remaining)
+                delay(1000)
+            }
+        }
     }
 
     fun playQueue(queue: Queue) {
