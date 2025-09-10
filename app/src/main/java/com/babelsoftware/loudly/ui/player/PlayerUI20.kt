@@ -1,5 +1,7 @@
 package com.babelsoftware.loudly.ui.player
 
+import android.Manifest
+import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -8,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.BatteryManager
+import androidx.annotation.RequiresPermission
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -203,6 +206,43 @@ fun rememberBatteryInfoState(): State<BatteryInfo> {
 }
 
 @Composable
+fun rememberBluetoothConnectionState(): State<String?> {
+    val context = LocalContext.current
+    val connectedDeviceName = remember { mutableStateOf<String?>(null) }
+
+    DisposableEffect(context) {
+        val receiver = object : BroadcastReceiver() {
+            @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+            override fun onReceive(context: Context, intent: Intent) {
+                if (intent.action == BluetoothDevice.ACTION_ACL_CONNECTED) {
+                    val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                    val deviceName = device?.name
+                    if (!deviceName.isNullOrEmpty()) {
+                        connectedDeviceName.value = deviceName
+                    }
+                }
+            }
+        }
+
+        val filter = IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED)
+        context.registerReceiver(receiver, filter)
+
+        onDispose {
+            context.unregisterReceiver(receiver)
+        }
+    }
+
+    LaunchedEffect(connectedDeviceName.value) {
+        if (connectedDeviceName.value != null) {
+            kotlinx.coroutines.delay(5000)
+            connectedDeviceName.value = null
+        }
+    }
+
+    return connectedDeviceName
+}
+
+@Composable
 fun BatteryChip(info: BatteryInfo) {
     val (iconRes, color, text) = when {
         info.isCharging -> Triple(R.drawable.ic_battery_charging, Color(0xFF4CAF50), "${info.level}%")
@@ -239,6 +279,16 @@ fun BatteryChip(info: BatteryInfo) {
             }
         }
     }
+}
+
+@Composable
+fun BluetoothDeviceChip(deviceName: String) {
+    InfoChip(
+        icon = R.drawable.bluetooth_devices,
+        text = deviceName,
+        color = Color.White,
+        onClick = {}
+    )
 }
 
 sealed class NetworkInfo {
@@ -383,29 +433,47 @@ private fun NetworkStatusChip() {
 private fun ComradeChipContainer() {
     val errorState by LocalPlayerConnection.current!!.errorManagerState.collectAsState()
     val batteryInfo by rememberBatteryInfoState()
+    val connectedBluetoothDevice by rememberBluetoothConnectionState()
 
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) {
-            NetworkStatusChip()
-        }
-        AnimatedVisibility(visible = errorState == PlayerErrorManager.State.RECOVERING) {
-            InfoChip(
-                icon = R.drawable.ic_autorenew,
-                text = stringResource(R.string.recovering_playback),
-                color = Color.White.copy(alpha = 0.8f),
-                onClick = {}
-            )
-        }
-
-        AnimatedVisibility(
-            visible = batteryInfo.isCharging || batteryInfo.level in 1..29,
-            enter = fadeIn() + slideInHorizontally { it },
-            exit = fadeOut() + slideOutHorizontally { it }
-        ) {
-            BatteryChip(info = batteryInfo)
+    AnimatedContent(
+        targetState = connectedBluetoothDevice,
+        transitionSpec = {
+            if (targetState != null) {
+                slideInHorizontally { width -> width } + fadeIn() togetherWith
+                        slideOutHorizontally { width -> -width } + fadeOut()
+            } else {
+                slideInHorizontally { width -> -width } + fadeIn() togetherWith
+                        slideOutHorizontally { width -> width } + fadeOut()
+            }
+        },
+        label = "ComradeChipAnimation"
+    ) { deviceName ->
+        if (deviceName != null) {
+            BluetoothDeviceChip(deviceName = deviceName)
+        } else {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) {
+                    NetworkStatusChip()
+                }
+                AnimatedVisibility(visible = errorState == PlayerErrorManager.State.RECOVERING) {
+                    InfoChip(
+                        icon = R.drawable.ic_autorenew,
+                        text = stringResource(R.string.recovering_playback),
+                        color = Color.White.copy(alpha = 0.8f),
+                        onClick = {}
+                    )
+                }
+                AnimatedVisibility(
+                    visible = batteryInfo.isCharging || batteryInfo.level in 1..29,
+                    enter = fadeIn() + slideInHorizontally { it },
+                    exit = fadeOut() + slideOutHorizontally { it }
+                ) {
+                    BatteryChip(info = batteryInfo)
+                }
+            }
         }
     }
 }
