@@ -250,6 +250,7 @@ val MiniPlayerActionButtonKey = stringPreferencesKey("miniPlayerActionButton")
 enum class MiniPlayerAction {
     Like,
     Next,
+    Previous,
     Download,
     None
 }

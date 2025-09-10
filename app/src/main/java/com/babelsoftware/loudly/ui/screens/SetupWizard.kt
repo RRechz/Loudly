@@ -37,6 +37,7 @@ import androidx.compose.material.icons.automirrored.rounded.NavigateNext
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.FastForward
+import androidx.compose.material.icons.rounded.FastRewind
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.MusicVideo
 import androidx.compose.material.icons.rounded.NotInterested
@@ -295,6 +296,7 @@ fun AppearanceSettingsStep() {
                     Text(text = when (action) {
                         MiniPlayerAction.Like -> stringResource(R.string.like)
                         MiniPlayerAction.Next -> stringResource(R.string.next)
+                        MiniPlayerAction.Previous -> stringResource(R.string.previous)
                         MiniPlayerAction.Download -> stringResource(R.string.download)
                         MiniPlayerAction.None -> stringResource(R.string.none)
                     })
@@ -304,6 +306,7 @@ fun AppearanceSettingsStep() {
                         imageVector = when(action) {
                             MiniPlayerAction.Like -> Icons.Rounded.Favorite
                             MiniPlayerAction.Next -> Icons.Rounded.FastForward
+                            MiniPlayerAction.Previous -> Icons.Rounded.FastRewind
                             MiniPlayerAction.Download -> Icons.Rounded.SystemUpdateAlt
                             MiniPlayerAction.None -> Icons.Rounded.NotInterested
                         },

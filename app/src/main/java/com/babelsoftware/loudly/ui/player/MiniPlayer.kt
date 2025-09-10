@@ -70,6 +70,7 @@ fun MiniPlayer(
     val isPlaying by playerConnection.isPlaying.collectAsState()
     val currentSong by playerConnection.currentSong.collectAsState(initial = null)
     val canSkipNext by playerConnection.canSkipNext.collectAsState()
+    val canSkipPrevious by playerConnection.canSkipPrevious.collectAsState()
 
     val context = LocalContext.current
     val downloadUtil = LocalDownloadUtil.current
@@ -176,6 +177,16 @@ fun MiniPlayer(
                                 Icon(
                                     painter = painterResource(R.drawable.skip_next),
                                     contentDescription = "Next",
+                                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
+                        }
+                        MiniPlayerAction.Previous -> {
+                            IconButton(enabled = canSkipPrevious, onClick = { playerConnection.player.seekToPrevious() }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.skip_previous),
+                                    contentDescription = "Previous",
                                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                                     modifier = Modifier.size(28.dp)
                                 )

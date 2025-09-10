@@ -1217,6 +1217,7 @@ fun AppearanceSettings(
             val miniPlayerActionDesc = when (miniPlayerAction) {
                 MiniPlayerAction.Like -> stringResource(R.string.like)
                 MiniPlayerAction.Next -> stringResource(R.string.next)
+                MiniPlayerAction.Previous -> stringResource(R.string.previous)
                 MiniPlayerAction.Download -> stringResource(R.string.download)
                 MiniPlayerAction.None -> stringResource(R.string.none)
             }
@@ -1367,6 +1368,7 @@ fun MiniPlayerActionDialog(
                         val description = when (option) {
                             MiniPlayerAction.Like -> stringResource(R.string.like)
                             MiniPlayerAction.Next -> stringResource(R.string.next)
+                            MiniPlayerAction.Previous -> stringResource(R.string.previous)
                             MiniPlayerAction.Download -> stringResource(R.string.download)
                             MiniPlayerAction.None -> stringResource(R.string.none)
                         }
@@ -1461,6 +1463,14 @@ private fun MiniPlayerPreview(action: MiniPlayerAction) {
                         Icon(
                             painter = painterResource(R.drawable.skip_next),
                             contentDescription = "Next",
+                            modifier = Modifier.size(28.dp),
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                        )
+                    }
+                    MiniPlayerAction.Previous -> {
+                        Icon(
+                            painter = painterResource(R.drawable.skip_previous),
+                            contentDescription = "Previous",
                             modifier = Modifier.size(28.dp),
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                         )
