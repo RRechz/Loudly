@@ -307,15 +307,3 @@ private fun ClassicWidgetPreview() {
             .padding(16.dp)
     )
 }
-
-@Composable
-private fun QuickWidgetPreview() {
-    Image(
-        painter = painterResource(id = R.drawable.widget_preview_quick),
-        contentDescription = "Minimalist Widget Preview",
-        contentScale = ContentScale.Fit,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    )
-}
