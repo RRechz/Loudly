@@ -1,10 +1,13 @@
 package com.babelsoftware.loudly.ui.player
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.drawable.BitmapDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.BatteryManager
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -12,7 +15,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
@@ -74,6 +79,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -157,6 +164,82 @@ import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 private const val HQ_BITRATE = 52000
+data class BatteryInfo(val level: Int, val isCharging: Boolean)
+
+@Composable
+fun rememberBatteryInfoState(): State<BatteryInfo> {
+    val context = LocalContext.current
+    val batteryInfo = remember { mutableStateOf(BatteryInfo(-1, false)) }
+
+    DisposableEffect(context) {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+                val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+                val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
+
+                val isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                        status == BatteryManager.BATTERY_STATUS_FULL
+
+                val currentLevel = if (level != -1 && scale != -1) {
+                    (level * 100 / scale.toFloat()).toInt()
+                } else {
+                    -1
+                }
+                batteryInfo.value = BatteryInfo(currentLevel, isCharging)
+            }
+        }
+
+        val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        context.registerReceiver(receiver, filter)?.let {
+            receiver.onReceive(context, it)
+        }
+
+        onDispose {
+            context.unregisterReceiver(receiver)
+        }
+    }
+    return batteryInfo
+}
+
+@Composable
+fun BatteryChip(info: BatteryInfo) {
+    val (iconRes, color, text) = when {
+        info.isCharging -> Triple(R.drawable.ic_battery_charging, Color(0xFF4CAF50), "${info.level}%")
+        info.level < 20 -> Triple(R.drawable.ic_battery, MaterialTheme.colorScheme.error, "${info.level}%")
+        info.level < 30 -> Triple(R.drawable.ic_low_battery, Color(0xFFFFC107), null)
+        else -> return
+    }
+
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
+        ),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.25f)),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = iconRes),
+                contentDescription = "Battery Level",
+                modifier = Modifier.size(16.dp),
+                tint = color
+            )
+            if (text != null) {
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    text = text,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp,
+                    color = color
+                )
+            }
+        }
+    }
+}
 
 sealed class NetworkInfo {
     data object None : NetworkInfo()
@@ -293,6 +376,37 @@ private fun NetworkStatusChip() {
             }
         }
         is NetworkInfo.None -> {}
+    }
+}
+
+@Composable
+private fun ComradeChipContainer() {
+    val errorState by LocalPlayerConnection.current!!.errorManagerState.collectAsState()
+    val batteryInfo by rememberBatteryInfoState()
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) {
+            NetworkStatusChip()
+        }
+        AnimatedVisibility(visible = errorState == PlayerErrorManager.State.RECOVERING) {
+            InfoChip(
+                icon = R.drawable.ic_autorenew,
+                text = stringResource(R.string.recovering_playback),
+                color = Color.White.copy(alpha = 0.8f),
+                onClick = {}
+            )
+        }
+
+        AnimatedVisibility(
+            visible = batteryInfo.isCharging || batteryInfo.level in 1..29,
+            enter = fadeIn() + slideInHorizontally { it },
+            exit = fadeOut() + slideOutHorizontally { it }
+        ) {
+            BatteryChip(info = batteryInfo)
+        }
     }
 }
 
@@ -481,8 +595,6 @@ fun NowPlayingScreen(
 
 @Composable
 private fun PlayerTopBar(onClose: () -> Unit) {
-    val errorState by LocalPlayerConnection.current!!.errorManagerState.collectAsState()
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -493,18 +605,7 @@ private fun PlayerTopBar(onClose: () -> Unit) {
         IconButton(onClick = onClose) {
             Icon(painterResource(R.drawable.arrow_back), contentDescription = "Geri", tint = Color.White)
         }
-
-        AnimatedVisibility(visible = errorState == PlayerErrorManager.State.RECOVERING) {
-            InfoChip(
-                icon = R.drawable.ic_autorenew,
-                text = stringResource(R.string.recovering_playback),
-                color = Color.White.copy(alpha = 0.8f),
-                onClick = {}
-            )
-        }
-        AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) {
-            NetworkStatusChip()
-        }
+        ComradeChipContainer()
     }
 }
 
