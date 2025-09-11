@@ -62,6 +62,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.rounded.PlaylistRemove
 import androidx.compose.material.icons.rounded.VpnLock
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -148,6 +149,7 @@ import com.babelsoftware.loudly.lyrics.LyricsUiState
 import com.babelsoftware.loudly.lyrics.LyricsUtils
 import com.babelsoftware.loudly.lyrics.LyricsViewModel
 import com.babelsoftware.loudly.models.MediaMetadata
+import com.babelsoftware.loudly.playback.StreakInfo
 import com.babelsoftware.loudly.ui.component.BottomSheetState
 import com.babelsoftware.loudly.ui.component.LocalMenuState
 import com.babelsoftware.loudly.ui.component.PlayerSliderTrack
@@ -166,7 +168,7 @@ import java.util.Locale
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
-private const val HQ_BITRATE = 52000
+private const val HQ_BITRATE = 100000
 data class BatteryInfo(val level: Int, val isCharging: Boolean)
 
 @Composable
@@ -445,6 +447,54 @@ private fun NetworkStatusChip() {
     }
 }
 
+@Composable
+fun StreakChip(streakInfo: StreakInfo, onClick: () -> Unit) {
+    val (icon, text) = when (streakInfo) {
+        is StreakInfo.AlbumStreak -> R.drawable.album to stringResource(R.string.album_streak_message, streakInfo.album.title)
+        is StreakInfo.ArtistStreak -> R.drawable.artist to stringResource(R.string.artist_streak_message, streakInfo.artist.name)
+        else -> return
+    }
+
+    InfoChip(
+        icon = icon,
+        text = text,
+        color = Color.White,
+        onClick = onClick
+    )
+}
+
+@Composable
+fun StreakActionDialog(
+    streakInfo: StreakInfo,
+    onDismiss: () -> Unit,
+    onStartRadio: () -> Unit
+) {
+    val title = when (streakInfo) {
+        is StreakInfo.AlbumStreak -> streakInfo.album.title
+        is StreakInfo.ArtistStreak -> streakInfo.artist.name
+        else -> return
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = title) },
+        text = { Text(text = stringResource(R.string.streak_dialog_message)) },
+        confirmButton = {
+            TextButton(onClick = {
+                onStartRadio()
+                onDismiss()
+            }) {
+                Text(stringResource(R.string.start_radio))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.cancel))
+            }
+        }
+    )
+}
+
 @OptIn(androidx.compose.animation.ExperimentalAnimationApi::class)
 @Composable
 private fun ComradeChipContainer() {
@@ -454,6 +504,19 @@ private fun ComradeChipContainer() {
     val batteryInfo by rememberBatteryInfoState()
     val connectedBluetoothDevice by rememberBluetoothConnectionState()
     val sleepTimerState by playerConnection.sleepTimerState.collectAsState()
+    val streakState by playerConnection.streakState.collectAsState()
+    var showStreakDialog by remember { mutableStateOf<StreakInfo>(StreakInfo.None) }
+
+    if (showStreakDialog !is StreakInfo.None) {
+        StreakActionDialog(
+            streakInfo = showStreakDialog,
+            onDismiss = { showStreakDialog = StreakInfo.None },
+            onStartRadio = {
+                playerConnection.startRadioFromStreak(showStreakDialog)
+                showStreakDialog = StreakInfo.None
+            }
+        )
+    }
 
     AnimatedContent(
         targetState = connectedBluetoothDevice,
@@ -475,6 +538,12 @@ private fun ComradeChipContainer() {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                AnimatedVisibility(visible = streakState !is StreakInfo.None) {
+                    StreakChip(
+                        streakInfo = streakState,
+                        onClick = { showStreakDialog = streakState }
+                    )
+                }
                 AnimatedVisibility(
                     visible = sleepTimerState.isActive && sleepTimerState.remainingSeconds < 60,
                     enter = fadeIn(),

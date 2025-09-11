@@ -21,10 +21,12 @@ import com.babelsoftware.loudly.extensions.metadata
 import com.babelsoftware.loudly.playback.queues.Queue
 import com.babelsoftware.loudly.TranslationHelper
 import com.babelsoftware.loudly.db.entities.LyricsEntity
+import com.babelsoftware.loudly.models.MediaMetadata
 import com.babelsoftware.loudly.utils.dataStore
 import com.babelsoftware.loudly.reportException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,12 +43,18 @@ data class SleepTimerState(
     val remainingSeconds: Long = 0
 )
 
+sealed class StreakInfo {
+    object None : StreakInfo()
+    data class AlbumStreak(val album: MediaMetadata.Album) : StreakInfo()
+    data class ArtistStreak(val artist: MediaMetadata.Artist) : StreakInfo()
+}
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlayerConnection(
     private val context: Context,
     binder: MusicService.MusicBinder,
     val database: MusicDatabase,
-    scope: CoroutineScope,
+    private val scope: CoroutineScope,
 ) : Player.Listener {
     val service = binder.service
     val player = service.player
@@ -99,6 +107,12 @@ class PlayerConnection(
 
     private val _sleepTimerState = MutableStateFlow(SleepTimerState())
     val sleepTimerState: StateFlow<SleepTimerState> = _sleepTimerState
+
+    private var previousMediaMetadata: MediaMetadata? = null
+    private var streakTimerJob: Job? = null
+
+    private val _streakState = MutableStateFlow<StreakInfo>(StreakInfo.None)
+    val streakState: StateFlow<StreakInfo> = _streakState
 
     fun startSleepTimer(minutes: Int) {
         service.sleepTimer.start(minutes)
@@ -169,6 +183,17 @@ class PlayerConnection(
         player.playWhenReady = true
     }
 
+    fun startRadioFromStreak(streakInfo: StreakInfo) {
+        val radioMediaItem = when (streakInfo) {
+            is StreakInfo.AlbumStreak -> mediaMetadata.value?.takeIf { it.album?.id == streakInfo.album.id }
+            is StreakInfo.ArtistStreak -> mediaMetadata.value?.takeIf { it.artists.any { artist -> artist.id == streakInfo.artist.id } }
+            else -> null
+        }
+        radioMediaItem?.let {
+            service.startRadioSeamlessly()
+        }
+    }
+
     override fun onPlaybackStateChanged(state: Int) {
         playbackState.value = state
         error.value = player.playerError
@@ -181,11 +206,38 @@ class PlayerConnection(
     }
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-        mediaMetadata.value = mediaItem?.metadata
+        val currentMetadata = mediaItem?.metadata
+        mediaMetadata.value = currentMetadata
         currentMediaItemIndex.value = player.currentMediaItemIndex
         currentWindowIndex.value = player.getCurrentQueueIndex()
         updateCanSkipPreviousAndNext()
         sendWidgetUpdateBroadcast()
+        streakTimerJob?.cancel()
+
+        val previous = previousMediaMetadata
+        if (currentMetadata != null && previous != null && reason != Player.MEDIA_ITEM_TRANSITION_REASON_SEEK) {
+            val currentAlbumId = currentMetadata.album?.id
+            if (currentAlbumId != null && currentAlbumId == previous.album?.id) {
+                _streakState.value = StreakInfo.AlbumStreak(currentMetadata.album)
+            }
+            else {
+                val currentArtistId = currentMetadata.artists.firstOrNull()?.id
+                if (currentArtistId != null && currentArtistId == previous.artists.firstOrNull()?.id) {
+                    _streakState.value = StreakInfo.ArtistStreak(currentMetadata.artists.first())
+                } else {
+                    _streakState.value = StreakInfo.None
+                }
+            }
+        } else {
+            _streakState.value = StreakInfo.None
+        }
+        if (_streakState.value !is StreakInfo.None) {
+            streakTimerJob = scope.launch {
+                delay(7000)
+                _streakState.value = StreakInfo.None
+            }
+        }
+        previousMediaMetadata = currentMetadata
     }
 
     override fun onTimelineChanged(timeline: Timeline, reason: Int) {

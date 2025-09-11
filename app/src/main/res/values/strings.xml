@@ -595,6 +595,9 @@
     <!-- Player UI -->
     <string name="translate">Translate (BETA)</string>
     <string name="copy">Copy</string>
+    <string name="album_streak_message">\"%1s\" continue from the album?</string>
+    <string name="artist_streak_message">Continue with artist \"%1s\"?</string>
+    <string name="streak_dialog_message">Would you like to continue with this flow?</string>
 
     <!-- Playback Error -->
     <string name="error_network_title">Network Error</string>
