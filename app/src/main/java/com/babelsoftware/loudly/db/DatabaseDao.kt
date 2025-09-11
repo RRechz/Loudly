@@ -834,6 +834,17 @@ interface DatabaseDao {
         }
     }
 
+    @Transaction
+    @Query("SELECT * FROM event ORDER BY timestamp DESC LIMIT 1")
+    fun getLatestHistoryEntry(): Flow<HistoryEntry?>
+
+    @Transaction
+    @Query("SELECT * FROM playlist WHERE name LIKE :query LIMIT 1")
+    fun findPlaylistByName(query: String): Flow<PlaylistEntity?>
+
+    @Query("SELECT * FROM playlist WHERE id = :id LIMIT 1")
+    fun getPlaylist(id: String): Flow<PlaylistEntity?>
+
     @Upsert
     fun upsert(map: SongAlbumMap)
 

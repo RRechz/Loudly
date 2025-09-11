@@ -33,6 +33,7 @@ import com.babelsoftware.loudly.ui.screens.settings.AboutScreen
 import com.babelsoftware.loudly.ui.screens.settings.AccountSettings
 import com.babelsoftware.loudly.ui.screens.settings.AppearanceSettings
 import com.babelsoftware.loudly.ui.screens.settings.BackupAndRestore
+import com.babelsoftware.loudly.ui.screens.settings.ComradeNotificationSettingsScreen
 import com.babelsoftware.loudly.ui.screens.settings.ContentSettings
 import com.babelsoftware.loudly.ui.screens.settings.DiscordLoginScreen
 import com.babelsoftware.loudly.ui.screens.settings.DiscordSettings
@@ -91,6 +92,9 @@ fun NavGraphBuilder.navigationBuilder(
     }
     composable("settings/tips") {
         TipsScreen(navController = navController)
+    }
+    composable("settings/comradenotification") {
+        ComradeNotificationSettingsScreen(navController = navController)
     }
     composable(
         route = "search/{query}",

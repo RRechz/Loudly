@@ -136,9 +136,16 @@ fun SettingsScreen(
             SettingsBox(
                 title = stringResource(R.string.tips_and_features),
                 description = stringResource(R.string.tips_and_fetures_description),
-                icon = IconResource.Drawable(painterResource(R.drawable.tips)), // Yeni bir ikon eklemeniz gerekecek
+                icon = IconResource.Drawable(painterResource(R.drawable.tips)),
                 shape = shapeManager(isFirst = true),
                 onClick = { navController.navigate("settings/tips") }
+            )
+            SettingsBox(
+                title = stringResource(R.string.ComradeNotification),
+                description = stringResource(R.string.comrade_notification_description),
+                icon = IconResource.Drawable(painterResource(R.drawable.ic_smart_hub)),
+                shape = shapeManager(),
+                onClick = { navController.navigate("settings/comradenotification") }
             )
             SettingsBox(
                 title = stringResource(R.string.storage),

@@ -300,8 +300,27 @@
     <string name="notifications">Notifications</string>
     <string name="keep_alive_title">Prevent system killing app</string>
     <string name="keep_alive_description">Use a foreground notification to prevent Loudly from being randomly closed by the system.</string>
-    <string name="notifications_settings">Notifications settings</string>
+    <string name="keep_to_alive_settings">Keep to Alive Settings</string>
     <string name="notification_permission_is_required">Notification permission is required</string>
+    <string name="ComradeNotification">Comrade Notification</string>
+
+    <string name="comrade_notifications_title">Comrade Notifications</string>
+    <string name="comrade_notifications_enable">Enable Smart Notifications</string>
+    <string name="comrade_notifications_enable_desc">Loudly provides smart music recommendations based on your preferences.</string>
+
+    <string name="permissions_category">Permissions</string>
+    <string name="comrade_permission_activity_title">Physical Activity Permission</string>
+    <string name="comrade_permission_activity_desc">This permission is required to detect when you are running or driving and provide relevant music recommendations.</string>
+    <string name="permission_button_grant">Allow</string>
+    <string name="permission_button_granted">Allowed</string>
+
+    <string name="comrade_recommendation_types">Types of Suggestions</string>
+    <string name="comrade_driving_detection">Driving Detection</string>
+    <string name="comrade_driving_detection_desc">It suggests route lists when you use the vehicle.</string>
+    <string name="comrade_activity_detection">Running/Walking Detection</string>
+    <string name="comrade_activity_detection_desc">It recommends energy lists for your exercise activities.</string>
+
+    <string name="demo_button_text" translatable="false">DEMO</string>
 
     <!-- Settings -->
     <string name="settings">Settings</string>
@@ -537,6 +556,7 @@
     <string name="content_description">Language · Location · Proxy</string>
     <string name="account_description">Log in · Spotify · Discord</string>
     <string name="appearance_description">Theme · Slider · Player</string>
+    <string name="comrade_notification_description">Comrade Notifications · Comrade Setup</string>
 
     <string name="appearance_setup_desc">Customize the appearance of the app and player</string>
     <string name="dynamic_theme_setup_dec">Uses color theme of device</string>
@@ -598,6 +618,13 @@
     <string name="album_streak_message">\"%1s\" continue from the album?</string>
     <string name="artist_streak_message">Continue with artist \"%1s\"?</string>
     <string name="streak_dialog_message">Would you like to continue with this flow?</string>
+    <string name="notification_headset_title">Are you ready for some music? 🎧</string>
+    <string name="notification_headset_continue">Continue from the last song you listened to: %1s</string>
+    <string name="notification_headset_generic">Tap to open Loudly!</string>
+    <string name="notification_vehicle_title">The journey begins! 🚗</string>
+    <string name="notification_vehicle_text">Would you like to play your “Road Songs” playlist?</string>
+    <string name="notification_running_title">Time to run! 👟</string>
+    <string name="notification_running_text">Keep up the tempo with your “Energy” playlist.</string>
 
     <!-- Playback Error -->
     <string name="error_network_title">Network Error</string>

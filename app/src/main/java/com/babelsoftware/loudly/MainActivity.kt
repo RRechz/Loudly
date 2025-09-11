@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -100,6 +101,7 @@ import coil.request.ImageRequest
 import com.babelsoftware.innertube.YouTube
 import com.babelsoftware.innertube.models.SongItem
 import com.babelsoftware.innertube.models.WatchEndpoint
+import com.babelsoftware.loudly.background.ContextualWorker
 import com.babelsoftware.loudly.constants.AppBarHeight
 import com.babelsoftware.loudly.constants.AppDesignVariantKey
 import com.babelsoftware.loudly.constants.AppDesignVariantType
@@ -118,15 +120,18 @@ import com.babelsoftware.loudly.constants.PlayerStyleKey
 import com.babelsoftware.loudly.constants.PureBlackKey
 import com.babelsoftware.loudly.constants.SearchSource
 import com.babelsoftware.loudly.constants.SearchSourceKey
+import com.babelsoftware.loudly.constants.SongSortType
 import com.babelsoftware.loudly.constants.StopMusicOnTaskClearKey
 import com.babelsoftware.loudly.db.MusicDatabase
 import com.babelsoftware.loudly.db.entities.SearchHistory
 import com.babelsoftware.loudly.extensions.toEnum
+import com.babelsoftware.loudly.extensions.toMediaItem
 import com.babelsoftware.loudly.models.toMediaMetadata
 import com.babelsoftware.loudly.playback.DownloadUtil
 import com.babelsoftware.loudly.playback.MusicService
 import com.babelsoftware.loudly.playback.MusicService.MusicBinder
 import com.babelsoftware.loudly.playback.PlayerConnection
+import com.babelsoftware.loudly.playback.queues.ListQueue
 import com.babelsoftware.loudly.playback.queues.YouTubeQueue
 import com.babelsoftware.loudly.ui.component.ActionChipButton
 import com.babelsoftware.loudly.ui.component.BottomSheetMenu
@@ -168,6 +173,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -252,6 +258,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        handleIncomingIntent(intent)
 
         lifecycleScope.launch {
             dataStore.data
@@ -588,6 +595,7 @@ class MainActivity : ComponentActivity() {
                     }
                     DisposableEffect(Unit) {
                         val listener = Consumer<Intent> { intent ->
+                            handleIncomingIntent(intent)
                             val uri = intent.data ?: intent.extras?.getString(Intent.EXTRA_TEXT)?.toUri() ?: return@Consumer
                             when (val path = uri.pathSegments.firstOrNull()) {
                                 "playlist" -> uri.getQueryParameter("list")?.let { playlistId ->
@@ -1053,6 +1061,68 @@ class MainActivity : ComponentActivity() {
         WindowCompat.getInsetsController(window, window.decorView.rootView).apply {
             isAppearanceLightStatusBars = !isDark
             isAppearanceLightNavigationBars = !isDark
+        }
+    }
+
+    private fun handleIncomingIntent(intent: Intent) {
+        lifecycleScope.launch {
+            while (playerConnection == null) {
+                delay(100)
+            }
+
+            val pc = playerConnection ?: return@launch
+
+            when (intent.action) {
+                "ACTION_PLAY_SONG" -> {
+                    val songId = intent.getStringExtra("SONG_ID")
+                    if (songId != null) {
+                        val song = withContext(Dispatchers.IO) {
+                            database.song(songId).firstOrNull()
+                        }
+                        if (song != null) {
+                            pc.playQueue(YouTubeQueue.Companion.radio(song.toMediaMetadata()))
+                        }
+                    }
+                }
+
+                "ACTION_PLAY_CONTEXTUAL_PLAYLIST" -> {
+                    val playlistId =
+                        intent.getStringExtra("PAYLOAD")
+                    if (playlistId != null) {
+                        if (playlistId == ContextualWorker.LIKED_SONGS_FALLBACK_ID) {
+                            val likedSongs = withContext(Dispatchers.IO) {
+                                database.likedSongs(SongSortType.CREATE_DATE, true).firstOrNull()
+                            }
+                            if (!likedSongs.isNullOrEmpty()) {
+                                pc.player.shuffleModeEnabled = true
+                                pc.playQueue(
+                                    ListQueue(
+                                        title = "Beğenilenler Karışık",
+                                        items = likedSongs.map { it.toMediaItem() }
+                                    ))
+                            }
+                        } else {
+                            val playlistEntity = withContext(Dispatchers.IO) {
+                                database.getPlaylist(playlistId).firstOrNull()
+                            }
+                            if (playlistEntity != null) {
+                                val songsInPlaylist = withContext(Dispatchers.IO) {
+                                    database.playlistSongs(playlistId).firstOrNull()
+                                }
+
+                                if (!songsInPlaylist.isNullOrEmpty()) {
+                                    pc.player.shuffleModeEnabled = false
+                                    pc.playQueue(
+                                        ListQueue(
+                                            title = playlistEntity.name,
+                                            items = songsInPlaylist.map { it.song.toMediaItem() }
+                                        ))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

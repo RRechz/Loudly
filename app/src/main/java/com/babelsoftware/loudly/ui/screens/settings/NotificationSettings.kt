@@ -60,21 +60,6 @@ fun NotificationSettings(
 ) {
     val context = LocalContext.current
     val (keepAlive, onKeepAliveChange) = rememberPreference(key = KeepAliveKey, defaultValue = false)
-    var permissionGranted by remember { mutableStateOf(false) }
-
-    val notificationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        permissionGranted = isGranted
-    }
-
-    val checkNotificationPermission = {
-        permissionGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-        } else {
-            true
-        }
-    }
 
     fun toggleKeepAlive(newValue: Boolean) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -102,20 +87,10 @@ fun NotificationSettings(
         }
     }
 
-    LaunchedEffect(Unit) {
-        checkNotificationPermission()
-    }
-
-    LaunchedEffect(permissionGranted) {
-        if (!permissionGranted) {
-            onKeepAliveChange(false)
-        }
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.notifications_settings)) },
+                title = { Text(stringResource(R.string.keep_to_alive_settings)) },
                 navigationIcon = {
                     IconButton(
                         onClick = navController::navigateUp,
@@ -139,30 +114,6 @@ fun NotificationSettings(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 16.dp)
         ) {
-            SettingCategory(title = stringResource(R.string.notifications))
-
-            SettingsBox(
-                title = stringResource(R.string.enable_notifications),
-                icon = IconResource.Drawable(
-                    painterResource(id = if (permissionGranted) R.drawable.notification_on else R.drawable.notifications_off)
-                ),
-                actionType = ActionType.SWITCH,
-                isChecked = permissionGranted,
-                onCheckedChange = { checked ->
-                    if (checked && !permissionGranted) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                        }
-                    } else if (!checked) {
-                        // Permissions can be disabled in settings.
-                        // This switch only triggers permission requests; it cannot revoke permissions.
-                        // The state can be checked again to reflect the permission status.
-                        checkNotificationPermission()
-                    }
-                },
-                shape = shapeManager(isFirst = true)
-            )
-
             SettingsBox(
                 title = stringResource(R.string.keep_alive_title),
                 description = stringResource(R.string.keep_alive_description),
@@ -170,7 +121,7 @@ fun NotificationSettings(
                 actionType = ActionType.SWITCH,
                 isChecked = keepAlive,
                 onCheckedChange = { toggleKeepAlive(it) },
-                shape = shapeManager(isLast = true)
+                shape = shapeManager(isBoth = true)
             )
         }
     }

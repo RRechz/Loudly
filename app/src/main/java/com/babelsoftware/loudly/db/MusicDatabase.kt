@@ -22,6 +22,7 @@ import com.babelsoftware.loudly.db.entities.RecentActivityEntity
 import com.babelsoftware.loudly.db.entities.RelatedSongMap
 import com.babelsoftware.loudly.db.entities.SearchHistory
 import com.babelsoftware.loudly.db.entities.SetVideoIdEntity
+import com.babelsoftware.loudly.db.entities.Song
 import com.babelsoftware.loudly.db.entities.SongAlbumMap
 import com.babelsoftware.loudly.db.entities.SongArtistMap
 import com.babelsoftware.loudly.db.entities.SongEntity
@@ -430,3 +431,14 @@ class Migration18To19 : AutoMigrationSpec {
         db.execSQL("UPDATE song SET explicit = 0 WHERE explicit IS NULL")
     }
 }
+
+data class HistoryEntry(
+    @Embedded
+    val event: Event,
+    @Relation(
+        parentColumn = "songId",
+        entityColumn = "id",
+        entity = SongEntity::class
+    )
+    val song: Song,
+)

@@ -27,6 +27,7 @@ import com.babelsoftware.loudly.extensions.toEnum
 import com.babelsoftware.loudly.extensions.toInetSocketAddress
 import com.babelsoftware.innertube.models.YouTubeLocale
 import com.babelsoftware.kugou.KuGou
+import com.babelsoftware.loudly.background.setupModernAwarenessSystem
 import com.babelsoftware.loudly.utils.dataStore
 import com.babelsoftware.loudly.utils.get
 import com.babelsoftware.loudly.reportException
@@ -110,6 +111,13 @@ class App : Application(), ImageLoaderFactory {
                         }
                     }
                 }
+        }
+        setupContextualNotifications()
+    }
+
+    private fun setupContextualNotifications() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setupModernAwarenessSystem(this)
         }
     }
 

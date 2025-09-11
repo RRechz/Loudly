@@ -268,6 +268,10 @@ val ShowLyricsKey = booleanPreferencesKey("showLyrics")
 val TranslateLyricsKey = booleanPreferencesKey("translateLyrics")
 val LockQueueKey = booleanPreferencesKey("lockQueue")
 
+val ComradeNotificationsEnabledKey = booleanPreferencesKey("comrade_notifications_enabled")
+val ComradeVehicleDetectionEnabledKey = booleanPreferencesKey("comrade_vehicle_detection_enabled")
+val ComradeActivityDetectionEnabledKey = booleanPreferencesKey("comrade_activity_detection_enabled")
+
 val PlayerVolumeKey = floatPreferencesKey("playerVolume")
 val RepeatModeKey = intPreferencesKey("repeatMode")
 

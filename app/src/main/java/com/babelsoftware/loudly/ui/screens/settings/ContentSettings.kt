@@ -25,6 +25,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.NoCell
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -250,8 +251,8 @@ fun ContentSettings(
 
             SettingCategory(title = stringResource(R.string.system_integration))
             SettingsBox(
-                title = stringResource(R.string.notifications_settings),
-                icon = IconResource.Drawable(painterResource(R.drawable.notification_on)),
+                title = stringResource(R.string.keep_to_alive_settings),
+                icon = IconResource.Vector(Icons.Rounded.NoCell),
                 shape = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) shapeManager(isFirst = true) else shapeManager(isBoth = true),
                 onClick = { navController.navigate("settings/content/notification") }
             )
