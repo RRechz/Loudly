@@ -249,7 +249,7 @@ fun BatteryChip(info: BatteryInfo) {
     val (iconRes, color, text) = when {
         info.isCharging -> Triple(R.drawable.ic_battery_charging, Color(0xFF4CAF50), "${info.level}%")
         info.level < 20 -> Triple(R.drawable.ic_battery, MaterialTheme.colorScheme.error, "${info.level}%")
-        info.level < 30 -> Triple(R.drawable.ic_low_battery, Color(0xFFFFC107), null)
+        info.level < 30 -> Triple(R.drawable.ic_low_battery, Color(0xFFFFC107), "${info.level}%")
         else -> return
     }
 
