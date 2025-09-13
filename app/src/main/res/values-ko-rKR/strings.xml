@@ -270,7 +270,6 @@
     <string name="notifications">알림</string>
     <string name="keep_alive_title">시스템이 앱을 종료하지 못하도록 방지</string>
     <string name="keep_alive_description">Loudly가 시스템에 의해 무작위로 닫히는 것을 방지하기 위해 포그라운드 알림을 사용합니다.</string>
-    <string name="notifications_settings">알림 설정</string>
     <string name="notification_permission_is_required">알림 권한이 필요합니다</string>
 
     <string name="settings">설정</string>

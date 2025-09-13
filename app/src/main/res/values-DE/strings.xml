@@ -279,7 +279,6 @@
     <string name="notifications">Benachrichtigungen</string>
     <string name="keep_alive_title">Verhindern, dass die App vom System beendet wird</string>
     <string name="keep_alive_description">Verwende eine Vordergrundbenachrichtigung, um zu verhindern, dass Loudly zufällig vom System geschlossen wird.</string>
-    <string name="notifications_settings">Benachrichtigungseinstellungen</string>
     <string name="notification_permission_is_required">Benachrichtigungsberechtigung ist erforderlich</string>
 
     <string name="settings">Einstellungen</string>

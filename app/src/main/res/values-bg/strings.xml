@@ -279,7 +279,6 @@
     <string name="notifications">Известия</string>
     <string name="keep_alive_title">Предотвратяване на затварянето на приложението от системата</string>
     <string name="keep_alive_description">Използвайте известие на преден план, за да предотвратите случайното затваряне на Loudly от системата.</string>
-    <string name="notifications_settings">Настройки на известията</string>
     <string name="notification_permission_is_required">Изисква се разрешение за известия</string>
 
     <string name="settings">Настройки</string>

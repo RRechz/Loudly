@@ -499,8 +499,7 @@ fun StreakActionDialog(
 @Composable
 private fun ComradeChipContainer() {
     val playerConnection = LocalPlayerConnection.current!!
-
-    val errorState by playerConnection.errorManagerState.collectAsState()
+    val isRetrying by playerConnection.isRetryingSong.collectAsState()
     val batteryInfo by rememberBatteryInfoState()
     val connectedBluetoothDevice by rememberBluetoothConnectionState()
     val sleepTimerState by playerConnection.sleepTimerState.collectAsState()
@@ -554,16 +553,17 @@ private fun ComradeChipContainer() {
                         onClick = { playerConnection.cancelSleepTimer() }
                     )
                 }
-                AnimatedVisibility(visible = errorState == PlayerErrorManager.State.IDLE) {
-                    NetworkStatusChip()
-                }
-                AnimatedVisibility(visible = errorState == PlayerErrorManager.State.RECOVERING) {
-                    InfoChip(
-                        icon = R.drawable.ic_autorenew,
-                        text = stringResource(R.string.recovering_playback),
-                        color = Color.White.copy(alpha = 0.8f),
-                        onClick = {}
-                    )
+                AnimatedContent(targetState = isRetrying, label = "NetworkStateAnimation") { retrying ->
+                    if (retrying) {
+                        InfoChip(
+                            icon = R.drawable.ic_autorenew,
+                            text = stringResource(R.string.recovering_playback),
+                            color = Color.White.copy(alpha = 0.8f),
+                            onClick = {}
+                        )
+                    } else {
+                        NetworkStatusChip()
+                    }
                 }
                 AnimatedVisibility(
                     visible = batteryInfo.isCharging || batteryInfo.level in 1..29

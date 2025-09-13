@@ -270,7 +270,6 @@
     <string name="notifications">通知</string>
     <string name="keep_alive_title">システムによるアプリの強制終了を防ぐ</string>
     <string name="keep_alive_description">フォアグラウンド通知を使用して、Loudlyがシステムによってランダムに終了されるのを防ぎます。</string>
-    <string name="notifications_settings">通知設定</string>
     <string name="notification_permission_is_required">通知の権限が必要です</string>
 
     <string name="settings">設定</string>

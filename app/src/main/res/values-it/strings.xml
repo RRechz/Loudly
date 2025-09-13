@@ -279,7 +279,6 @@
     <string name="notifications">Notifiche</string>
     <string name="keep_alive_title">Impedisci al sistema di chiudere l\'app</string>
     <string name="keep_alive_description">Usa una notifica in primo piano per impedire che Loudly venga chiuso casualmente dal sistema.</string>
-    <string name="notifications_settings">Impostazioni notifiche</string>
     <string name="notification_permission_is_required">È richiesta l\'autorizzazione per le notifiche</string>
 
     <string name="settings">Impostazioni</string>

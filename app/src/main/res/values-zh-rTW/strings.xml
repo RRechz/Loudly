@@ -270,7 +270,6 @@
     <string name="notifications">通知</string>
     <string name="keep_alive_title">防止應用程式被系統終止</string>
     <string name="keep_alive_description">使用前景通知，防止 Loudly 被系統隨機關閉。</string>
-    <string name="notifications_settings">通知設定</string>
     <string name="notification_permission_is_required">需要通知權限</string>
 
     <string name="settings">設定</string>

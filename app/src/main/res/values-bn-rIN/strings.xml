@@ -279,7 +279,6 @@
     <string name="notifications">বিজ্ঞপ্তি</string>
     <string name="keep_alive_title">সিস্টেম দ্বারা অ্যাপ বন্ধ হওয়া প্রতিরোধ করুন</string>
     <string name="keep_alive_description">সিস্টেম দ্বারা Loudly-কে এলোমেলোভাবে বন্ধ হওয়া থেকে আটকাতে একটি ফোরগ্রাউন্ড বিজ্ঞপ্তি ব্যবহার করুন।</string>
-    <string name="notifications_settings">বিজ্ঞপ্তি সেটিংস</string>
     <string name="notification_permission_is_required">বিজ্ঞপ্তির অনুমতি প্রয়োজন</string>
 
     <string name="settings">সেটিংস</string>

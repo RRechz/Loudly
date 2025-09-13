@@ -297,7 +297,6 @@
     <string name="notifications">Oznámení</string>
     <string name="keep_alive_title">Zabránit systému v ukončení aplikace</string>
     <string name="keep_alive_description">Použijte oznámení na popředí, abyste zabránili náhodnému ukončení Loudly systémem.</string>
-    <string name="notifications_settings">Nastavení oznámení</string>
     <string name="notification_permission_is_required">Je vyžadováno povolení k oznámením</string>
 
     <string name="settings">Nastavení</string>

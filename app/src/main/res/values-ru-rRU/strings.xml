@@ -297,7 +297,6 @@
     <string name="notifications">Уведомления</string>
     <string name="keep_alive_title">Предотвратить закрытие приложения системой</string>
     <string name="keep_alive_description">Использовать постоянное уведомление, чтобы предотвратить случайное закрытие Loudly системой.</string>
-    <string name="notifications_settings">Настройки уведомлений</string>
     <string name="notification_permission_is_required">Требуется разрешение на уведомления</string>
 
     <string name="settings">Настройки</string>

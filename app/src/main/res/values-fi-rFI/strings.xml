@@ -279,7 +279,6 @@
     <string name="notifications">Ilmoitukset</string>
     <string name="keep_alive_title">Estä järjestelmää sulkemasta sovellusta</string>
     <string name="keep_alive_description">Käytä etualan ilmoitusta estääksesi Loudlya sulkeutumasta satunnaisesti järjestelmän toimesta.</string>
-    <string name="notifications_settings">Ilmoitusasetukset</string>
     <string name="notification_permission_is_required">Ilmoituslupa vaaditaan</string>
 
     <string name="settings">Asetukset</string>

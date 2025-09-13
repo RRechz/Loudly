@@ -279,7 +279,6 @@
     <string name="notifications">Ειδοποιήσεις</string>
     <string name="keep_alive_title">Αποτροπή τερματισμού της εφαρμογής από το σύστημα</string>
     <string name="keep_alive_description">Χρησιμοποιήστε μια ειδοποίηση στο προσκήνιο για να αποτρέψετε το τυχαίο κλείσιμο του Loudly από το σύστημα.</string>
-    <string name="notifications_settings">Ρυθμίσεις ειδοποιήσεων</string>
     <string name="notification_permission_is_required">Απαιτείται άδεια ειδοποιήσεων</string>
 
     <string name="settings">Ρυθμίσεις</string>

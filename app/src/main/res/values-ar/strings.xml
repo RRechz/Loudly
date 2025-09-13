@@ -315,7 +315,6 @@
     <string name="notifications">الإشعارات</string>
     <string name="keep_alive_title">منع النظام من إغلاق التطبيق</string>
     <string name="keep_alive_description">استخدم إشعارًا في المقدمة لمنع Loudly من الإغلاق العشوائي بواسطة النظام.</string>
-    <string name="notifications_settings">إعدادات الإشعارات</string>
     <string name="notification_permission_is_required">إذن الإشعارات مطلوب</string>
 
     <string name="settings">الإعدادات</string>

@@ -270,7 +270,6 @@
     <string name="notifications">通知</string>
     <string name="keep_alive_title">防止应用被系统终止</string>
     <string name="keep_alive_description">使用前台通知，防止 Loudly 被系统随机关闭。</string>
-    <string name="notifications_settings">通知设置</string>
     <string name="notification_permission_is_required">需要通知权限</string>
 
     <string name="settings">设置</string>

@@ -148,12 +148,16 @@ dependencies {
     implementation(libs.compose.icons.extended)
 
     implementation("com.vanniktech:android-image-cropper:4.6.0")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.palette:palette-ktx:1.0.0")
     implementation("io.ktor:ktor-client-cio:3.2.3")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation("com.google.mlkit:translate:17.0.3")
     implementation("com.google.mlkit:language-id:17.0.6")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.37.3")
+    implementation("androidx.hilt:hilt-work:1.3.0")
+    kapt("androidx.hilt:hilt-compiler:1.3.0")
 
     implementation(libs.coil)
 
@@ -165,6 +169,7 @@ dependencies {
 
     implementation(libs.room.runtime)
     implementation(libs.cardview)
+    implementation(libs.work.runtime.ktx)
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
 

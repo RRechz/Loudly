@@ -103,7 +103,7 @@ class PlayerConnection(
 
     val error = MutableStateFlow<PlaybackException?>(null)
 
-    val errorManagerState = service.errorManagerState
+    val isRetryingSong = service.isRetryingSong.stateIn(scope, SharingStarted.Lazily, false)
 
     private val _sleepTimerState = MutableStateFlow(SleepTimerState())
     val sleepTimerState: StateFlow<SleepTimerState> = _sleepTimerState

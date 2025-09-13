@@ -10,6 +10,7 @@ import com.babelsoftware.innertube.models.YouTubeClient.Companion.TVHTML5_SIMPLY
 import com.babelsoftware.innertube.models.YouTubeClient.Companion.WEB_REMIX
 import com.babelsoftware.innertube.models.response.PlayerResponse
 import com.babelsoftware.innertube.pages.NewPipeUtils
+import kotlinx.coroutines.delay
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
@@ -46,84 +47,92 @@ object YTPlayerUtils {
         val signatureTimestamp = NewPipeUtils.getSignatureTimestamp(videoId).getOrNull()
         val isLoggedIn = YouTube.cookie != null
 
-        // Metadata will now be retrieved in a loop.
-        // This way, a single client failure should not halt the entire process
         var audioConfig: PlayerResponse.PlayerConfig.AudioConfig? = null
         var videoDetails: PlayerResponse.VideoDetails? = null
         var playbackTracking: PlayerResponse.PlaybackTracking? = null
         var format: PlayerResponse.StreamingData.Format? = null
         var streamUrl: String? = null
         var streamExpiresInSeconds: Int? = null
-
-        val allClients = listOf(MAIN_CLIENT) + STREAM_FALLBACK_CLIENTS
+        val allClients = (listOf(MAIN_CLIENT) + STREAM_FALLBACK_CLIENTS).shuffled()
+        var lastError: Throwable? = null
 
         for (client in allClients) {
             if (client.loginRequired && !isLoggedIn && YouTube.cookie == null) continue
 
-            val streamPlayerResponse = YouTube.player(videoId, playlistId, client, signatureTimestamp).getOrNull() // A player request is made for each client, no special circumstances
+            try {
+                val streamPlayerResponse = YouTube.player(videoId, playlistId, client, signatureTimestamp).getOrThrow()
 
-            if (streamPlayerResponse?.playabilityStatus?.status != "OK") continue
-
-            if (videoDetails == null) {
-                audioConfig = streamPlayerResponse.playerConfig?.audioConfig
-                videoDetails = streamPlayerResponse.videoDetails
-                playbackTracking = streamPlayerResponse.playbackTracking
-            }
-
-            val audioFormats = streamPlayerResponse.streamingData?.adaptiveFormats?.filter { it.isAudio } ?: continue
-            val bestFormat = when (audioQuality) {
-                // Low Quality (LOW) Setting: Bitrate is kept between 45 - 52 Kbps.
-                AudioQuality.LOW -> {
-                    audioFormats
-                        .filter { it.bitrate in 45_000..52_000 }
-                        .maxByOrNull { it.bitrate }
+                if (streamPlayerResponse.playabilityStatus?.status != "OK") {
+                    lastError = IllegalStateException("Playability status is: ${streamPlayerResponse.playabilityStatus?.status}")
+                    continue
                 }
 
-                // High Quality (HIGH) Setting: Bitrate is kept between 128 - 256 Kbps.
-                AudioQuality.HIGH -> {
-                    audioFormats
-                        .filter { it.bitrate in 128_000..256_000 }
-                        .maxByOrNull { it.bitrate }
+                if (videoDetails == null) {
+                    audioConfig = streamPlayerResponse.playerConfig?.audioConfig
+                    videoDetails = streamPlayerResponse.videoDetails
+                    playbackTracking = streamPlayerResponse.playbackTracking
                 }
 
-                // Maximum Quality (MAX) Setting: Smart selection up to 512 Kbps.
-                AudioQuality.MAX -> {
-                    audioFormats
-                        .filter { it.bitrate <= 512_000 }
-                        // Select the one with the highest bitrate; if equal, give priority to WEBM/OPUS.
-                        .maxByOrNull { it.bitrate + if (it.mimeType.startsWith("audio/webm")) 1 else 0 }
-                }
-
-                // Automatic Quality (AUTO) Setting: Smart selection based on network conditions.
-                AudioQuality.AUTO -> {
-                    if (connectivityManager.isActiveNetworkMetered) {
-                        // Mobile network: 45 - 128 Kbps range is targeted.
+                val audioFormats = streamPlayerResponse.streamingData?.adaptiveFormats?.filter { it.isAudio } ?: continue
+                val bestFormat = when (audioQuality) {
+                    // Low Quality (LOW) Setting: Bitrate is kept between 45 - 52 Kbps.
+                    AudioQuality.LOW -> {
                         audioFormats
-                            .filter { it.bitrate in 45_000..128_000 }
+                            .filter { it.bitrate in 45_000..52_000 }
                             .maxByOrNull { it.bitrate }
-                    } else {
-                        // Wi-Fi: A range of 45 - 512 kbps is targeted.
+                    }
+
+                    // High Quality (HIGH) Setting: Bitrate is kept between 128 - 256 Kbps.
+                    AudioQuality.HIGH -> {
                         audioFormats
-                            .filter { it.bitrate in 45_000..512_000 }
+                            .filter { it.bitrate in 128_000..256_000 }
+                            .maxByOrNull { it.bitrate }
+                    }
+
+                    // Maximum Quality (MAX) Setting: Smart selection up to 512 Kbps.
+                    AudioQuality.MAX -> {
+                        audioFormats
+                            .filter { it.bitrate <= 512_000 }
+                            // Select the one with the highest bitrate; if equal, give priority to WEBM/OPUS.
                             .maxByOrNull { it.bitrate + if (it.mimeType.startsWith("audio/webm")) 1 else 0 }
                     }
+
+                    // Automatic Quality (AUTO) Setting: Smart selection based on network conditions.
+                    AudioQuality.AUTO -> {
+                        if (connectivityManager.isActiveNetworkMetered) {
+                            // Mobile network: 45 - 128 Kbps range is targeted.
+                            audioFormats
+                                .filter { it.bitrate in 45_000..128_000 }
+                                .maxByOrNull { it.bitrate }
+                        } else {
+                            // Wi-Fi: A range of 45 - 512 kbps is targeted.
+                            audioFormats
+                                .filter { it.bitrate in 45_000..512_000 }
+                                .maxByOrNull { it.bitrate + if (it.mimeType.startsWith("audio/webm")) 1 else 0 }
+                        }
+                    }
+                } ?: continue // If no suitable format is found, try the next client
+                val currentStreamUrl = NewPipeUtils.getStreamUrl(bestFormat, videoId).getOrNull()
+
+                if (currentStreamUrl != null && validateStatus(currentStreamUrl)) {
+                    streamUrl = currentStreamUrl
+                    format = bestFormat
+                    streamExpiresInSeconds = streamPlayerResponse.streamingData?.expiresInSeconds ?: 3600
+                    break
                 }
-            } ?: continue // If no suitable format is found, try the next client
 
-            val currentStreamUrl = NewPipeUtils.getStreamUrl(bestFormat, videoId).getOrNull()
-
-            // ---> Verify when a valid URL is found
-            if (currentStreamUrl != null && validateStatus(currentStreamUrl)) {
-                streamUrl = currentStreamUrl
-                format = bestFormat
-                streamExpiresInSeconds = streamPlayerResponse.streamingData?.expiresInSeconds ?: 3600
-                break // Working flow found, exiting loop
+            } catch (e: Exception) {
+                lastError = e
+                delay(500)
             }
-            // <---
         }
 
         if (streamUrl == null || format == null) {
-            throw PlaybackException("Failed to get working stream", null, PlaybackException.ERROR_CODE_IO_UNSPECIFIED)
+            throw PlaybackException(
+                "Sorry, buddy, despite all attempts, a valid publication URL could not be obtained...",
+                lastError,
+                PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED // Bu hata kodu daha anlamlı
+            )
         }
 
         PlaybackData(

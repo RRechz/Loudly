@@ -207,7 +207,6 @@
 <string name="notifications">Notificações</string>
 <string name="keep_alive_title">Impedir que o sistema mate o aplicativo</string>
 <string name="keep_alive_description">Use uma notificação em primeiro plano para evitar que o Loudly seja fechado aleatoriamente pelo sistema.</string>
-<string name="notifications_settings">Configurações de notificações</string>
 <!--  Settings  -->
 <string name="settings">Configurações</string>
 <string name="appearance">Aparência</string>

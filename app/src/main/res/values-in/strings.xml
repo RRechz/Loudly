@@ -279,7 +279,6 @@
     <string name="notifications">Notifikasi</string>
     <string name="keep_alive_title">Mencegah aplikasi dimatikan oleh sistem</string>
     <string name="keep_alive_description">Gunakan notifikasi latar depan untuk mencegah Loudly ditutup secara acak oleh sistem.</string>
-    <string name="notifications_settings">Setelan notifikasi</string>
     <string name="notification_permission_is_required">Izin notifikasi diperlukan</string>
 
     <string name="settings">Setelan</string>

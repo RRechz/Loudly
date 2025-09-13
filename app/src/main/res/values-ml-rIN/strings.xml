@@ -279,7 +279,6 @@
     <string name="notifications">അറിയിപ്പുകൾ</string>
     <string name="keep_alive_title">സിസ്റ്റം ആപ്പ് അടയ്ക്കുന്നത് തടയുക</string>
     <string name="keep_alive_description">സിസ്റ്റം അപ്രതീക്ഷിതമായി Loudly അടയ്ക്കുന്നത് തടയാൻ ഒരു ഫോർഗ്രൗണ്ട് അറിയിപ്പ് ഉപയോഗിക്കുക.</string>
-    <string name="notifications_settings">അറിയിപ്പ് ക്രമീകരണങ്ങൾ</string>
     <string name="notification_permission_is_required">അറിയിപ്പ് അനുമതി ആവശ്യമാണ്</string>
 
     <string name="settings">ക്രമീകരണങ്ങൾ</string>

@@ -106,7 +106,6 @@ import com.babelsoftware.loudly.playback.queues.Queue
 import com.babelsoftware.loudly.playback.queues.YouTubeQueue
 import com.babelsoftware.loudly.playback.queues.filterExplicit
 import com.babelsoftware.loudly.reportException
-import com.babelsoftware.loudly.ui.player.PlayerErrorManager
 import com.babelsoftware.loudly.utils.CoilBitmapLoader
 import com.babelsoftware.loudly.utils.DiscordRPC
 import com.babelsoftware.loudly.utils.YTPlayerUtils
@@ -197,9 +196,6 @@ class MusicService : MediaLibraryService(),
 
     private val normalizeFactor = MutableStateFlow(1f)
     val playerVolume = MutableStateFlow(dataStore.get(PlayerVolumeKey, 1f).coerceIn(0f, 1f))
-
-    private lateinit var errorManager: PlayerErrorManager
-    val errorManagerState = MutableStateFlow(PlayerErrorManager.State.IDLE)
 
     lateinit var sleepTimer: SleepTimer
 
@@ -318,9 +314,6 @@ class MusicService : MediaLibraryService(),
                 addListener(sleepTimer)
                 addAnalyticsListener(PlaybackStatsListener(false, this@MusicService))
             }
-        errorManager = PlayerErrorManager(player) { newState ->
-            errorManagerState.value = newState
-        }
         mediaLibrarySessionCallback.apply {
             toggleLike = ::toggleLike
             toggleStartRadio = ::toggleStartRadio
@@ -739,25 +732,64 @@ class MusicService : MediaLibraryService(),
         }
     }
 
-    override fun onIsPlayingChanged(isPlaying: Boolean) {
-        super.onIsPlayingChanged(isPlaying)
-        if (isPlaying && player.playbackState == Player.STATE_READY) {
-            errorManager.notifyPlaybackStarted()
+    private var consecutivePlaybackFailures = 0
+    private val MAX_CONSECUTIVE_FAILURES = 2
+    private var currentMediaIdRetries = 0
+    private var lastFailedMediaId: String? = null
+    val isRetryingSong = MutableStateFlow(false)
+
+    override fun onPlayerError(error: PlaybackException) {
+        val currentMediaItem = player.currentMediaItem ?: return
+        val currentMediaId = currentMediaItem.mediaId
+
+        if (lastFailedMediaId != currentMediaId) {
+            currentMediaIdRetries = 0
+        }
+        lastFailedMediaId = currentMediaId
+
+        songUrlCache.remove(currentMediaId)
+        currentPlaybackFormat.value = null
+
+        currentMediaIdRetries++
+
+        if (currentMediaIdRetries <= 2) {
+            // Yeniden deneme başladığında durumu 'true' yap
+            isRetryingSong.value = true
+
+            player.setMediaItem(currentMediaItem, player.currentPosition)
+            player.prepare()
+            player.play()
+        } else {
+            // Yeniden deneme bitti ve başarısız oldu, durumu 'false' yap
+            isRetryingSong.value = false
+            consecutivePlaybackFailures++
+            currentMediaIdRetries = 0
+
+            if (consecutivePlaybackFailures >= MAX_CONSECUTIVE_FAILURES) {
+                player.stop()
+                player.clearMediaItems()
+            } else {
+                if (player.hasNextMediaItem()) {
+                    player.seekToNext()
+                    player.prepare()
+                    player.playWhenReady = true
+                }
+            }
         }
     }
 
-    override fun onPlayerError(error: PlaybackException) {
-        /*
-        if (dataStore.get(AutoSkipNextOnErrorKey, false) &&
-            isInternetAvailable(this) &&
-            player.hasNextMediaItem()
-        ) {
-            player.seekToNext()
-            player.prepare()
-            player.playWhenReady = true
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+        super.onIsPlayingChanged(isPlaying)
+        if (isPlaying && player.playbackState == Player.STATE_READY) {
+            // Oynatma başarılı olduğunda durumu 'false' yap
+            isRetryingSong.value = false
+
+            if (consecutivePlaybackFailures > 0 || currentMediaIdRetries > 0) {
+                consecutivePlaybackFailures = 0
+                currentMediaIdRetries = 0
+                lastFailedMediaId = null
+            }
         }
-         */
-        errorManager.handlePlayerError(error)
     }
 
     private fun createCacheDataSource(): CacheDataSource.Factory =
@@ -772,6 +804,9 @@ class MusicService : MediaLibraryService(),
                             OkHttpDataSource.Factory(
                                 OkHttpClient.Builder()
                                     .proxy(YouTube.proxy)
+                                    .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                                    .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                                    .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
                                     .build()
                             )
                         )
@@ -965,7 +1000,6 @@ class MusicService : MediaLibraryService(),
             discordRpc?.closeRPC()
         }
         discordRpc = null
-        errorManager.release()
         mediaSession.release()
         player.removeListener(this)
         player.removeListener(sleepTimer)

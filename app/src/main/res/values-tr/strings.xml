@@ -276,7 +276,7 @@
     <string name="notifications">Bildirimler</string>
     <string name="keep_alive_title">Sistemin uygulamayı kapatmasını engelle</string>
     <string name="keep_alive_description">Loudly\'nin sistem tarafından rastgele kapatılmasını önlemek için bir ön plan bildirimi kullanın.</string>
-    <string name="notifications_settings">Bildirim ayarları</string>
+    <string name="keep_to_alive_settings">Canlı Tutma Ayarları</string>
     <string name="notification_permission_is_required">Bildirim izni gereklidir</string>
 
     <string name="settings">Ayarlar</string>
@@ -417,6 +417,7 @@
     <string name="audio_offload">Boşaltmayı etkinleştir</string>
     <string name="audio_offload_description">Ses çalmak için boşaltma ses yolunu kullanın. Bunu devre dışı bırakmak güç kullanımını artırabilir ancak ses çalma veya son işleme ile ilgili sorunlar yaşıyorsanız yararlı olabilir</string>
     <string name="clear_all_downloads">Tüm indirmeleri temizle</string>
+    <string name="caches">Önbellekler</string>
     <string name="max_image_cache_size">Maksimum resim önbelleği boyutu</string>
     <string name="clear_image_cache">Resim önbelleğini temizle</string>
     <string name="max_song_cache_size">Maksimum şarkı önbelleği boyutu</string>
@@ -596,6 +597,7 @@ TAKILMIŞ GÖRÜNÜRSE PANİK YAPMAYIN; bazen alım işlemi biraz zaman alabilir
     <string name="home_card_update_desc">Detaylar için ayarları kontrol et</string>
     <string name="app_up_to_date">Yazılım Güncel</string>
     <string name="copy">Kopyala</string>
+    <string name="notification_running_text">“Energy” çalma listenizle temponuzu koruyun.</string>
     <string name="error_network_title">Ağ Hatası</string>
     <string name="error_network_description">Ağ bağlantınızı kotnrol edin ve yeniden deneyin.</string>
     <string name="error_unsupported_format_title">Desteklenmeyen İçerik</string>
@@ -631,9 +633,35 @@ TAKILMIŞ GÖRÜNÜRSE PANİK YAPMAYIN; bazen alım işlemi biraz zaman alabilir
     <string name="remove_profile_picture">Profil Fotoğrafını Kaldır</string>
     <string name="show_texts">Metni Göster</string>
     <string name="show_texts_description">Profil kartında selamlama ve kullanıcı adı metnini göster</string>
+    <string name="comrade_notification_description">Yoldaş Bildirimleri · Yoldaş Kurulumu</string>
     <string name="appearance_setup_desc">Uygulamanın ve oynatıcının görünümünü özelleştirin</string>
     <string name="dynamic_theme_setup_dec">Cihazın renk temasını kullanır</string>
     <string name="player_and_audio_setup_desc">Ses ve oynatma deneyiminizi özelleştirin</string>
     <string name="skip_silence_setup_desc">Şarkılardaki sessiz anları atla</string>
     <string name="stop_music_setup_desc">Uygulama son kullanılanlar listesinden silinirse, müzik durur.</string>
+    <string name="ComradeNotification">Yoldaş Bildirimleri</string>
+    <string name="comrade_notifications_title">Yoldaş Bildirimleri</string>
+    <string name="comrade_notifications_enable">Akıllı Bildirimleri Etkinleştir</string>
+    <string name="comrade_notifications_enable_desc">Loudly, tercihlerinize göre akıllı müzik önerileri sunar.</string>
+    <string name="permissions_category">İzinler</string>
+    <string name="comrade_permission_activity_title">Fiziksel Aktivite İzinleri</string>
+    <string name="comrade_permission_activity_desc">Bu izin, koşarken veya araba sürerken ilgili müzik önerileri sunmak için gereklidir.</string>
+    <string name="permission_button_grant">İzin ver</string>
+    <string name="permission_button_granted">İzin verildi</string>
+    <string name="comrade_recommendation_types">Öneri Türleri</string>
+    <string name="comrade_driving_detection">Sürüş Algılama</string>
+    <string name="comrade_driving_detection_desc">Aracı kullandığınızda rota listeleri önerir.</string>
+    <string name="comrade_activity_detection">Koşu/Yürüyüş Algılama</string>
+    <string name="comrade_activity_detection_desc">Egzersiz aktiviteleriniz için enerji listeleri önerir.</string>
+    <string name="clear_all_downloads_confirmation">UYARI! Tüm indirmeler silinecektir. Onaylıyor musunuz?</string>
+    <string name="currently_used_formatted">Şu anda kullanılan Biçimlendirilmiş</string>
+    <string name="album_streak_message">“%1s” albümden devam ediyor mu?</string>
+    <string name="artist_streak_message">Sanatçı “%1s” ile devam etmek ister misiniz?</string>
+    <string name="streak_dialog_message">Bu akışla devam etmek ister misiniz?</string>
+    <string name="notification_headset_title">Müzik dinlemeye hazır mısınız? 🎧</string>
+    <string name="notification_headset_continue">Son dinlediğiniz şarkıdan devam edin: %1s</string>
+    <string name="notification_headset_generic">Loudly\'yi açmak için dokunun!</string>
+    <string name="notification_vehicle_title">Yolculuk başlıyor! 🚗</string>
+    <string name="notification_vehicle_text">“Yol Şarkıları” çalma listenizi çalmak ister misiniz?</string>
+    <string name="notification_running_title">Koşu zamanı! 👟</string>
 </resources>

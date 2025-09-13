@@ -279,7 +279,6 @@
     <string name="notifications">Értesítések</string>
     <string name="keep_alive_title">Alkalmazás leállításának megakadályozása</string>
     <string name="keep_alive_description">Használj egy előtérben futó értesítést, hogy a rendszer ne zárja be véletlenszerűen a Loudly-t.</string>
-    <string name="notifications_settings">Értesítési beállítások</string>
     <string name="notification_permission_is_required">Értesítési engedély szükséges</string>
 
     <string name="settings">Beállítások</string>

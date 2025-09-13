@@ -299,7 +299,6 @@
     <string name="notifications">Сповіщення</string>
     <string name="keep_alive_title">Запобігти закриттю додатку системою</string>
     <string name="keep_alive_description">Використовуйте сповіщення у фоновому режимі, щоб запобігти випадковому закриттю Loudly системою.</string>
-    <string name="notifications_settings">Налаштування сповіщень</string>
     <string name="notification_permission_is_required">Требуется дозвіл на сповіщення</string>
 
     <!-- Settings -->
